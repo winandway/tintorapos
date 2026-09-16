@@ -68,7 +68,7 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 
 ## Fase 1 — Verificación y cierre
 
-- [ ] 47. Pruebas de punta a punta (Playwright): registro → dos pasos → precios → empleado → registrar tablet → PIN → nueva orden → etiquetas → producción → lista → entrega y cobro → cierre de caja; cambio de idioma; celular
+- [x] 47. Pruebas de punta a punta (Playwright): registro → dos pasos → precios → empleado → registrar tablet → PIN → nueva orden → etiquetas → producción → lista → entrega y cobro → cierre de caja; cambio de idioma; celular
 - [ ] 48. Verificación visual en el navegador integrado a 375 px y escritorio de cada pantalla, con capturas y revisión de consola
 - [ ] 49. Compilación real con OpenNext + empaquetado `_worker.js` con wrangler `--dry-run`, medir tamaño gzip (< 10 MB) y prueba de humo contra el worker compilado
 - [ ] 50. `npm run verify` completo en verde (tipos, lint, pruebas con cobertura, build, audit, gitleaks)

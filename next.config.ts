@@ -25,5 +25,6 @@ export default nextConfig;
 // base de desarrollo.
 if (desarrollo) {
   const carpeta = process.env.TINTORA_PERSISTENCIA;
-  void initOpenNextCloudflareForDev(carpeta ? { persist: { path: carpeta } } : undefined);
+  // wrangler guarda en <carpeta>/v3 (igual que `wrangler d1 execute --persist-to`).
+  void initOpenNextCloudflareForDev(carpeta ? { persist: { path: `${carpeta}/v3` } } : undefined);
 }
