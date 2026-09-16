@@ -230,6 +230,12 @@ export const COBERTURA: Record<string, Cobertura> = {
     casos: () => [{ metodo: "POST", cuerpo: { contadoCents: 1 }, esperado: [200, 409] }],
   },
   "/datos/caja/turnos": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/fotos": {
+    publica:
+      "cubierta en tests/integracion/fotos.test.ts (multipart: sube a una orden de la otra tintorería → 404)",
+  },
+  "/datos/fotos/[id]": { casos: (e) => [{ metodo: "DELETE", params: { id: e.a.ids.fotoId! } }] },
+  "/media/fotos/[id]": { casos: (e) => [{ metodo: "GET", params: { id: e.a.ids.fotoId! } }] },
   "/datos/empleados": {
     casos: () => [
       { metodo: "GET", esperado: [200] },

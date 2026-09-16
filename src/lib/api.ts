@@ -44,6 +44,26 @@ export interface OpcionesPedido {
   senal?: AbortSignal;
 }
 
+/** Sube un archivo con multipart (misma protección CSRF que pedir). */
+export async function subir<T = Record<string, unknown>>(url: string, formulario: FormData): Promise<T> {
+  let r: Response;
+  try {
+    r = await fetch(url, {
+      method: "POST",
+      headers: { "x-csrf": tokenCsrf(), accept: "application/json" },
+      body: formulario,
+      credentials: "same-origin",
+    });
+  } catch {
+    throw new ErrorApi(0, "sin_conexion", "");
+  }
+  const datos = (await r.json().catch(() => null)) as {
+    error?: { codigo?: string; mensaje?: string };
+  } | null;
+  if (!r.ok) throw new ErrorApi(r.status, datos?.error?.codigo ?? "inesperado", datos?.error?.mensaje ?? "");
+  return datos as T;
+}
+
 export async function pedir<T = Record<string, unknown>>(url: string, o: OpcionesPedido = {}): Promise<T> {
   const metodo = o.metodo ?? (o.cuerpo !== undefined ? "POST" : "GET");
   const cabeceras: Record<string, string> = { accept: "application/json" };

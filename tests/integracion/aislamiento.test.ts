@@ -9,6 +9,7 @@ import { usarEntorno } from "../ayuda/mock-entorno";
 import { Navegador } from "../ayuda/cliente-http";
 import { escenarioAislamiento, huellaTintoreria, type Escenario } from "../ayuda/escenario";
 import { COBERTURA } from "../ayuda/cobertura-rutas";
+import { sesionPara } from "../ayuda/fabrica";
 
 /**
  * CANDADO DE AISLAMIENTO (rutas): el dueño de la tintorería B intenta leer,
@@ -61,11 +62,14 @@ describe("candado de aislamiento entre tintorerías (rutas)", () => {
           fugas.push(`${ruta}: no exporta ${caso.metodo}`);
           continue;
         }
+        // Un id indefinido haría pasar el caso sin probar nada (ya pasó una vez).
+        const vacios = Object.entries(caso.params ?? {}).filter(([, v]) => !v);
+        if (vacios.length)
+          fugas.push(`${caso.metodo} ${ruta}: parámetro sin valor (${vacios.map(([k]) => k).join(", ")})`);
         const n = new Navegador();
-        n.cookies.set(
-          caso.como === "dispositivoB" ? "tp_disp" : "tp_sesion",
-          caso.como === "dispositivoB" ? esc.b.dispositivoToken : esc.b.sesionDueno,
-        );
+        // Sesión nueva por caso: así un «salir» no deja sin sesión a los casos siguientes.
+        if (caso.como === "dispositivoB") n.cookies.set("tp_disp", esc.b.dispositivoToken);
+        else n.cookies.set("tp_sesion", await sesionPara(e.env.DB, esc.b.id, esc.b.duenoId));
         const r = await n.llamar(fn, {
           metodo: caso.metodo,
           ruta: caso.url ?? ruta,
@@ -79,7 +83,9 @@ describe("candado de aislamiento entre tintorerías (rutas)", () => {
         }
         const permitidos = caso.esperado ?? [400, 403, 404];
         if (!permitidos.includes(r.estado))
-          fugas.push(`${caso.metodo} ${ruta}: respondió ${r.estado}, se esperaba ${permitidos.join("/")}`);
+          fugas.push(
+            `${caso.metodo} ${ruta}: respondió ${r.estado} (${texto.slice(0, 160)}), se esperaba ${permitidos.join("/")}`,
+          );
       }
     }
     expect(fugas, fugas.join("\n")).toEqual([]);

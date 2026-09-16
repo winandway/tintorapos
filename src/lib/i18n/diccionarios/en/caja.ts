@@ -1,0 +1,43 @@
+import type { caja as base } from "../es/caja";
+import type { Forma } from "../../index";
+
+export const caja: Forma<typeof base> = {
+  titulo: "Register",
+  cerrada: "The register is closed",
+  cerradaTexto:
+    "Open it at the start of the shift with the cash in the drawer. Cash payments need an open register.",
+  fondo: "Starting cash in the drawer",
+  abrir: "Open register",
+  abierta: "Register open",
+  abiertaPor: "Opened by {nombre} · {hora}",
+  fondoInicial: "Starting cash",
+  efectivo: "Cash",
+  tarjeta: "Card (terminal)",
+  otro: "Other",
+  entradas: "Cash in",
+  salidas: "Cash out",
+  esperado: "Expected cash in drawer",
+  pagos: "{n} payments",
+  movimientos: "Drawer activity",
+  sinMovimientos: "No activity yet.",
+  entrada: "Cash in",
+  salida: "Cash out",
+  sinVenta: "Open drawer (no sale)",
+  monto: "Amount",
+  motivo: "Reason",
+  motivoPlaceholder: "Reason for this entry",
+  registrar: "Record",
+  cerrar: "Close register",
+  cerrarTitulo: "Count the cash in the drawer",
+  cerrarTexto:
+    "Count bills and coins and enter the total. We don't show the expected amount so the count stays honest.",
+  contado: "Counted cash",
+  notas: "Closing notes",
+  cerradaOk: "Register closed. The count was recorded.",
+  diferencia: "Difference",
+  sobra: "Over by {monto}",
+  falta: "Short by {monto}",
+  cuadra: "Balanced",
+  historial: "Past closings",
+  metodos: { efectivo: "Cash", tarjeta_externa: "Card", otro: "Other" },
+};

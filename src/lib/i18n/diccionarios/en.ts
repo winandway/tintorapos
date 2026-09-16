@@ -7,6 +7,7 @@ import { app } from "./en/app";
 import { ajustes } from "./en/ajustes";
 import { clientes } from "./en/clientes";
 import { ordenes } from "./en/ordenes";
+import { caja } from "./en/caja";
 import { errores } from "./en/errores";
 import { validacion } from "./en/validacion";
 import type { es } from "./es";
@@ -22,4 +23,5 @@ export const en: Forma<typeof es> = {
   ajustes,
   clientes,
   ordenes,
+  caja,
 };

@@ -2,6 +2,7 @@ import { nuevoId, sha256Hex } from "@/lib/codigos";
 import { registrarTintoreria } from "@/server/cuentas/registro";
 import { abrirTurno } from "@/server/caja";
 import { crearOrden } from "@/server/ordenes/crear";
+import { guardarFoto } from "@/server/fotos";
 import { sesionDe } from "./sesion";
 import type { EntornoPrueba } from "./entorno";
 import { crearDispositivo, crearUsuario, sesionPara, type TintoreriaPrueba } from "./fabrica";
@@ -72,6 +73,11 @@ export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario>
       urgente: false,
       pago: { id: pagoId, metodo: "efectivo", montoCents: 100 },
     });
+    const fotoId = await guardarFoto(db, e.env.BUCKET, s, {
+      ordenId,
+      prendaId: prendaOrdenId,
+      bytes: new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4]),
+    });
     return {
       ...t,
       sesionDueno,
@@ -91,6 +97,7 @@ export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario>
         pagoId,
         turnoId,
         orden.codigoPublico,
+        fotoId,
       ],
       ids: {
         prendaId: prenda!.id,
@@ -102,6 +109,7 @@ export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario>
         pagoId,
         turnoId,
         codigoPublico: orden.codigoPublico,
+        fotoId,
       },
     };
   };
