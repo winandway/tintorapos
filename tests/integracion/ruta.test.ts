@@ -234,5 +234,12 @@ describe("envoltura de rutas /datos (candado de seguridad)", () => {
     const req = new Request("https://tintora.prueba/x", { headers: { origin: "https://tintora.prueba" } });
     const r2 = await conParams(req, { params: Promise.resolve({ id: "1", resto: ["a", "b"] }) });
     expect(await r2.json()).toEqual({ id: "1", resto: "a/b" });
+    // Así llama Next.js a una ruta SIN parámetros (fallo real encontrado en el navegador).
+    const r3 = await conParams(req, {
+      params: Promise.resolve(undefined as unknown as Record<string, string>),
+    });
+    expect(r3.status).toBe(200);
+    const r4 = await conParams(req);
+    expect(r4.status).toBe(200);
   });
 });

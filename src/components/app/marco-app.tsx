@@ -1,0 +1,301 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Isotipo } from "@/components/marca/logo";
+import { SelectorIdioma } from "@/components/selector-idioma";
+import { pedir } from "@/lib/api";
+import { fmt } from "@/lib/i18n";
+import { useIdioma } from "@/lib/i18n/cliente";
+import { recargarEn } from "@/lib/navegacion";
+import { IconoNav, type NombreIcono } from "./iconos";
+
+export interface InfoMarco {
+  usuario: { nombre: string; rol: string };
+  permisos: string[];
+  tienda: string;
+  tipo: "cuenta" | "pin";
+  plan: string;
+  pruebaHasta: number | null;
+  /** Minutos de inactividad antes de bloquear (solo en dispositivos de la tienda). */
+  bloqueoMin: number | null;
+}
+
+interface ItemNav {
+  ruta: string;
+  clave: keyof ReturnType<typeof useIdioma>["d"]["app"]["nav"];
+  icono: NombreIcono;
+  permiso?: string | string[];
+  principal?: boolean;
+}
+
+const ITEMS: ItemNav[] = [
+  { ruta: "/app", clave: "inicio", icono: "inicio", principal: true },
+  {
+    ruta: "/app/mostrador",
+    clave: "mostrador",
+    icono: "mostrador",
+    permiso: "ordenes.crear",
+    principal: true,
+  },
+  { ruta: "/app/ordenes", clave: "ordenes", icono: "ordenes", permiso: "ordenes.ver", principal: true },
+  { ruta: "/app/produccion", clave: "produccion", icono: "produccion", permiso: "ordenes.cambiar_estado" },
+  { ruta: "/app/entrega", clave: "entrega", icono: "entrega", permiso: "ordenes.entregar", principal: true },
+  { ruta: "/app/clientes", clave: "clientes", icono: "clientes", permiso: "clientes.ver" },
+  { ruta: "/app/caja", clave: "caja", icono: "caja", permiso: "caja.abrir" },
+  { ruta: "/app/reportes", clave: "reportes", icono: "reportes", permiso: "reportes.ver" },
+  {
+    ruta: "/app/ajustes",
+    clave: "ajustes",
+    icono: "ajustes",
+    permiso: ["ajustes.tienda", "empleados.gestionar", "dispositivos.gestionar"],
+  },
+];
+
+export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactNode }) {
+  const { d } = useIdioma();
+  const ruta = usePathname();
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const [masAbierto, setMasAbierto] = useState(false);
+  const visibles = ITEMS.filter((i) => {
+    if (!i.permiso) return true;
+    const lista = Array.isArray(i.permiso) ? i.permiso : [i.permiso];
+    return lista.some((p) => info.permisos.includes(p));
+  });
+  const activo = (r: string) => (r === "/app" ? ruta === "/app" : ruta.startsWith(r));
+  const principales = visibles.filter((i) => i.principal).slice(0, 4);
+  const secundarios = visibles.filter((i) => !principales.includes(i));
+
+  async function salir(destino: string) {
+    try {
+      await pedir("/datos/sesion/salir", { metodo: "POST" });
+    } finally {
+      // Si falla el aviso al servidor, se sale igual.
+      recargarEn(destino);
+    }
+  }
+
+  useBloqueoInactividad(info.bloqueoMin, () => void salir("/app/pin"));
+  const aviso = avisoPrueba(info, d);
+
+  return (
+    <div className="min-h-dvh md:grid md:grid-cols-[232px_1fr]">
+      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-percha/70 bg-superficie md:flex no-imprimir">
+        <Link href="/app" className="flex items-center gap-2.5 px-5 py-5">
+          <Isotipo className="size-8" />
+          <span className="min-w-0">
+            <span className="block truncate text-[15px] font-bold leading-tight">{info.tienda}</span>
+            <span className="block text-xs text-gris">Tintora POS</span>
+          </span>
+        </Link>
+        <nav className="flex-1 space-y-0.5 overflow-y-auto px-3" aria-label="Tintora POS">
+          {visibles.map((i) => (
+            <Link
+              key={i.ruta}
+              href={i.ruta}
+              aria-current={activo(i.ruta) ? "page" : undefined}
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold transition ${
+                activo(i.ruta) ? "bg-tinta text-white" : "text-noche hover:bg-tinta-suave"
+              }`}
+            >
+              <IconoNav nombre={i.icono} />
+              {d.app.nav[i.clave]}
+            </Link>
+          ))}
+        </nav>
+        <div className="border-t border-percha/70 p-3">
+          <SelectorIdioma />
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-col">
+        <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-percha/70 bg-papel/90 px-4 backdrop-blur no-imprimir">
+          <Link href="/app" className="flex min-w-0 items-center gap-2 md:hidden">
+            <Isotipo className="size-7" />
+            <span className="truncate text-[15px] font-bold">{info.tienda}</span>
+          </Link>
+          <div className="hidden md:block" />
+          <div className="flex items-center gap-2">
+            <IndicadorConexion />
+            <div className="md:hidden">
+              <SelectorIdioma compacto />
+            </div>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMenuAbierto((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={menuAbierto}
+                aria-label={d.app.menuCuenta}
+                className="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 hover:bg-tinta-suave"
+              >
+                <span className="flex size-8 items-center justify-center rounded-full bg-tinta text-sm font-bold text-white">
+                  {info.usuario.nombre.trim().charAt(0).toUpperCase()}
+                </span>
+                <span className="hidden text-left sm:block">
+                  <span className="block max-w-36 truncate text-sm font-semibold leading-tight">
+                    {info.usuario.nombre}
+                  </span>
+                  <span className="block text-xs text-gris">
+                    {d.app.roles[info.usuario.rol as keyof typeof d.app.roles]}
+                  </span>
+                </span>
+              </button>
+              {menuAbierto && (
+                <div
+                  role="menu"
+                  className="absolute right-0 mt-2 w-60 overflow-hidden rounded-2xl bg-superficie py-1.5 shadow-xl ring-1 ring-percha"
+                >
+                  <div className="border-b border-percha/70 px-4 pt-2 pb-3 sm:hidden">
+                    <p className="font-semibold">{info.usuario.nombre}</p>
+                    <p className="text-sm text-gris">
+                      {d.app.roles[info.usuario.rol as keyof typeof d.app.roles]}
+                    </p>
+                  </div>
+                  {info.bloqueoMin !== null && (
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => void salir("/app/pin")}
+                      className="block w-full px-4 py-2.5 text-left text-[15px] hover:bg-papel"
+                    >
+                      {d.app.bloquear}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => void salir(info.bloqueoMin !== null ? "/app/pin" : "/entrar")}
+                    className="block w-full px-4 py-2.5 text-left text-[15px] font-semibold text-peligro hover:bg-papel"
+                  >
+                    {d.app.salir}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {aviso && (
+          <div
+            className={`px-4 py-2 text-center text-sm font-medium no-imprimir ${aviso.tono === "fin" ? "bg-alerta-suave text-alerta" : "bg-tinta-suave text-tinta-oscura"}`}
+          >
+            {aviso.texto}
+          </div>
+        )}
+
+        <main id="contenido" className="flex-1 px-4 pt-5 pb-28 md:px-8 md:pb-10">
+          {children}
+        </main>
+      </div>
+
+      <nav
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-percha/70 bg-superficie/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden no-imprimir"
+        aria-label="Tintora POS"
+      >
+        <div className="grid grid-cols-5">
+          {principales.map((i) => (
+            <Link
+              key={i.ruta}
+              href={i.ruta}
+              aria-current={activo(i.ruta) ? "page" : undefined}
+              className={`flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold ${activo(i.ruta) ? "text-tinta" : "text-gris"}`}
+            >
+              <IconoNav nombre={i.icono} />
+              {d.app.nav[i.clave]}
+            </Link>
+          ))}
+          {secundarios.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setMasAbierto((v) => !v)}
+              aria-expanded={masAbierto}
+              className={`flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold ${masAbierto ? "text-tinta" : "text-gris"}`}
+            >
+              <IconoNav nombre="mas" />
+              {d.app.nav.mas}
+            </button>
+          )}
+        </div>
+        {masAbierto && (
+          <div className="grid grid-cols-3 gap-2 border-t border-percha/70 p-3">
+            {secundarios.map((i) => (
+              <Link
+                key={i.ruta}
+                href={i.ruta}
+                onClick={() => setMasAbierto(false)}
+                className={`flex flex-col items-center gap-1 rounded-xl py-3 text-xs font-semibold ${activo(i.ruta) ? "bg-tinta text-white" : "bg-papel text-noche"}`}
+              >
+                <IconoNav nombre={i.icono} />
+                {d.app.nav[i.clave]}
+              </Link>
+            ))}
+          </div>
+        )}
+      </nav>
+    </div>
+  );
+}
+
+function avisoPrueba(
+  info: InfoMarco,
+  d: ReturnType<typeof useIdioma>["d"],
+): { tono: "info" | "fin"; texto: string } | null {
+  if (info.plan !== "prueba" || !info.pruebaHasta) return null;
+  const ahora = typeof window === "undefined" ? info.pruebaHasta - 1 : Date.now();
+  const dias = Math.ceil((info.pruebaHasta - ahora) / 86_400_000);
+  if (dias <= 0) return { tono: "fin", texto: d.app.pruebaTermino };
+  if (dias === 1) return { tono: "fin", texto: d.app.pruebaUltimoDia };
+  return { tono: "info", texto: fmt(d.app.pruebaQuedan, { dias }) };
+}
+
+/** En una tablet de la tienda, si nadie toca la pantalla en N minutos, se bloquea (vuelve al PIN). */
+function useBloqueoInactividad(minutos: number | null, bloquear: () => void) {
+  const ultimo = useRef(0);
+  const bloquearRef = useRef(bloquear);
+  useEffect(() => {
+    bloquearRef.current = bloquear;
+  }, [bloquear]);
+  useEffect(() => {
+    if (!minutos) return;
+    ultimo.current = Date.now();
+    const tocar = () => {
+      ultimo.current = Date.now();
+    };
+    const eventos = ["pointerdown", "keydown", "scroll", "touchstart"] as const;
+    eventos.forEach((e) => window.addEventListener(e, tocar, { passive: true }));
+    const reloj = setInterval(() => {
+      if (Date.now() - ultimo.current > minutos * 60_000) bloquearRef.current();
+    }, 15_000);
+    return () => {
+      eventos.forEach((e) => window.removeEventListener(e, tocar));
+      clearInterval(reloj);
+    };
+  }, [minutos]);
+}
+
+function IndicadorConexion() {
+  const { d } = useIdioma();
+  const [enLinea, setEnLinea] = useState(true);
+  useEffect(() => {
+    const actualizar = () => setEnLinea(navigator.onLine);
+    actualizar();
+    window.addEventListener("online", actualizar);
+    window.addEventListener("offline", actualizar);
+    return () => {
+      window.removeEventListener("online", actualizar);
+      window.removeEventListener("offline", actualizar);
+    };
+  }, []);
+  if (enLinea) return null;
+  return (
+    <span
+      className="flex items-center gap-1.5 rounded-full bg-alerta-suave px-2.5 py-1 text-xs font-bold text-alerta"
+      role="status"
+    >
+      <span className="size-2 rounded-full bg-alerta" />
+      {d.comun.sinConexion}
+    </span>
+  );
+}

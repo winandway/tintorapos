@@ -157,7 +157,8 @@ export function ruta<S extends z.ZodType | undefined = undefined>(opciones: Opci
 
       const ip = ipDePeticion(req);
       const ipHash = aHex(await hmacSha256(vars.APP_SECRET, `ip:${ip}`)).slice(0, 32);
-      const paramsCrudos = extra ? await extra.params : {};
+      // Next entrega params como promesa que puede resolver a undefined en rutas sin parámetros.
+      const paramsCrudos = (extra?.params ? await extra.params : undefined) ?? {};
       const params: Record<string, string> = {};
       for (const [k, v] of Object.entries(paramsCrudos)) params[k] = Array.isArray(v) ? v.join("/") : v;
 

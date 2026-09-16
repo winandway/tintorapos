@@ -35,7 +35,6 @@ export const CODIGOS_ERROR = [
   "clave_simple",
   "clave_igual_correo",
   "pin_debil",
-  "pin_repetido",
   "soporte_nombre",
   "ultimo_dueno",
   "saldo_pendiente",

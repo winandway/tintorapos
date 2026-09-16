@@ -53,4 +53,5 @@ export const COBERTURA: Record<string, Cobertura> = {
     ],
   },
   "/datos/auditoria": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/pin/autorizadores": { casos: () => [{ metodo: "GET", esperado: [200] }] },
 };
