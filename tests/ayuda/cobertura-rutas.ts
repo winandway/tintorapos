@@ -236,6 +236,18 @@ export const COBERTURA: Record<string, Cobertura> = {
   },
   "/datos/fotos/[id]": { casos: (e) => [{ metodo: "DELETE", params: { id: e.a.ids.fotoId! } }] },
   "/media/fotos/[id]": { casos: (e) => [{ metodo: "GET", params: { id: e.a.ids.fotoId! } }] },
+  "/datos/avisos": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/avisos/plantillas": {
+    casos: () => [{ metodo: "PUT", cuerpo: { lista: { activo: false } }, esperado: [200] }],
+  },
+  "/datos/avisos/prueba": {
+    casos: () => [
+      { metodo: "POST", cuerpo: { canal: "correo", destino: "prueba@ejemplo.com" }, esperado: [200] },
+    ],
+  },
+  "/datos/webhooks/twilio": {
+    publica: "no recibe sesión; exige la firma de Twilio (tests/integracion/avisos.test.ts)",
+  },
   "/datos/empleados": {
     casos: () => [
       { metodo: "GET", esperado: [200] },

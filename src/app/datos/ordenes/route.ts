@@ -1,3 +1,4 @@
+import { encolarAvisos, procesarCola } from "@/server/avisos";
 import { crearOrden, esquemaNuevaOrden } from "@/server/ordenes/crear";
 import { listarOrdenes, ESTADOS, type FiltroOrdenes } from "@/server/ordenes/consultas";
 import { tienePermiso } from "@/server/permisos";
@@ -30,5 +31,17 @@ export const POST = ruta({
   acceso: "sesion",
   permiso: "ordenes.crear",
   cuerpo: esquemaNuevaOrden,
-  manejar: async (c) => crearOrden(c.db, c.sesion!, c.cuerpo, c.ahora),
+  manejar: async (c) => {
+    const r = await crearOrden(c.db, c.sesion!, c.cuerpo, c.ahora);
+    if (!r.repetida) {
+      const ids = await encolarAvisos(
+        c.db,
+        c.vars.APP_URL,
+        { tintoreriaId: c.sesion!.tintoreria.id, ordenId: r.id, tipo: "recibida" },
+        c.ahora,
+      );
+      if (ids.length) c.esperarLuego(procesarCola(c.env, c.vars, { ids }));
+    }
+    return r;
+  },
 });

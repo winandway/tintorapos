@@ -329,7 +329,7 @@ CREATE TABLE IF NOT EXISTS avisos (
   id TEXT PRIMARY KEY,
   tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
   orden_id TEXT REFERENCES ordenes(id),
-  cliente_id TEXT NOT NULL REFERENCES clientes(id),
+  cliente_id TEXT REFERENCES clientes(id),
   tipo TEXT NOT NULL CHECK (tipo IN ('recibida', 'lista', 'recordatorio', 'prueba')),
   canal TEXT NOT NULL CHECK (canal IN ('sms', 'correo')),
   destino TEXT NOT NULL,
