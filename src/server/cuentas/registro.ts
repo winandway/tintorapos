@@ -72,10 +72,10 @@ export async function registrarTintoreria(
       .bind(sucursalId, tintoreriaId, d.negocio, d.telefono ?? null, ahora),
     db
       .prepare(
-        `insert into usuarios (id, tintoreria_id, nombre, rol, correo, clave_hash, creado_en, actualizado_en)
-         values (?, ?, ?, 'dueno', ?, ?, ?, ?)`,
+        `insert into usuarios (id, tintoreria_id, nombre, rol, correo, clave_hash, ultimo_ingreso_en, creado_en, actualizado_en)
+         values (?, ?, ?, 'dueno', ?, ?, ?, ?, ?)`,
       )
-      .bind(usuarioId, tintoreriaId, d.nombre, d.correo, claveHash, ahora, ahora),
+      .bind(usuarioId, tintoreriaId, d.nombre, d.correo, claveHash, ahora, ahora, ahora),
   ];
   SERVICIOS_ESTANDAR.forEach((s, i) => {
     sentencias.push(

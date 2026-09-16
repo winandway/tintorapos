@@ -106,6 +106,11 @@ export function camposDeZod(error: z.ZodError): Record<string, string> {
     if (/^[a-z_]+$/.test(i.message)) codigo = i.message;
     else if (i.code === "invalid_type" && (i as { input?: unknown }).input === undefined)
       codigo = "requerido";
+    else if (
+      (i.code === "too_small" || i.code === "too_big") &&
+      (i as { origin?: string }).origin === "number"
+    )
+      codigo = "fuera_de_rango";
     else if (i.code === "too_small")
       codigo = (i as { minimum?: unknown }).minimum === 1 ? "requerido" : "muy_corto";
     else if (i.code === "too_big") codigo = "muy_largo";

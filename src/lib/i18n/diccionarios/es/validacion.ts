@@ -2,6 +2,7 @@ export const validacion = {
   requerido: "Este campo es obligatorio.",
   invalido: "El valor no es válido.",
   muy_corto: "Es demasiado corto.",
+  fuera_de_rango: "Está fuera del rango permitido.",
   muy_largo: "Es demasiado largo.",
   correo: "Escribe un correo válido, como nombre@ejemplo.com.",
   telefono: "Escribe un número de teléfono válido, con código de área.",

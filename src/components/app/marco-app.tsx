@@ -16,8 +16,8 @@ export interface InfoMarco {
   permisos: string[];
   tienda: string;
   tipo: "cuenta" | "pin";
-  plan: string;
-  pruebaHasta: number | null;
+  /** Días de prueba que quedan, calculados en el servidor (null si no está en prueba). */
+  diasPrueba: number | null;
   /** Minutos de inactividad antes de bloquear (solo en dispositivos de la tienda). */
   bloqueoMin: number | null;
 }
@@ -242,9 +242,8 @@ function avisoPrueba(
   info: InfoMarco,
   d: ReturnType<typeof useIdioma>["d"],
 ): { tono: "info" | "fin"; texto: string } | null {
-  if (info.plan !== "prueba" || !info.pruebaHasta) return null;
-  const ahora = typeof window === "undefined" ? info.pruebaHasta - 1 : Date.now();
-  const dias = Math.ceil((info.pruebaHasta - ahora) / 86_400_000);
+  if (info.diasPrueba === null) return null;
+  const dias = info.diasPrueba;
   if (dias <= 0) return { tono: "fin", texto: d.app.pruebaTermino };
   if (dias === 1) return { tono: "fin", texto: d.app.pruebaUltimoDia };
   return { tono: "info", texto: fmt(d.app.pruebaQuedan, { dias }) };

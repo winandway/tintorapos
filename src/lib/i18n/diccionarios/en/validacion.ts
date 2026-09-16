@@ -5,6 +5,7 @@ export const validacion: Forma<typeof base> = {
   requerido: "This field is required.",
   invalido: "This value isn't valid.",
   muy_corto: "It's too short.",
+  fuera_de_rango: "It's outside the allowed range.",
   muy_largo: "It's too long.",
   correo: "Enter a valid email, like name@example.com.",
   telefono: "Enter a valid phone number, including the area code.",

@@ -54,4 +54,65 @@ export const COBERTURA: Record<string, Cobertura> = {
   },
   "/datos/auditoria": { casos: () => [{ metodo: "GET", esperado: [200] }] },
   "/datos/pin/autorizadores": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/ajustes/tienda": {
+    casos: () => [
+      { metodo: "GET", esperado: [200] },
+      { metodo: "PUT", cuerpo: { nombre: "x" } },
+    ],
+  },
+  "/datos/catalogo": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/catalogo/prendas": {
+    casos: () => [{ metodo: "POST", cuerpo: { nombreEs: "Prenda B" }, esperado: [200] }],
+  },
+  "/datos/catalogo/prendas/[id]": {
+    casos: (e) => [
+      { metodo: "PUT", params: { id: e.a.ids.prendaId! }, cuerpo: { nombreEs: "Robada", activo: false } },
+    ],
+  },
+  "/datos/catalogo/servicios": {
+    casos: () => [
+      {
+        metodo: "POST",
+        cuerpo: { nombreEs: "Servicio B", unidad: "pieza", aplicaImpuesto: true },
+        esperado: [200],
+      },
+    ],
+  },
+  "/datos/catalogo/servicios/[id]": {
+    casos: (e) => [
+      {
+        metodo: "PUT",
+        params: { id: e.a.ids.servicioId! },
+        cuerpo: { nombreEs: "Robado", unidad: "pieza", aplicaImpuesto: false },
+      },
+    ],
+  },
+  "/datos/catalogo/precios": {
+    casos: (e) => [
+      {
+        metodo: "PUT",
+        cuerpo: { precios: [{ servicioId: e.a.ids.servicioId, prendaId: e.a.ids.prendaId, precioCents: 1 }] },
+      },
+      {
+        metodo: "PUT",
+        cuerpo: { precios: [{ servicioId: e.b.ids.servicioId, prendaId: e.a.ids.prendaId, precioCents: 1 }] },
+      },
+    ],
+  },
+  "/datos/empleados": {
+    casos: () => [
+      { metodo: "GET", esperado: [200] },
+      { metodo: "POST", cuerpo: { nombre: "Nuevo B", rol: "planta", pin: "4829" }, esperado: [200] },
+    ],
+  },
+  "/datos/empleados/[id]": {
+    casos: (e) => [
+      {
+        metodo: "PUT",
+        params: { id: e.a.ids.empleadoId! },
+        cuerpo: { nombre: "Robado", rol: "planta", pin: "4829" },
+      },
+      { metodo: "PATCH", params: { id: e.a.ids.empleadoId! }, cuerpo: { activo: false } },
+    ],
+  },
 };

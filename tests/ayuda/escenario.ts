@@ -1,6 +1,7 @@
-import { sha256Hex } from "@/lib/codigos";
+import { nuevoId, sha256Hex } from "@/lib/codigos";
+import { registrarTintoreria } from "@/server/cuentas/registro";
 import type { EntornoPrueba } from "./entorno";
-import { crearDispositivo, crearTintoreria, sesionPara, type TintoreriaPrueba } from "./fabrica";
+import { crearDispositivo, crearUsuario, sesionPara, type TintoreriaPrueba } from "./fabrica";
 
 export interface LadoEscenario extends TintoreriaPrueba {
   sesionDueno: string;
@@ -17,19 +18,44 @@ export interface Escenario {
   env: EntornoPrueba["env"];
 }
 
-/** Dos tintorerías completas. A tiene datos; B intenta alcanzarlos. */
+/** Dos tintorerías completas (registro real con catálogo). A tiene datos; B intenta alcanzarlos. */
 export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario> {
   const db = e.env.DB;
   const lado = async (nombre: string): Promise<LadoEscenario> => {
-    const t = await crearTintoreria(db, nombre);
+    const r = await registrarTintoreria(db, {
+      negocio: nombre,
+      nombre: `Dueño ${nombre}`,
+      correo: `dueno-${nuevoId().slice(0, 8)}@ejemplo.com`,
+      clave: "Clave-Segura-2026",
+      zonaHoraria: "America/New_York",
+      idioma: "es",
+      pais: "US",
+      moneda: "USD",
+    });
+    const t: TintoreriaPrueba = { id: r.tintoreriaId, sucursalId: r.sucursalId, duenoId: r.usuarioId };
     const d = await crearDispositivo(db, t);
+    const prenda = await db
+      .prepare("select id from catalogo_prendas where tintoreria_id = ? order by orden limit 1")
+      .bind(t.id)
+      .first<{ id: string }>();
+    const servicio = await db
+      .prepare("select id from catalogo_servicios where tintoreria_id = ? order by orden limit 1")
+      .bind(t.id)
+      .first<{ id: string }>();
+    const empleadoId = await crearUsuario(db, t.id, "cajero", { pin: "5820", nombre: `Cajero ${nombre}` });
+    await db
+      .prepare(
+        "insert into precios (tintoreria_id, servicio_id, prenda_id, precio_cents, actualizado_en) values (?, ?, ?, 777, ?)",
+      )
+      .bind(t.id, servicio!.id, prenda!.id, Date.now())
+      .run();
     return {
       ...t,
       sesionDueno: await sesionPara(db, t.id, t.duenoId),
       dispositivoId: d.id,
       dispositivoToken: d.token,
-      marcas: [t.id, t.duenoId, nombre],
-      ids: {},
+      marcas: [t.id, t.duenoId, nombre, empleadoId, prenda!.id, servicio!.id, d.id],
+      ids: { prendaId: prenda!.id, servicioId: servicio!.id, empleadoId },
     };
   };
   const a = await lado("Tintoreria A marca-unica-aaaa");

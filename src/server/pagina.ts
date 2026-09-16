@@ -47,3 +47,9 @@ export async function exigirSesion(permiso?: Permiso): Promise<ContextoPagina & 
   if (permiso && !tienePermiso(c.sesion.usuario.rol, permiso)) redirect("/app?sin-permiso=1");
   return c as ContextoPagina & { sesion: Sesion };
 }
+
+/** Días de prueba gratis que quedan (null si la tintorería no está en prueba). */
+export function diasDePrueba(t: Sesion["tintoreria"], ahora = Date.now()): number | null {
+  if (t.plan !== "prueba" || !t.pruebaHasta) return null;
+  return Math.ceil((t.pruebaHasta - ahora) / 86_400_000);
+}
