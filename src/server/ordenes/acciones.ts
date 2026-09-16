@@ -20,6 +20,7 @@ export async function entregarOrden(
   ordenId: string,
   d: z.infer<typeof esquemaEntrega>,
   ahora = Date.now(),
+  origen: "en_linea" | "sin_conexion" = "en_linea",
 ) {
   const o = await db
     .prepare("select estado, total_cents, pagado_cents from ordenes where tintoreria_id = ? and id = ?")
@@ -43,7 +44,7 @@ export async function entregarOrden(
       .prepare("select id from pagos where tintoreria_id = ? and id = ?")
       .bind(s.tintoreria.id, d.pago.id)
       .first();
-    if (!ya) sentencias.push(...(await sentenciasPago(db, s, ordenId, d.pago, ahora)));
+    if (!ya) sentencias.push(...(await sentenciasPago(db, s, ordenId, d.pago, ahora, origen)));
   }
   sentencias.push(
     db

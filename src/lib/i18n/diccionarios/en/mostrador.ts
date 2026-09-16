@@ -76,6 +76,11 @@ export const mostrador: Forma<typeof base> = {
   fotosError: "Some photos didn't upload. You can add them from the order.",
   pagada: "Paid",
   saldo: "Balance due",
+  guardadaSinConexion: "Saved offline",
+  guardadaSinConexionTexto:
+    "It's saved on this device and uploads by itself when the internet is back. The tags already work.",
+  necesitaConexion:
+    "A manager's approval isn't available offline. Remove the discount or the lowered price, or wait for the internet to come back.",
   continuar: "Continue",
   volverPrendas: "Back to items",
 };

@@ -9,6 +9,8 @@ import { pedir } from "@/lib/api";
 import { fmt } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { recargarEn } from "@/lib/navegacion";
+import { EstadoConexion } from "./estado-conexion";
+import { limpiarPaginasGuardadas } from "./registro-sw";
 import { IconoNav, type NombreIcono } from "./iconos";
 
 export interface InfoMarco {
@@ -68,6 +70,7 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
   const secundarios = visibles.filter((i) => !principales.includes(i));
 
   async function salir(destino: string) {
+    limpiarPaginasGuardadas();
     try {
       await pedir("/datos/sesion/salir", { metodo: "POST" });
     } finally {
@@ -117,7 +120,7 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
           </Link>
           <div className="hidden md:block" />
           <div className="flex items-center gap-2">
-            <IndicadorConexion />
+            <EstadoConexion copiaLocal={info.bloqueoMin !== null && info.permisos.includes("ordenes.ver")} />
             <div className="md:hidden">
               <SelectorIdioma compacto />
             </div>
@@ -272,29 +275,4 @@ function useBloqueoInactividad(minutos: number | null, bloquear: () => void) {
       clearInterval(reloj);
     };
   }, [minutos]);
-}
-
-function IndicadorConexion() {
-  const { d } = useIdioma();
-  const [enLinea, setEnLinea] = useState(true);
-  useEffect(() => {
-    const actualizar = () => setEnLinea(navigator.onLine);
-    actualizar();
-    window.addEventListener("online", actualizar);
-    window.addEventListener("offline", actualizar);
-    return () => {
-      window.removeEventListener("online", actualizar);
-      window.removeEventListener("offline", actualizar);
-    };
-  }, []);
-  if (enLinea) return null;
-  return (
-    <span
-      className="flex items-center gap-1.5 rounded-full bg-alerta-suave px-2.5 py-1 text-xs font-bold text-alerta"
-      role="status"
-    >
-      <span className="size-2 rounded-full bg-alerta" />
-      {d.comun.sinConexion}
-    </span>
-  );
 }

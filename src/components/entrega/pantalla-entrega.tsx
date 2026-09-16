@@ -11,6 +11,10 @@ import { EncabezadoPagina } from "@/components/ui/encabezado";
 import { Ticket } from "@/components/ui/ticket";
 import { ErrorApi, pedir } from "@/lib/api";
 import { extraerCodigo, nuevoId } from "@/lib/codigos";
+import { ahoraMs } from "@/lib/fechas";
+import { buscarOrdenLocal, datosSinConexion } from "@/lib/sin-conexion/cache";
+import { ordenVistaLocal } from "@/lib/sin-conexion/vistas";
+import { useEnLinea } from "@/lib/sin-conexion/use-en-linea";
 import { textoError } from "@/lib/errores-cliente";
 import { fmt, formatoDinero, formatoFecha, textoBilingue } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
@@ -61,7 +65,8 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [hecha, setHecha] = useState<number | null>(null);
-  const caja = useDatos<{ turno: unknown }>("/datos/caja");
+  const caja = useDatos<{ turno: unknown }>("/datos/caja", { cache: true });
+  const enLinea = useEnLinea();
   const dinero = (n: number) => formatoDinero(n, moneda, idioma);
 
   const abrirOrden = useCallback(
@@ -72,10 +77,17 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
         setOrden(r.orden);
         setCandidatas(null);
       } catch (e) {
-        setError(textoError(d, e));
+        const local =
+          e instanceof ErrorApi && e.sinConexion
+            ? ordenVistaLocal(await datosSinConexion(), id, zona, ahoraMs())
+            : null;
+        if (local) {
+          setOrden(local);
+          setCandidatas(null);
+        } else setError(textoError(d, e));
       }
     },
-    [d],
+    [d, zona],
   );
 
   const buscar = useCallback(
@@ -83,22 +95,38 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
       setError(null);
       setHecha(null);
       setOrden(null);
-      if (extraerCodigo(texto)) {
-        try {
+      const codigo = extraerCodigo(texto);
+      try {
+        if (codigo) {
           const r = await pedir<{ ordenId: string }>(`/datos/escaneo?codigo=${encodeURIComponent(texto)}`);
           return abrirOrden(r.ordenId);
-        } catch (e) {
-          return setError(textoError(d, e));
         }
-      }
-      try {
         const r = await pedir<{ ordenes: OrdenLista[] }>(
           `/datos/ordenes?estado=abiertas&q=${encodeURIComponent(texto)}`,
         );
         if (r.ordenes.length === 1) return abrirOrden(r.ordenes[0]!.id);
         setCandidatas(r.ordenes);
       } catch (e) {
-        setError(textoError(d, e));
+        if (!(e instanceof ErrorApi && e.sinConexion)) return setError(textoError(d, e));
+        // Sin conexión: búsqueda en la copia local de órdenes abiertas.
+        const datos = await datosSinConexion();
+        const halladas = buscarOrdenLocal(datos, texto, codigo);
+        if (halladas.length === 1) return abrirOrden(halladas[0]!.orden.id);
+        setCandidatas(
+          halladas.map(({ orden: o }) => ({
+            id: o.id,
+            numero: o.numero,
+            estado: o.estado,
+            dia: 0,
+            atrasada: false,
+            totalCents: o.total_cents,
+            saldoCents: Math.max(0, o.total_cents - o.pagado_cents),
+            piezas: 0,
+            listas: 0,
+            cliente: `${o.cliente_nombre} ${o.cliente_apellido ?? ""}`.trim(),
+            telefono: null,
+          })),
+        );
       }
     },
     [abrirOrden, d],
@@ -135,7 +163,7 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
 
   const noLista = orden ? orden.prendas.some((p) => p.estado !== "lista" && p.estado !== "anulada") : false;
   const ubicaciones = orden ? [...new Set(orden.prendas.map((p) => p.ubicacion).filter(Boolean))] : [];
-  const cajaCerrada = metodo === "efectivo" && !caja.datos?.turno && (orden?.saldoCents ?? 0) > 0;
+  const cajaCerrada = enLinea && metodo === "efectivo" && !caja.datos?.turno && (orden?.saldoCents ?? 0) > 0;
 
   return (
     <div className="mx-auto max-w-3xl">

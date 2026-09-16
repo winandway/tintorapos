@@ -12,7 +12,7 @@ import { MenuTresPuntos } from "@/components/ui/menu-tres-puntos";
 import { Modal } from "@/components/ui/modal";
 import { Ticket } from "@/components/ui/ticket";
 import { ErrorApi, subir } from "@/lib/api";
-import { nuevoId } from "@/lib/codigos";
+import { codigoPublico, nuevoId } from "@/lib/codigos";
 import { aCentavos, vuelto, type ReglasPrecio } from "@/lib/dinero";
 import { textoError } from "@/lib/errores-cliente";
 import { ahoraMs, diaSemana, fechaLocal, fechaPromesa, instanteLocal } from "@/lib/fechas";
@@ -32,6 +32,8 @@ import {
 } from "@/lib/mostrador/carrito";
 import { crearOrden, type RespuestaOrden } from "@/lib/operaciones";
 import { useDatos } from "@/lib/use-datos";
+import { useEnLinea } from "@/lib/sin-conexion/use-en-linea";
+import { EtiquetasLocales, type DatosEtiquetasLocales } from "./etiquetas-locales";
 import { SelectorCliente, type ClienteElegido } from "./selector-cliente";
 
 interface Catalogo {
@@ -60,8 +62,8 @@ export function Mostrador({
 }) {
   const { d, idioma } = useIdioma();
   const dm = d.mostrador;
-  const { datos: cat, error: errorCat } = useDatos<Catalogo>("/datos/catalogo");
-  const caja = useDatos<{ turno: unknown }>("/datos/caja");
+  const { datos: cat, error: errorCat } = useDatos<Catalogo>("/datos/catalogo", { cache: true });
+  const caja = useDatos<{ turno: unknown }>("/datos/caja", { cache: true });
   const [cliente, setCliente] = useState<ClienteElegido | null>(null);
   const [carrito, despachar] = useReducer(reducirCarrito, undefined, carritoVacio);
   const [servicioId, setServicioId] = useState<string>("");
@@ -81,9 +83,9 @@ export function Mostrador({
   const [descuentoTexto, setDescuentoTexto] = useState("");
   const [creando, setCreando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [creada, setCreada] = useState<(RespuestaOrden & { dia: number; fotosFallidas: number }) | null>(
-    null,
-  );
+  const [creada, setCreada] = useState<
+    (RespuestaOrden & { dia: number; fotosFallidas: number; local: DatosEtiquetasLocales }) | null
+  >(null);
   const [subiendo, setSubiendo] = useState(0);
   const { ejecutar, modal } = useConAutorizacion();
 
@@ -110,7 +112,9 @@ export function Mostrador({
       diasEntregaCarrito(carrito, servicios, tienda.diasEntrega),
       carrito.urgente,
     );
-  const cajaAbierta = Boolean(caja.datos?.turno);
+  const enLinea = useEnLinea();
+  // Sin conexión el efectivo se acepta igual: se registra al sincronizar.
+  const cajaAbierta = Boolean(caja.datos?.turno) || !enLinea;
 
   const montoCobro =
     modoPago === "completo" ? totales.totalCents : modoPago === "abono" ? (aCentavos(abono) ?? 0) : 0;
@@ -175,9 +179,24 @@ export function Mostrador({
             ...(metodo !== "efectivo" && referencia ? { referencia } : {}),
           }
         : null;
+    // Sin conexión no se puede pedir el PIN de un gerente: se avisa antes de cobrar.
+    const rebaja = carrito.piezas.some((p) => {
+      const lista = precios.get(
+        `${p.servicioId}|${servicios.get(p.servicioId)?.unidad === "libra" ? "" : (p.prendaId ?? "")}`,
+      );
+      return p.precioManual && lista !== undefined && p.precioUnitCents < lista;
+    });
+    if (!navigator.onLine && (totales.requiereAutorizacion || rebaja)) {
+      setCreando(false);
+      setError(dm.necesitaConexion);
+      return;
+    }
     const cuerpo = {
       id: nuevoId(),
-      cliente: { id: cliente.id },
+      codigoPublico: codigoPublico(),
+      cliente: cliente.nuevo
+        ? { nuevo: { ...cliente.nuevo, id: cliente.id, correo: cliente.nuevo.correo || undefined } }
+        : { id: cliente.id },
       prendas: carrito.piezas.map((p) => ({
         id: p.id,
         codigoEtiqueta: p.codigoEtiqueta,
@@ -198,10 +217,13 @@ export function Mostrador({
     };
     try {
       const r = await ejecutar((autorizacion) =>
-        crearOrden({ ...cuerpo, ...(autorizacion ? { autorizacion } : {}) }),
+        crearOrden({ ...cuerpo, ...(autorizacion ? { autorizacion } : {}) }, totales, {
+          cliente: `${cliente.nombre} ${cliente.apellido ?? ""}`.trim(),
+        }),
       );
       let fallidas = 0;
-      const pendientes = carrito.piezas.filter((p) => fotos.has(p.id));
+      const pendientes = r.enCola ? [] : carrito.piezas.filter((p) => fotos.has(p.id));
+      if (r.enCola) fallidas = carrito.piezas.filter((p) => fotos.has(p.id)).length;
       setSubiendo(pendientes.length);
       for (const p of pendientes) {
         const f = new FormData();
@@ -216,7 +238,20 @@ export function Mostrador({
         }
       }
       setSubiendo(0);
-      setCreada({ ...r, dia: diaSemana(ahoraMs(), tienda.zona), fotosFallidas: fallidas });
+      setCreada({
+        ...r,
+        dia: diaSemana(ahoraMs(), tienda.zona),
+        fotosFallidas: fallidas,
+        local: {
+          cliente: cliente.nombre,
+          promesa,
+          urgente: carrito.urgente,
+          piezas: carrito.piezas.map((p) => ({
+            codigo: p.codigoEtiqueta,
+            nombre: nombre(p.prendaId ? prendas.get(p.prendaId) : servicios.get(p.servicioId)),
+          })),
+        },
+      });
     } catch (e) {
       if (!(e instanceof ErrorApi && e.codigo === "cancelado")) setError(textoError(d, e));
     } finally {
@@ -238,6 +273,40 @@ export function Mostrador({
   }
 
   if (creada) {
+    if (creada.enCola) {
+      return (
+        <div className="mx-auto flex max-w-lg flex-col items-center py-6 text-center">
+          <Ticket
+            numero="—"
+            dia={creada.dia}
+            tamano="grande"
+            arriba={d.ordenes.dias[creada.dia]}
+            abajo={dinero(creada.totales.totalCents)}
+          />
+          <h1 className="titulo-ancho mt-6 text-3xl" data-testid="orden-en-cola">
+            {dm.guardadaSinConexion}
+          </h1>
+          <p className="mt-2 text-gris">{dm.guardadaSinConexionTexto}</p>
+          {creada.fotosFallidas > 0 && (
+            <Aviso tono="alerta" className="mt-4">
+              {dm.fotosError}
+            </Aviso>
+          )}
+          <Boton tamano="grande" ancho className="mt-6" onClick={() => window.print()}>
+            {dm.imprimirEtiquetas}
+          </Boton>
+          <Boton tamano="grande" variante="exito" className="mt-3" onClick={reiniciar}>
+            + {dm.nuevaOrden}
+          </Boton>
+          <EtiquetasLocales
+            datos={creada.local}
+            codigoPublico={creada.codigoPublico}
+            dia={creada.dia}
+            zona={tienda.zona}
+          />
+        </div>
+      );
+    }
     const url = (tipo: string) => `/app/ordenes/${creada.id}/imprimir?tipo=${tipo}`;
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center py-6 text-center">

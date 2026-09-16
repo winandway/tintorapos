@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Aviso } from "@/components/ui/aviso";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo";
@@ -11,6 +11,8 @@ import { pedir } from "@/lib/api";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { recargarEn } from "@/lib/navegacion";
+import { borrarCache } from "@/lib/sin-conexion/almacen";
+import { limpiarPaginasGuardadas } from "@/components/app/registro-sw";
 import { destinoSiguiente } from "./destinos";
 
 export function FormEntrar({ siteKey, hayDispositivo }: { siteKey: string | null; hayDispositivo: boolean }) {
@@ -22,6 +24,14 @@ export function FormEntrar({ siteKey, hayDispositivo }: { siteKey: string | null
   const [campos, setCampos] = useState<Record<string, string>>({});
   const [enviando, setEnviando] = useState(false);
   const alPase = useCallback((t: string | null) => setPase(t), []);
+
+  useEffect(() => {
+    // Si este navegador ya no es dispositivo de la tienda (se desactivó), se borra lo guardado en él.
+    if (!hayDispositivo) {
+      borrarCache().catch(() => {});
+      limpiarPaginasGuardadas();
+    }
+  }, [hayDispositivo]);
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();

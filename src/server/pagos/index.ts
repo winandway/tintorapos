@@ -42,7 +42,8 @@ export async function sentenciasPago(
   origen: "en_linea" | "sin_conexion" = "en_linea",
 ): Promise<D1PreparedStatement[]> {
   const turno = await turnoAbierto(db, s.tintoreria.id, s.sucursalId);
-  if (p.metodo === "efectivo" && !turno) throw new ErrorApp(409, "turno_cerrado");
+  // Sin conexión el efectivo ya se recibió en el mostrador: se registra aunque la caja se haya cerrado después.
+  if (p.metodo === "efectivo" && !turno && origen === "en_linea") throw new ErrorApp(409, "turno_cerrado");
   return [
     db
       .prepare(

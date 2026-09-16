@@ -73,6 +73,11 @@ export const mostrador = {
   fotosError: "Algunas fotos no se subieron. Puedes agregarlas desde la orden.",
   pagada: "Pagada",
   saldo: "Saldo pendiente",
+  guardadaSinConexion: "Guardada sin conexión",
+  guardadaSinConexionTexto:
+    "Quedó guardada en este dispositivo y se sube sola cuando vuelva internet. Las etiquetas ya sirven.",
+  necesitaConexion:
+    "Sin conexión no se puede pedir la autorización de un gerente. Quita el descuento o el precio rebajado, o espera a que vuelva internet.",
   continuar: "Continuar",
   volverPrendas: "Volver a las prendas",
 };

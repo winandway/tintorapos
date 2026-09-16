@@ -9,6 +9,10 @@ import { CampoEscaneo } from "@/components/ui/campo-escaneo";
 import { EncabezadoPagina } from "@/components/ui/encabezado";
 import { Ticket } from "@/components/ui/ticket";
 import { ErrorApi, pedir } from "@/lib/api";
+import { extraerCodigo } from "@/lib/codigos";
+import { ahoraMs } from "@/lib/fechas";
+import { buscarOrdenLocal, datosSinConexion } from "@/lib/sin-conexion/cache";
+import { ordenVistaLocal } from "@/lib/sin-conexion/vistas";
 import { textoError } from "@/lib/errores-cliente";
 import { fmt, formatoFecha, textoBilingue } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
@@ -60,7 +64,7 @@ export function PantallaProduccion({ zona }: { zona: string }) {
   const [rapido, setRapido] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  const lista = useDatos<{ ordenes: OrdenLista[] }>("/datos/ordenes?estado=abiertas");
+  const lista = useDatos<{ ordenes: OrdenLista[] }>("/datos/ordenes?estado=abiertas", { cache: true });
 
   const mover = useCallback(
     async (o: OrdenVista, estado: "recibida" | "en_proceso" | "lista", soloPieza: string | null) => {
@@ -77,8 +81,13 @@ export function PantallaProduccion({ zona }: { zona: string }) {
             estado: d.ordenes.estados[r.estadoNuevo as keyof typeof d.ordenes.estados] ?? r.estadoNuevo,
           }),
         );
-        const fresca = await pedir<{ orden: OrdenVista }>(`/datos/ordenes/${o.id}`);
-        setOrden(fresca.orden);
+        if (r.enCola) {
+          const local = ordenVistaLocal(await datosSinConexion(), o.id, zona, ahoraMs());
+          if (local) setOrden(local);
+        } else {
+          const fresca = await pedir<{ orden: OrdenVista }>(`/datos/ordenes/${o.id}`);
+          setOrden(fresca.orden);
+        }
         lista.recargar();
       } catch (e) {
         setError(textoError(d, e));
@@ -86,7 +95,7 @@ export function PantallaProduccion({ zona }: { zona: string }) {
         setOcupado(false);
       }
     },
-    [ubicacion, avisar, dp.movida, d, lista],
+    [ubicacion, avisar, dp.movida, d, lista, zona],
   );
 
   const leer = useCallback(
@@ -103,11 +112,23 @@ export function PantallaProduccion({ zona }: { zona: string }) {
         setOcupado(false);
         if (rapido) await mover(o.orden, "lista", r.prendaId);
       } catch (e) {
+        if (e instanceof ErrorApi && e.sinConexion) {
+          // Sin conexión: se busca en la copia local de órdenes abiertas.
+          const datos = await datosSinConexion();
+          const [hallada] = buscarOrdenLocal(datos, texto, extraerCodigo(texto));
+          const local = hallada ? ordenVistaLocal(datos, hallada.orden.id, zona, ahoraMs()) : null;
+          setOcupado(false);
+          if (!local) return setError(dp.noEncontrado);
+          setOrden(local);
+          setPrendaId(hallada!.prendaId);
+          if (rapido) await mover(local, "lista", hallada!.prendaId);
+          return;
+        }
         setError(e instanceof ErrorApi && e.estado === 404 ? dp.noEncontrado : textoError(d, e));
         setOcupado(false);
       }
     },
-    [d, dp.noEncontrado, rapido, mover],
+    [d, dp.noEncontrado, rapido, mover, zona],
   );
 
   const nombre = (es: string, en: string | null) => textoBilingue(idioma, es, en);

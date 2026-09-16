@@ -21,6 +21,7 @@ import { seguridad } from "./en/seguridad";
 import { datos } from "./en/datos";
 import { reportes } from "./en/reportes";
 import { tablero } from "./en/tablero";
+import { sinConexion } from "./en/sinConexion";
 
 export const en: Forma<typeof es> = {
   comun,
@@ -44,4 +45,5 @@ export const en: Forma<typeof es> = {
   datos,
   reportes,
   tablero,
+  sinConexion,
 };

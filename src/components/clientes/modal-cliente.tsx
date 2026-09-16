@@ -6,6 +6,7 @@ import { Boton } from "@/components/ui/boton";
 import { Casilla, CampoArea, CampoSelector, CampoTexto } from "@/components/ui/campo";
 import { Modal } from "@/components/ui/modal";
 import { ErrorApi, pedir } from "@/lib/api";
+import { nuevoId } from "@/lib/codigos";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { useIdioma } from "@/lib/i18n/cliente";
 
@@ -47,11 +48,14 @@ export function ModalCliente({
   inicial,
   alCerrar,
   alGuardar,
+  permitirLocal = false,
 }: {
   abierto: boolean;
   inicial: DatosFormCliente | null;
   alCerrar: () => void;
-  alGuardar: (id: string, datos: DatosFormCliente) => void;
+  alGuardar: (id: string, datos: DatosFormCliente, local?: boolean) => void;
+  /** Permite crear el cliente solo en el dispositivo cuando no hay conexión (mostrador). */
+  permitirLocal?: boolean;
 }) {
   const { d } = useIdioma();
   const dc = d.clientes;
@@ -93,6 +97,11 @@ export function ModalCliente({
         alGuardar(r.id, v);
       }
     } catch (err) {
+      if (permitirLocal && !v.id && err instanceof ErrorApi && err.sinConexion) {
+        // Sin conexión: el cliente viaja dentro de la orden y se crea al sincronizar.
+        alGuardar(nuevoId(), v, true);
+        return;
+      }
       setError(textoError(d, err));
       setCampos(camposDe(err));
       if (err instanceof ErrorApi && err.codigo === "cliente_repetido")

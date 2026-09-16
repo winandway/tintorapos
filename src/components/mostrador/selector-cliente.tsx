@@ -5,6 +5,7 @@ import { clienteVacio, ModalCliente, type DatosFormCliente } from "@/components/
 import { formatoTelefono } from "@/components/clientes/lista-clientes";
 import { Boton } from "@/components/ui/boton";
 import { pedir } from "@/lib/api";
+import { buscarClientesLocal, datosSinConexion } from "@/lib/sin-conexion/cache";
 import { fmt, formatoDinero } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
 
@@ -17,6 +18,8 @@ export interface ClienteElegido {
   ordenesAbiertas: number;
   saldoCents: number;
   preferencias?: DatosFormCliente["preferencias"];
+  /** Cliente creado sin conexión: se manda completo dentro de la orden. */
+  nuevo?: DatosFormCliente;
 }
 
 export function SelectorCliente({
@@ -51,7 +54,22 @@ export function SelectorCliente({
     let vivo = true;
     pedir<{ clientes: ClienteElegido[] }>(`/datos/clientes?q=${encodeURIComponent(consulta)}`)
       .then((r) => vivo && setResultados(r.clientes.slice(0, 6)))
-      .catch(() => vivo && setResultados([]));
+      .catch(async () => {
+        // Sin conexión: se busca en la copia de clientes guardada en el dispositivo.
+        const locales = buscarClientesLocal(await datosSinConexion(), consulta);
+        if (vivo)
+          setResultados(
+            locales.map((c) => ({
+              id: c.id,
+              nombre: c.nombre,
+              apellido: c.apellido,
+              telefono: c.telefono,
+              idioma: c.idioma,
+              ordenesAbiertas: 0,
+              saldoCents: 0,
+            })),
+          );
+      });
     return () => {
       vivo = false;
     };
@@ -154,8 +172,23 @@ export function SelectorCliente({
         abierto={Boolean(nuevo)}
         inicial={nuevo}
         alCerrar={() => setNuevo(null)}
-        alGuardar={async (id) => {
+        permitirLocal
+        alGuardar={async (id, datos, local) => {
           setNuevo(null);
+          if (local) {
+            alElegir({
+              id,
+              nombre: datos.nombre,
+              apellido: datos.apellido || null,
+              telefono: datos.telefono || null,
+              idioma: datos.idioma,
+              ordenesAbiertas: 0,
+              saldoCents: 0,
+              preferencias: datos.preferencias,
+              nuevo: datos,
+            });
+            return;
+          }
           try {
             const r = await pedir<{ cliente: ClienteElegido }>(`/datos/clientes/${id}`);
             alElegir(r.cliente);

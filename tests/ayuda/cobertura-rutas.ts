@@ -273,6 +273,41 @@ export const COBERTURA: Record<string, Cobertura> = {
     ],
   },
   "/datos/reportes/operacion": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/sync": {
+    casos: (e) => [
+      {
+        metodo: "POST",
+        cuerpo: {
+          ops: [
+            {
+              id: "77777777-7777-4777-8777-777777777777",
+              tipo: "estado",
+              ordenId: e.a.ids.ordenId,
+              cuerpo: { estado: "lista" },
+              creadoEn: Date.now(),
+            },
+          ],
+        },
+        esperado: [200],
+      },
+      {
+        metodo: "POST",
+        cuerpo: {
+          ops: [
+            {
+              id: "88888888-8888-4888-8888-888888888888",
+              tipo: "pago",
+              ordenId: e.a.ids.ordenId,
+              cuerpo: { id: "99999999-9999-4999-8999-999999999999", metodo: "efectivo", montoCents: 1 },
+              creadoEn: Date.now(),
+            },
+          ],
+        },
+        esperado: [200],
+      },
+    ],
+  },
+  "/datos/mostrador/cache": { casos: () => [{ metodo: "GET", esperado: [200] }] },
   "/datos/empleados": {
     casos: () => [
       { metodo: "GET", esperado: [200] },

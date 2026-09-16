@@ -19,6 +19,7 @@ import { seguridad } from "./es/seguridad";
 import { datos } from "./es/datos";
 import { reportes } from "./es/reportes";
 import { tablero } from "./es/tablero";
+import { sinConexion } from "./es/sinConexion";
 
 export const es = {
   comun,
@@ -42,4 +43,5 @@ export const es = {
   datos,
   reportes,
   tablero,
+  sinConexion,
 };
