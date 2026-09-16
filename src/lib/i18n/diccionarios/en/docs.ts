@@ -1,0 +1,41 @@
+import type { docs as base } from "../es/docs";
+import type { Forma } from "../../index";
+
+export const docs: Forma<typeof base> = {
+  titulo: "Docs",
+  subtitulo: "Short, step-by-step guides for running your store with Tintora POS.",
+  buscar: "Search the guides: tags, register, offline…",
+  buscarCorto: "Search",
+  sinResultados: "No guides match “{q}”. Try another word.",
+  resultados: "Search results",
+  navegacion: "Docs guides",
+  verGuias: "Show all guides",
+  cerrarGuias: "Hide guides",
+  volver: "← Docs",
+  anterior: "Previous",
+  siguiente: "Next",
+  consejo: "Tip",
+  importante: "Important",
+  cerrar: "Close",
+  guias: "{n} guides",
+  ayudaTitulo: "Didn’t find what you were looking for?",
+  ayudaTexto: "Contact support and we’ll get back to you in your language.",
+  figuras: {
+    tienda: "Your cleaner",
+    cliente: "Customer",
+    rolesAccion: "What they can do",
+    acciones: {
+      recibir: "Take in orders",
+      produccion: "Move items in production",
+      entregar: "Hand over and collect payment",
+      caja: "Open and close the register",
+      anular: "Void orders and payments",
+      ajustes: "Change prices and settings",
+      empleados: "Manage employees and devices",
+      exportar: "Export data",
+    },
+    puede: "Allowed",
+    noPuede: "Not allowed",
+    variables: "Words in braces are filled in automatically with each order’s details.",
+  },
+};

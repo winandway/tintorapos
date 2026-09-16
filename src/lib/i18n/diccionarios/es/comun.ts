@@ -41,4 +41,7 @@ export const comun = {
   probarGratis: "Probar gratis",
   irAlPanel: "Ir al panel",
   saltarAlContenido: "Saltar al contenido",
+  noEncontradaTitulo: "No encontramos esta página",
+  noEncontradaTexto: "Puede que el enlace esté incompleto o que la página ya no exista.",
+  irInicio: "Ir al inicio",
 };

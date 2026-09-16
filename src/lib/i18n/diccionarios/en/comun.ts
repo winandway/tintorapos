@@ -44,4 +44,7 @@ export const comun: Forma<typeof base> = {
   probarGratis: "Start free trial",
   irAlPanel: "Go to dashboard",
   saltarAlContenido: "Skip to content",
+  noEncontradaTitulo: "We couldn’t find this page",
+  noEncontradaTexto: "The link may be incomplete, or the page may no longer exist.",
+  irInicio: "Go to the home page",
 };

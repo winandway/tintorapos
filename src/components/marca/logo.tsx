@@ -27,11 +27,14 @@ export function Isotipo({ className = "size-9" }: { className?: string }) {
   );
 }
 
-export function Logo({ className = "" }: { className?: string }) {
+/** `compacto`: en pantallas de menos de 360 px queda solo el isotipo (encabezados apretados). */
+export function Logo({ className = "", compacto = false }: { className?: string; compacto?: boolean }) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <Isotipo />
-      <span className="titulo-ancho text-[19px] leading-none text-noche">
+      <span
+        className={`titulo-ancho text-[19px] leading-none text-noche ${compacto ? "max-[359px]:hidden" : ""}`}
+      >
         Tintora
         <span className="ml-1.5 inline-block rounded-md bg-dia-3 px-1.5 py-0.5 align-[2px] text-[11px] tracking-wider text-noche">
           POS

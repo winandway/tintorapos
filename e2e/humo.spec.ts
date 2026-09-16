@@ -9,8 +9,13 @@ export const RUTAS_PUBLICAS = [
   "/",
   "/entrar",
   "/registro",
+  "/docs",
+  "/docs/primeros-pasos",
   "/privacidad",
   "/terminos",
+  "/llms.txt",
+  "/sitemap.xml",
+  "/robots.txt",
   "/manifest.webmanifest",
 ];
 

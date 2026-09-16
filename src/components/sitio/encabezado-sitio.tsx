@@ -19,7 +19,7 @@ export function EncabezadoSitio({
     <header className="sticky top-0 z-30 border-b border-percha/60 bg-papel/85 backdrop-blur-md no-imprimir">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:gap-6">
         <Link href="/" className="shrink-0 rounded-lg" aria-label="Tintora POS">
-          <Logo />
+          <Logo compacto />
         </Link>
         <nav className="hidden flex-1 items-center gap-6 text-[15px] font-semibold text-gris md:flex">
           {enlaces.map((e) => (
