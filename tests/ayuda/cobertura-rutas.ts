@@ -34,4 +34,23 @@ export const COBERTURA: Record<string, Cobertura> = {
   },
   "/datos/clave/recuperar": { publica: "solo recibe un correo y siempre responde lo mismo" },
   "/datos/clave/restablecer": { publica: "solo recibe un token secreto de 256 bits" },
+  "/datos/dispositivos": {
+    casos: () => [
+      { metodo: "GET", esperado: [200] },
+      { metodo: "POST", cuerpo: { nombre: "Tablet B" }, esperado: [200] },
+    ],
+  },
+  "/datos/dispositivos/[id]": { casos: (e) => [{ metodo: "DELETE", params: { id: e.a.dispositivoId } }] },
+  "/datos/pin/empleados": { casos: () => [{ metodo: "GET", como: "dispositivoB", esperado: [200] }] },
+  "/datos/pin/entrar": {
+    casos: (e) => [
+      {
+        metodo: "POST",
+        como: "dispositivoB",
+        cuerpo: { usuarioId: e.a.duenoId, pin: "4829" },
+        esperado: [401],
+      },
+    ],
+  },
+  "/datos/auditoria": { casos: () => [{ metodo: "GET", esperado: [200] }] },
 };

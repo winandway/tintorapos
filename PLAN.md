@@ -35,7 +35,7 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 - [x] 20. Verificación en dos pasos (TOTP) obligatoria para el dueño: alta con QR, códigos de respaldo, verificación al entrar; pruebas con vectores RFC 6238
 - [x] 21. Recuperar contraseña por correo (token de un solo uso, 1 h) con adaptador de correo `env.EMAIL` que falla visible
 - [ ] 22. Dispositivos de la tienda: registrar esta tablet, pantalla de PIN con empleados, bloqueo tras 5 intentos (15 min), bloqueo por inactividad, lista y revocación desde el panel
-- [ ] 23. Roles y permisos (dueño, gerente, cajero, planta, repartidor) + autorización con PIN de gerente + auditoría de solo-agregar; pruebas al 100% de la matriz
+- [x] 23. Roles y permisos (dueño, gerente, cajero, planta, repartidor) + autorización con PIN de gerente + auditoría de solo-agregar; pruebas al 100% de la matriz
 - [ ] 24. Componentes base de la interfaz: `CampoClave` con ojito, botones, campos, modal, menú de 3 puntos (borrar solo ahí, con confirmación), avisos, encabezado con menú de cuenta y salir, pie con crédito Windoce LLC
 
 ## Fase 1 — Operación de la tienda
