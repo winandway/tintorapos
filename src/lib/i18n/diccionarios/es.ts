@@ -15,6 +15,8 @@ import { produccion } from "./es/produccion";
 import { entrega } from "./es/entrega";
 import { publico } from "./es/publico";
 import { avisos } from "./es/avisos";
+import { seguridad } from "./es/seguridad";
+import { datos } from "./es/datos";
 
 export const es = {
   comun,
@@ -34,4 +36,6 @@ export const es = {
   entrega,
   publico,
   avisos,
+  seguridad,
+  datos,
 };

@@ -17,6 +17,8 @@ import { produccion } from "./en/produccion";
 import { entrega } from "./en/entrega";
 import { publico } from "./en/publico";
 import { avisos } from "./en/avisos";
+import { seguridad } from "./en/seguridad";
+import { datos } from "./en/datos";
 
 export const en: Forma<typeof es> = {
   comun,
@@ -36,4 +38,6 @@ export const en: Forma<typeof es> = {
   entrega,
   publico,
   avisos,
+  seguridad,
+  datos,
 };

@@ -139,3 +139,36 @@ export async function verificarDosPasos(
   const restantes = metodo === "respaldo" ? (JSON.parse(f.codigos_respaldo) as string[]).length - 1 : null;
   return { ok: true, respaldosRestantes: restantes };
 }
+
+/** Genera códigos de respaldo nuevos (invalida los anteriores). Pide un código actual de la app. */
+export async function regenerarRespaldos(
+  db: D1Database,
+  appSecret: string,
+  s: Sesion,
+  codigo: string,
+  ahora = Date.now(),
+) {
+  const f = await filaTotp(db, s);
+  if (!f.totp_activo) throw new ErrorApp(409, "no_aplica");
+  const paso = await verificarTotp(await secretoDe(appSecret, f), codigo, ahora, f.totp_ultimo_paso);
+  if (paso === null) throw new ErrorApp(400, "codigo_incorrecto", {}, { codigo: "invalido" });
+  const codigos = nuevosCodigosRespaldo();
+  await db.batch([
+    db
+      .prepare(
+        "update usuarios set codigos_respaldo = ?, totp_ultimo_paso = ? where id = ? and tintoreria_id = ?",
+      )
+      .bind(
+        JSON.stringify(await Promise.all(codigos.map(hashRespaldo))),
+        paso,
+        s.usuario.id,
+        s.tintoreria.id,
+      ),
+    sentenciaAuditoria(
+      db,
+      { tintoreriaId: s.tintoreria.id, usuarioId: s.usuario.id, accion: "seguridad.respaldos_regenerados" },
+      ahora,
+    ),
+  ]);
+  return { codigosRespaldo: codigos };
+}

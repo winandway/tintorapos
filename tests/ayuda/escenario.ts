@@ -139,9 +139,13 @@ const TABLAS = [
 ];
 
 /** Huella de todos los datos de una tintorería: si algo cambia, cambia la huella. */
-export async function huellaTintoreria(db: D1Database, tintoreriaId: string): Promise<string> {
+export async function huellaTintoreria(
+  db: D1Database,
+  tintoreriaId: string,
+  excluir: string[] = [],
+): Promise<string> {
   const partes: string[] = [];
-  for (const def of TABLAS) {
+  for (const def of TABLAS.filter((t) => !excluir.includes(t))) {
     const [tabla, col = "tintoreria_id"] = def.split(":");
     const { results } = await db
       .prepare(`select * from ${tabla} where ${col} = ? order by rowid`)

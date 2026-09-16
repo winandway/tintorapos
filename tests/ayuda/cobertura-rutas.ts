@@ -29,6 +29,9 @@ export const COBERTURA: Record<string, Cobertura> = {
   "/datos/sesion/dos-pasos/verificar": {
     casos: () => [{ metodo: "POST", cuerpo: { codigo: "000000" }, esperado: [400, 409] }],
   },
+  "/datos/sesion/dos-pasos/respaldos": {
+    casos: () => [{ metodo: "POST", cuerpo: { codigo: "000000" }, esperado: [400, 409] }],
+  },
   "/datos/clave/cambiar": {
     casos: () => [{ metodo: "POST", cuerpo: { actual: "no-es", nueva: "Otra-Clave-2026" } }],
   },
@@ -248,6 +251,17 @@ export const COBERTURA: Record<string, Cobertura> = {
   "/datos/webhooks/twilio": {
     publica: "no recibe sesión; exige la firma de Twilio (tests/integracion/avisos.test.ts)",
   },
+  "/datos/reloj": {
+    publica:
+      "solo con el secreto del reloj; recorre todas las tintorerías por diseño (tests/integracion/reloj-respaldos.test.ts)",
+  },
+  "/datos/exportar": {
+    casos: () => [
+      { metodo: "GET", url: "/datos/exportar?formato=json", esperado: [200] },
+      { metodo: "GET", url: "/datos/exportar?formato=csv&tabla=clientes", esperado: [200] },
+    ],
+  },
+  "/datos/respaldos": { casos: () => [{ metodo: "GET", esperado: [200] }] },
   "/datos/empleados": {
     casos: () => [
       { metodo: "GET", esperado: [200] },

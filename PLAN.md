@@ -53,8 +53,8 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 - [x] 35. Lista y detalle de órdenes: filtros (estado, atrasadas, fecha), detalle con historial, pagos y acciones (anular dentro de los 3 puntos)
 - [x] 36. Página pública del cliente `/t/[código]`: estado de la orden bilingüe, solo primer nombre, sin teléfono ni importes, `noindex`, límite de intentos
 - [x] 37. Avisos: cola en base, plantillas bilingües editables (recibida, lista, recordatorio), SMS por Twilio y correo, reintentos, STOP con firma de Twilio verificada, solo a quien aceptó; pruebas con MSW
-- [ ] 38. Reloj `/datos/reloj` protegido con secreto: procesar avisos, recordatorios de ropa sin recoger, respaldo diario cifrado al almacén con retención 30 días, limpieza de papelera, sesiones y límites
-- [ ] 39. Respaldo y restauración probada (cifrar → descifrar → cargar en base limpia) + exportación de datos del dueño (JSON y CSV)
+- [x] 38. Reloj `/datos/reloj` protegido con secreto: procesar avisos, recordatorios de ropa sin recoger, respaldo diario cifrado al almacén con retención 30 días, limpieza de papelera, sesiones y límites
+- [x] 39. Respaldo y restauración probada (cifrar → descifrar → cargar en base limpia) + exportación de datos del dueño (JSON y CSV)
 - [ ] 40. Reportes: ventas por día/semana/mes, por servicio, por empleado, por forma de pago; órdenes atrasadas; ropa sin recoger; exportar CSV
 - [ ] 41. Tablero de inicio `/app` con cifras de hoy y lista de primeros pasos (tienda, precios, empleados, tablet, etiqueta de prueba)
 - [ ] 42. Modo sin conexión: PWA (manifest + service worker), caché local en IndexedDB (catálogo, clientes, órdenes abiertas), cola de operaciones con identificadores del dispositivo, sincronización idempotente `/datos/sync`, indicador de conexión
