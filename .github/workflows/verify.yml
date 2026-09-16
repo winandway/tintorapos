@@ -1,0 +1,52 @@
+name: verify
+
+on:
+  push:
+    # La rama de publicación solo lleva el paquete compilado.
+    branches-ignore: ["yapanel-build"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Tipos
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Pruebas con cobertura (umbral rompe el build)
+        run: npm run test
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+      - name: Dependencias (npm audit)
+        run: npm run audit
+      - name: Secretos (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Navegador para pruebas de punta a punta
+        run: npx playwright install --with-deps chromium
+      - name: Pruebas de punta a punta
+        run: |
+          printf 'APP_SECRET=%s\nAPP_URL=http://localhost:3210\n' "$(openssl rand -base64 48 | tr -d '\n')" > .dev.vars
+          npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

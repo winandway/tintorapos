@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      pruebas:
+        patterns: ["vitest", "@vitest/*", "@testing-library/*", "msw", "@playwright/test", "jsdom"]
+      lint:
+        patterns: ["eslint*", "prettier", "typescript-eslint"]
+    ignore:
+      # Next y el adaptador de Cloudflare se suben JUNTOS y a mano, comprobando
+      # el rango de versiones que acepta el adaptador (tiene un hueco que se mueve).
+      - dependency-name: "next"
+      - dependency-name: "@opennextjs/cloudflare"
+      - dependency-name: "wrangler"
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly

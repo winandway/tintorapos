@@ -7,16 +7,16 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 
 ## Fase 0 — Cimientos y blindaje
 
-- [ ] 1. Scaffolding: Next.js 16.3.5 (dentro del rango de @opennextjs/cloudflare), React 19, TypeScript estricto, Tailwind 4, App Router en `src/`
-- [ ] 2. Adaptador OpenNext + `wrangler.jsonc` local (DB, BUCKET, assets) + `yadominios.json` + `.dev.vars.example`; `next dev` con las bindings locales funcionando
-- [ ] 3. Blindaje capa 1: tsconfig estricto (`noUncheckedIndexedAccess`, `noImplicitOverride`), ESLint 10 + next + security + prettier, scripts `typecheck`/`lint`/`format`
-- [ ] 4. Blindaje capa 2: Vitest + coverage v8 con umbrales (60% global, 90% dinero/sesiones/permisos/datos personales), jsdom, Testing Library, MSW, arnés de D1 y R2 reales con Miniflare
-- [ ] 5. Blindaje capa 2b: Playwright configurado (celular y escritorio) + prueba de humo de rutas principales
-- [ ] 6. Blindaje capa 3: `.gitignore`, `.env.example`, gitleaks (config), Dependabot, `npm audit` en verify
-- [ ] 7. Blindaje capa 4: `src/env.ts` con zod (validación al arrancar + script `check:env`), cabeceras de seguridad (CSP, HSTS, XFO, nosniff, Referrer, Permissions)
-- [ ] 8. Blindaje capa 5: husky + lint-staged (pre-commit: formato, lint, gitleaks, pruebas relacionadas; pre-push: verify), `npm run verify`, GitHub Actions `verify.yml`
-- [ ] 9. Blindaje capa 6: Action `publicar.yml` (compila, comprueba par de versiones, empaqueta `_worker.js` + `schema.sql` a rama `yapanel-build`) y script de humo post-publicación
-- [ ] 10. Commit del blindaje solo, aparte, con `npm run verify` en verde
+- [x] 1. Scaffolding: Next.js 16.3.5 (dentro del rango de @opennextjs/cloudflare), React 19, TypeScript estricto, Tailwind 4, App Router en `src/`
+- [x] 2. Adaptador OpenNext + `wrangler.jsonc` local (DB, BUCKET, assets) + `yadominios.json` + `.dev.vars.example`; `next dev` con las bindings locales funcionando
+- [x] 3. Blindaje capa 1: tsconfig estricto (`noUncheckedIndexedAccess`, `noImplicitOverride`), ESLint 10 + next + security + prettier, scripts `typecheck`/`lint`/`format`
+- [x] 4. Blindaje capa 2: Vitest + coverage v8 con umbrales (60% global, 90% dinero/sesiones/permisos/datos personales), jsdom, Testing Library, MSW, arnés de D1 y R2 reales con Miniflare
+- [x] 5. Blindaje capa 2b: Playwright configurado (celular y escritorio) + prueba de humo de rutas principales
+- [x] 6. Blindaje capa 3: `.gitignore`, `.env.example`, gitleaks (config), Dependabot, `npm audit` en verify
+- [x] 7. Blindaje capa 4: `src/env.ts` con zod (validación al arrancar + script `check:env`), cabeceras de seguridad (CSP, HSTS, XFO, nosniff, Referrer, Permissions)
+- [x] 8. Blindaje capa 5: husky + lint-staged (pre-commit: formato, lint, gitleaks, pruebas relacionadas; pre-push: verify), `npm run verify`, GitHub Actions `verify.yml`
+- [x] 9. Blindaje capa 6: Action `publicar.yml` (compila, comprueba par de versiones, empaqueta `_worker.js` + `schema.sql` a rama `yapanel-build`) y script de humo post-publicación
+- [x] 10. Commit del blindaje solo, aparte, con `npm run verify` en verde
 
 ## Fase 1 — Base del producto
 

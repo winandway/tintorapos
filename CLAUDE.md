@@ -64,3 +64,7 @@ cuando Richard dé el «adelante» (ver `PENDIENTES.md`).
 - Cada respuesta termina con «Esperando por ti» leído de `PENDIENTES.md`.
 - Al terminar un trabajo visible: verificación en el navegador con captura,
   reporte corto y mensaje para el cliente (dueño de tintorería) en un bloque.
+
+## Next.js 16
+
+@AGENTS.md

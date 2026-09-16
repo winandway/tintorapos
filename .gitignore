@@ -1,19 +1,40 @@
-# dependencias y compilados
-node_modules/
-.next/
-.open-next/
-out/
-dist/
-coverage/
-_worker.js
+# dependencias
+/node_modules
+/.pnp
+.pnp.*
+
+# compilados y salidas
+/.next/
+/out/
+/build
+/dist
+/.open-next/
+/.dist-worker/
+/out-deploy/
+/_worker.js
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+*.tsbuildinfo
+next-env.d.ts
+
+# estado local de wrangler/miniflare (base y almacén de desarrollo)
+/.wrangler/
 
 # secretos: nunca al repo
 .env
 .env.*
 !.env.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+*.pem
 
-# sistema y editores
+# sistema, editores y registros
 .DS_Store
-*.log
 .vscode/
 .idea/
+*.log
+npm-debug.log*

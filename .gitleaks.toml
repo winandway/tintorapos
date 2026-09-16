@@ -1,0 +1,12 @@
+# Escaneo de secretos: ninguna clave, token ni contraseña entra al repo.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Archivos de ejemplo sin valores y dependencias"
+paths = [
+  '''\.dev\.vars\.example$''',
+  '''\.env\.example$''',
+  '''package-lock\.json$''',
+  '''cloudflare-env\.d\.ts$''',
+]

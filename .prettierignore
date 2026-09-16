@@ -1,0 +1,13 @@
+node_modules
+.next
+.open-next
+.wrangler
+.dist-worker
+out-deploy
+coverage
+playwright-report
+test-results
+package-lock.json
+cloudflare-env.d.ts
+next-env.d.ts
+*.md

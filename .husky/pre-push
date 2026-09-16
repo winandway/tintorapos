@@ -1,0 +1,2 @@
+# Compuerta de push: todo tiene que dar verde (tipos, lint, pruebas, build, audit, secretos).
+npm run verify

@@ -1,0 +1,30 @@
+// Configuración LOCAL de desarrollo y del empaquetado del _worker.js.
+// YaDominios Cloud solo lee de aquí `compatibility_date` y `compatibility_flags`;
+// la base (env.DB) y el almacén (env.BUCKET) los inyecta la plataforma sola.
+// Las bindings de abajo existen para que `next dev` y `wrangler dev` tengan una
+// base y un almacén LOCALES (carpeta .wrangler/). Nunca se despliega con wrangler.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tintora-pos",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-07-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tintora-pos-local",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "tintora-pos-local",
+    },
+  ],
+  "observability": { "enabled": true },
+}

@@ -1,0 +1,51 @@
+name: publicar
+
+# Compila Tintora POS y empuja el paquete a la rama `yapanel-build`.
+# En YaDominios Cloud el sitio se conecta a ESA rama (no a main).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  empaquetar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Compilar y empaquetar (comprueba versiones y topes)
+        run: node scripts/empaquetar-worker.mjs
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: yapanel-build
+          publish_dir: ./out-deploy
+          force_orphan: true
+          commit_message: "publicar: ${{ github.sha }}"
+
+  humo:
+    needs: empaquetar
+    runs-on: ubuntu-latest
+    # Solo si ya está configurada la dirección del sitio (Settings → Variables → SITIO_URL).
+    if: ${{ vars.SITIO_URL != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Esperar a que la plataforma republique
+        run: sleep 120
+      - name: Humo post-publicación
+        run: node scripts/humo-publicado.mjs "${{ vars.SITIO_URL }}"
