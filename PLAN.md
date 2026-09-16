@@ -48,8 +48,8 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 - [x] 30. Fotos de prendas: subida redimensionada en el navegador, guardado en `env.BUCKET`, servidas por `/media` con comprobación de sesión y pertenencia
 - [x] 31. Mostrador (pantalla): nueva orden en pocos toques para tablet y celular, cliente, prendas, fotos, urgente, descuento, cobro o abono, confirmar e imprimir
 - [x] 32. Impresión: recibo 80 mm para el cliente, copia interna, etiquetas con QR por prenda (2×1 in); reimpresión de recibo con autorización y auditoría
-- [ ] 33. Producción (pantalla): escanear QR (lector USB/Bluetooth y cámara), mover prenda/orden de estado, ubicación en el rack, lista por estado
-- [ ] 34. Entrega (pantalla): escanear ticket o buscar, ver saldo, cobrar lo pendiente, marcar entregada
+- [x] 33. Producción (pantalla): escanear QR (lector USB/Bluetooth y cámara), mover prenda/orden de estado, ubicación en el rack, lista por estado
+- [x] 34. Entrega (pantalla): escanear ticket o buscar, ver saldo, cobrar lo pendiente, marcar entregada
 - [ ] 35. Lista y detalle de órdenes: filtros (estado, atrasadas, fecha), detalle con historial, pagos y acciones (anular dentro de los 3 puntos)
 - [ ] 36. Página pública del cliente `/t/[código]`: estado de la orden bilingüe, solo primer nombre, sin teléfono ni importes, `noindex`, límite de intentos
 - [ ] 37. Avisos: cola en base, plantillas bilingües editables (recibida, lista, recordatorio), SMS por Twilio y correo, reintentos, STOP con firma de Twilio verificada, solo a quien aceptó; pruebas con MSW

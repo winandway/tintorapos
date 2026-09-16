@@ -1,0 +1,17 @@
+export const entrega = {
+  titulo: "Entregar",
+  subtitulo: "Escanea el recibo del cliente o búscalo por celular, nombre o número.",
+  buscar: "Recibo, celular, nombre o número",
+  sinOrdenes: "No hay órdenes abiertas con esa búsqueda.",
+  elegir: "Elige la orden que se lleva",
+  saldo: "Saldo a cobrar",
+  pagada: "Pagada completa",
+  noLista: "Hay prendas que todavía no están listas.",
+  entregarIgual: "Entregar igual",
+  cobrarYEntregar: "Cobrar {monto} y entregar",
+  entregar: "Entregar",
+  entregada: "Orden #{numero} entregada",
+  otra: "Entregar otra",
+  metodo: "Método de pago",
+  ubicaciones: "Buscar en: {ubicaciones}",
+};

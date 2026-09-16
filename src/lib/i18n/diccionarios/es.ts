@@ -11,6 +11,8 @@ import { errores } from "./es/errores";
 import { validacion } from "./es/validacion";
 import { mostrador } from "./es/mostrador";
 import { impresion } from "./es/impresion";
+import { produccion } from "./es/produccion";
+import { entrega } from "./es/entrega";
 
 export const es = {
   comun,
@@ -26,4 +28,6 @@ export const es = {
   caja,
   mostrador,
   impresion,
+  produccion,
+  entrega,
 };
