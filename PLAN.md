@@ -9,7 +9,7 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 
 - [x] 1. Scaffolding: Next.js 16.3.5 (dentro del rango de @opennextjs/cloudflare), React 19, TypeScript estricto, Tailwind 4, App Router en `src/`
 - [x] 2. Adaptador OpenNext + `wrangler.jsonc` local (DB, BUCKET, assets) + `yadominios.json` + `.dev.vars.example`; `next dev` con las bindings locales funcionando
-- [x] 3. Blindaje capa 1: tsconfig estricto (`noUncheckedIndexedAccess`, `noImplicitOverride`), ESLint 10 + next + security + prettier, scripts `typecheck`/`lint`/`format`
+- [x] 3. Blindaje capa 1: tsconfig estricto (`noUncheckedIndexedAccess`, `noImplicitOverride`), ESLint 9 (la 10 no es compatible con eslint-config-next) + next + security + prettier, scripts `typecheck`/`lint`/`format`
 - [x] 4. Blindaje capa 2: Vitest + coverage v8 con umbrales (60% global, 90% dinero/sesiones/permisos/datos personales), jsdom, Testing Library, MSW, arnés de D1 y R2 reales con Miniflare
 - [x] 5. Blindaje capa 2b: Playwright configurado (celular y escritorio) + prueba de humo de rutas principales
 - [x] 6. Blindaje capa 3: `.gitignore`, `.env.example`, gitleaks (config), Dependabot, `npm audit` en verify
