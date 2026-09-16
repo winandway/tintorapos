@@ -237,7 +237,9 @@ CREATE TABLE IF NOT EXISTS ordenes (
   anulada_motivo TEXT,
   recordatorios_enviados INTEGER NOT NULL DEFAULT 0,
   ultimo_recordatorio_en INTEGER,
-  UNIQUE (tintoreria_id, numero)
+  UNIQUE (tintoreria_id, numero),
+  -- Candado de dinero: nunca se cobra más de lo que vale la orden.
+  CHECK (pagado_cents >= 0 AND pagado_cents <= total_cents)
 );
 CREATE INDEX IF NOT EXISTS idx_ordenes_estado ON ordenes (tintoreria_id, estado, fecha_promesa);
 CREATE INDEX IF NOT EXISTS idx_ordenes_cliente ON ordenes (tintoreria_id, cliente_id);

@@ -1,5 +1,8 @@
 import { nuevoId, sha256Hex } from "@/lib/codigos";
 import { registrarTintoreria } from "@/server/cuentas/registro";
+import { abrirTurno } from "@/server/caja";
+import { crearOrden } from "@/server/ordenes/crear";
+import { sesionDe } from "./sesion";
 import type { EntornoPrueba } from "./entorno";
 import { crearDispositivo, crearUsuario, sesionPara, type TintoreriaPrueba } from "./fabrica";
 
@@ -56,13 +59,50 @@ export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario>
       )
       .bind(clienteId, t.id, `Cliente ${nombre}`, "+13125550199", "3125550199", Date.now(), Date.now())
       .run();
+    const sesionDueno = await sesionPara(db, t.id, t.duenoId);
+    const s = await sesionDe(db, sesionDueno);
+    const turnoId = await abrirTurno(db, s, 5000);
+    const ordenId = nuevoId();
+    const prendaOrdenId = nuevoId();
+    const pagoId = nuevoId();
+    const orden = await crearOrden(db, s, {
+      id: ordenId,
+      cliente: { id: clienteId },
+      prendas: [{ id: prendaOrdenId, prendaId: prenda!.id, servicioId: servicio!.id, cantidad: 1 }],
+      urgente: false,
+      pago: { id: pagoId, metodo: "efectivo", montoCents: 100 },
+    });
     return {
       ...t,
-      sesionDueno: await sesionPara(db, t.id, t.duenoId),
+      sesionDueno,
       dispositivoId: d.id,
       dispositivoToken: d.token,
-      marcas: [t.id, t.duenoId, nombre, empleadoId, prenda!.id, servicio!.id, d.id, clienteId],
-      ids: { prendaId: prenda!.id, servicioId: servicio!.id, empleadoId, clienteId },
+      marcas: [
+        t.id,
+        t.duenoId,
+        nombre,
+        empleadoId,
+        prenda!.id,
+        servicio!.id,
+        d.id,
+        clienteId,
+        ordenId,
+        prendaOrdenId,
+        pagoId,
+        turnoId,
+        orden.codigoPublico,
+      ],
+      ids: {
+        prendaId: prenda!.id,
+        servicioId: servicio!.id,
+        empleadoId,
+        clienteId,
+        ordenId,
+        prendaOrdenId,
+        pagoId,
+        turnoId,
+        codigoPublico: orden.codigoPublico,
+      },
     };
   };
   const a = await lado("Tintoreria A marca-unica-aaaa");

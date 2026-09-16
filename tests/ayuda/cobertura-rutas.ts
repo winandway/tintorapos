@@ -120,6 +120,116 @@ export const COBERTURA: Record<string, Cobertura> = {
   "/datos/clientes/[id]/restaurar": {
     casos: (e) => [{ metodo: "POST", params: { id: e.a.ids.clienteId! } }],
   },
+  "/datos/ordenes": {
+    casos: (e) => [
+      { metodo: "GET", url: "/datos/ordenes?estado=todas", esperado: [200] },
+      {
+        metodo: "POST",
+        cuerpo: {
+          id: "11111111-1111-4111-8111-111111111111",
+          cliente: { id: e.a.ids.clienteId },
+          prendas: [
+            {
+              id: "22222222-2222-4222-8222-222222222222",
+              prendaId: e.b.ids.prendaId,
+              servicioId: e.b.ids.servicioId,
+              cantidad: 1,
+            },
+          ],
+        },
+      },
+      {
+        metodo: "POST",
+        cuerpo: {
+          id: "33333333-3333-4333-8333-333333333333",
+          cliente: { id: e.b.ids.clienteId },
+          prendas: [
+            {
+              id: "44444444-4444-4444-8444-444444444444",
+              prendaId: e.a.ids.prendaId,
+              servicioId: e.a.ids.servicioId,
+              cantidad: 1,
+            },
+          ],
+        },
+      },
+      {
+        metodo: "POST",
+        cuerpo: {
+          id: e.a.ids.ordenId,
+          cliente: { id: e.b.ids.clienteId },
+          prendas: [
+            {
+              id: "55555555-5555-4555-8555-555555555555",
+              prendaId: e.b.ids.prendaId,
+              servicioId: e.b.ids.servicioId,
+              cantidad: 1,
+            },
+          ],
+        },
+        esperado: [200, 409],
+      },
+    ],
+  },
+  "/datos/ordenes/[id]": { casos: (e) => [{ metodo: "GET", params: { id: e.a.ids.ordenId! } }] },
+  "/datos/ordenes/[id]/estado": {
+    casos: (e) => [{ metodo: "POST", params: { id: e.a.ids.ordenId! }, cuerpo: { estado: "lista" } }],
+  },
+  "/datos/ordenes/[id]/entregar": {
+    casos: (e) => [{ metodo: "POST", params: { id: e.a.ids.ordenId! }, cuerpo: { forzar: true } }],
+  },
+  "/datos/ordenes/[id]/anular": {
+    casos: (e) => [
+      { metodo: "POST", params: { id: e.a.ids.ordenId! }, cuerpo: { motivo: "prueba de ataque" } },
+    ],
+  },
+  "/datos/ordenes/[id]/abandonar": {
+    casos: (e) => [{ metodo: "POST", params: { id: e.a.ids.ordenId! }, cuerpo: {} }],
+  },
+  "/datos/ordenes/[id]/reimpresion": {
+    casos: (e) => [{ metodo: "POST", params: { id: e.a.ids.ordenId! }, cuerpo: { tipo: "etiquetas" } }],
+  },
+  "/datos/ordenes/[id]/pagos": {
+    casos: (e) => [
+      {
+        metodo: "POST",
+        params: { id: e.a.ids.ordenId! },
+        cuerpo: { id: "66666666-6666-4666-8666-666666666666", metodo: "otro", montoCents: 1 },
+      },
+      {
+        metodo: "POST",
+        params: { id: e.b.ids.ordenId! },
+        cuerpo: { id: e.a.ids.pagoId, metodo: "otro", montoCents: 1 },
+        esperado: [409],
+      },
+    ],
+  },
+  "/datos/pagos/[id]/anular": {
+    casos: (e) => [
+      { metodo: "POST", params: { id: e.a.ids.pagoId! }, cuerpo: { motivo: "prueba de ataque" } },
+    ],
+  },
+  "/datos/escaneo": {
+    casos: (e) => [
+      { metodo: "GET", url: `/datos/escaneo?codigo=${e.a.ids.codigoPublico}` },
+      { metodo: "GET", url: "/datos/escaneo?codigo=1001", esperado: [200] },
+    ],
+  },
+  "/datos/caja": {
+    casos: () => [
+      { metodo: "GET", esperado: [200] },
+      { metodo: "POST", cuerpo: { fondoCents: 1 }, esperado: [200, 409] },
+    ],
+  },
+  "/datos/caja/movimientos": {
+    casos: () => [
+      { metodo: "POST", cuerpo: { tipo: "entrada", montoCents: 1, motivo: "prueba" }, esperado: [200, 409] },
+    ],
+  },
+  "/datos/caja/cerrar": {
+    casos: () => [{ metodo: "POST", cuerpo: { contadoCents: 1 }, esperado: [200, 409] }],
+  },
+  "/datos/caja/turnos": { casos: () => [{ metodo: "GET", esperado: [200] }] },
   "/datos/empleados": {
     casos: () => [
       { metodo: "GET", esperado: [200] },
