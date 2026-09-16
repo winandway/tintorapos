@@ -1,0 +1,21 @@
+export const tablero = {
+  hola: "Hola, {nombre}",
+  hoy: "Hoy en {tienda}",
+  cobradoHoy: "Cobrado hoy",
+  recibidasHoy: "Órdenes recibidas hoy",
+  porEntregar: "Listas para entregar",
+  atrasadas: "Atrasadas",
+  acciones: { mostrador: "Nueva orden", entrega: "Entregar", produccion: "Producción" },
+  primerosPasos: "Primeros pasos",
+  primerosPasosTexto: "Deja tu tintorería lista en unos minutos.",
+  pasos: {
+    tienda: "Completa los datos de tu tienda (dirección, teléfono e impuesto)",
+    precios: "Pon tus precios",
+    empleados: "Agrega a tus empleados con su PIN",
+    dispositivo: "Registra la tablet del mostrador",
+    orden: "Recibe tu primera orden e imprime las etiquetas",
+  },
+  hecho: "Hecho",
+  ir: "Ir",
+  sinPermiso: "Tu usuario no tiene acceso a esa pantalla.",
+};
