@@ -71,6 +71,6 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 - [x] 47. Pruebas de punta a punta (Playwright): registro → dos pasos → precios → empleado → registrar tablet → PIN → nueva orden → etiquetas → producción → lista → entrega y cobro → cierre de caja; cambio de idioma; celular
 - [x] 48. Verificación visual en el navegador integrado a 375 px y escritorio de cada pantalla, con capturas y revisión de consola
 - [x] 49. Compilación real con OpenNext + empaquetado `_worker.js` con wrangler `--dry-run`, medir tamaño gzip (< 10 MB) y prueba de humo contra el worker compilado
-- [ ] 50. `npm run verify` completo en verde (tipos, lint, pruebas con cobertura, build, audit, gitleaks)
+- [x] 50. `npm run verify` completo en verde (tipos, lint, pruebas con cobertura, build, audit, gitleaks)
 - [ ] 51. Documentos: `CANDADOS.md`, `VERIFICAR-PAGOS.md` (sin procesador: solo registro manual, en rojo lo no probado), actualizar `ESTUDIO`, `CLAUDE.md`, `PENDIENTES.md`, README
 - [ ] 52. Memoria persistente con el estado del proyecto y commits finales descriptivos
