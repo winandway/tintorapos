@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { es } from "../src/lib/i18n/diccionarios/es";
-import { codigoTotp, correoDePrueba, ipDePrueba, listo } from "./ayuda";
+import { crearCuenta, ipDePrueba, listo } from "./ayuda";
 
 /**
  * El día completo de una tintorería, de punta a punta y como lo haría una persona:
@@ -12,30 +12,8 @@ test.use({ extraHTTPHeaders: { "x-forwarded-for": ipDePrueba() }, locale: "es-US
 
 test("un día completo en la tintorería", async ({ page, context }) => {
   test.setTimeout(420_000);
-  const correo = correoDePrueba();
-  const clave = `Clave-segura-${Date.now()}`;
-
-  await test.step("registro", async () => {
-    await page.goto("/registro");
-    await page.getByLabel(es.acceso.negocio).fill("Tintorería de prueba E2E");
-    await page.getByLabel(es.acceso.tuNombre).fill("Dueña de prueba");
-    await page.getByLabel(es.acceso.correo).fill(correo);
-    await page.getByLabel(es.acceso.clave, { exact: true }).fill(clave);
-    await page.getByRole("checkbox").check();
-    await page.getByRole("button", { name: es.acceso.crearCuenta }).click();
-    await expect(page).toHaveURL(/\/entrar\/activar-dos-pasos/, { timeout: 60_000 });
-  });
-
-  await test.step("verificación en dos pasos obligatoria para el dueño", async () => {
-    await page.getByRole("button", { name: es.acceso.empezar }).click();
-    const secreto = (await page.getByTestId("secreto-totp").textContent()) ?? "";
-    expect(secreto.replace(/\s/g, "")).toMatch(/^[A-Z2-7]{16,}$/);
-    await page.getByLabel(es.acceso.codigo).fill(codigoTotp(secreto));
-    await page.getByRole("button", { name: es.acceso.confirmarCodigo }).click();
-    await expect(page.getByTestId("codigos-respaldo").locator("li")).toHaveCount(10);
-    await page.getByRole("checkbox", { name: es.acceso.yaGuarde }).check();
-    await page.getByRole("button", { name: es.acceso.irAlPanel }).click();
-    await expect(page).toHaveURL(/\/app$/, { timeout: 60_000 });
+  await test.step("registro y verificación en dos pasos obligatoria para el dueño", async () => {
+    await crearCuenta(page);
   });
 
   await test.step("precios", async () => {

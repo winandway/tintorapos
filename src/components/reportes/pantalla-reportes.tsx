@@ -185,6 +185,8 @@ export function PantallaReportes({ moneda, zona }: { moneda: string; zona: strin
                   ))}
                 </tbody>
               </table>
+            ) : datos.cobradoCents === 0 ? (
+              <p className="rounded-2xl bg-papel px-4 py-10 text-center text-gris">{dr.sinDatos}</p>
             ) : (
               <GraficaBarras
                 titulo={dr.cobradoPorDia}

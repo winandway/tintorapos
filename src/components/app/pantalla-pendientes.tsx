@@ -33,20 +33,22 @@ export function PantallaPendientes({ zona }: { zona: string }) {
         titulo={ds.titulo}
         subtitulo={ds.subtitulo}
         acciones={
-          <Boton
-            cargando={subiendo}
-            disabled={!lista?.length}
-            onClick={async () => {
-              setSubiendo(true);
-              try {
-                await sincronizar();
-              } finally {
-                setSubiendo(false);
-              }
-            }}
-          >
-            {ds.subirAhora}
-          </Boton>
+          lista && lista.length > 0 ? (
+            <Boton
+              cargando={subiendo}
+              disabled={!lista?.length}
+              onClick={async () => {
+                setSubiendo(true);
+                try {
+                  await sincronizar();
+                } finally {
+                  setSubiendo(false);
+                }
+              }}
+            >
+              {ds.subirAhora}
+            </Boton>
+          ) : undefined
         }
       />
       {!lista ? (

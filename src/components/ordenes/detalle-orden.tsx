@@ -244,7 +244,8 @@ export function DetalleOrden({
                         {nombrePieza(p)}
                       </span>
                       <span className="block text-[13px] text-gris">
-                        {textoBilingue(idioma, p.servicioEs, p.servicioEn)} · {p.codigoEtiqueta}
+                        {textoBilingue(idioma, p.servicioEs, p.servicioEn)}{" "}
+                        <span className="whitespace-nowrap">· {p.codigoEtiqueta}</span>
                         {p.ubicacion ? ` · 📍${p.ubicacion}` : ""}
                       </span>
                       {(p.color || p.marca) && (
