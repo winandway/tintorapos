@@ -5,7 +5,14 @@ import { expect, test } from "@playwright/test";
  * Es la red mínima: si algo tumba la app, salta aquí.
  * También se corre contra el sitio publicado con E2E_URL=https://… npm run test:e2e -- humo
  */
-export const RUTAS_PUBLICAS = ["/"];
+export const RUTAS_PUBLICAS = [
+  "/",
+  "/entrar",
+  "/registro",
+  "/privacidad",
+  "/terminos",
+  "/manifest.webmanifest",
+];
 
 for (const ruta of RUTAS_PUBLICAS) {
   test(`responde 200: ${ruta}`, async ({ request }) => {

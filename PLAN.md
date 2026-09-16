@@ -62,7 +62,7 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 
 ## Fase 1 — Cara pública y documentos
 
-- [ ] 44. Página principal bilingüe (dolores → soluciones, funciones, seguridad, sin conexión, prueba gratis 14 días, preguntas frecuentes) + privacidad y términos (borradores)
+- [x] 44. Página principal bilingüe (dolores → soluciones, funciones, seguridad, sin conexión, prueba gratis 14 días, preguntas frecuentes) + privacidad y términos (borradores)
 - [ ] 45. Docs estilo Wikipedia en `/docs`: grupo de rutas con barra lateral que nunca se pierde, íconos, buscador con ⌘K, tarjetas por sección, «← Docs», cada guía su página, bilingüe, `llms.txt` y sitemap
 - [ ] 46. Guías: primeros pasos, recibir ropa, etiquetas, producción, entrega, caja, sin conexión, avisos, página del cliente, dos pasos, dispositivos, autorizaciones, reportes, exportar, respaldos, impresoras
 

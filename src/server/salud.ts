@@ -66,6 +66,10 @@ export async function revisarSalud(env: CloudflareEnv, vars: Variables, ahora = 
       ? { estado: "ok" }
       : { estado: "no_configurado", detalle: "TURNSTILE_SITE_KEY y TURNSTILE_SECRET_KEY" };
 
+  piezas.soporte = vars.SUPPORT_EMAIL
+    ? { estado: "ok" }
+    : { estado: "no_configurado", detalle: "SUPPORT_EMAIL (contacto de privacidad y términos)" };
+
   if (piezas.base.estado === "ok") {
     const reloj = await leerSistema(env.DB, "reloj_ultima_corrida").catch(() => null);
     if (!reloj) piezas.reloj = { estado: "error", detalle: "el reloj externo nunca llamó a /datos/reloj" };

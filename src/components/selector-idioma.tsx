@@ -64,7 +64,7 @@ export function SelectorIdioma({ compacto = false }: { compacto?: boolean }) {
             onClick={() => elegir(op)}
             aria-pressed={activo}
             aria-label={fmt(d.comun.cambiarIdiomaA, { idioma: etiqueta })}
-            className={`flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-semibold transition ${
+            className={`flex items-center gap-1.5 rounded-full ${compacto ? "px-1.5" : "px-2"} py-1 text-xs font-semibold transition ${
               activo ? "bg-tinta-suave text-tinta" : "text-gris hover:bg-percha/50"
             }`}
           >

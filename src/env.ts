@@ -26,6 +26,11 @@ export const esquemaEnv = z.object({
   TWILIO_AUTH_TOKEN: opcional,
   TWILIO_FROM: opcional,
   EMAIL_FROM: opcional,
+  /** Correo de contacto que se publica en privacidad y términos. */
+  SUPPORT_EMAIL: opcional.refine(
+    (v) => v === undefined || z.email().safeParse(v).success,
+    "SUPPORT_EMAIL debe ser un correo",
+  ),
 });
 
 export type Variables = z.infer<typeof esquemaEnv>;

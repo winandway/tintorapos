@@ -103,3 +103,23 @@ body {
     background: #fff;
   }
 }
+
+/* Portada: los tickets del riel se mecen una sola vez al cargar. */
+@keyframes balanceo {
+  0% {
+    transform: rotate(-9deg);
+  }
+  45% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-2deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+.balanceo {
+  transform-origin: 50% 0;
+  animation: balanceo 1.4s cubic-bezier(0.3, 0.7, 0.3, 1) both;
+}
