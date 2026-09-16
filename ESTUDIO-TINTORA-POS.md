@@ -354,7 +354,9 @@ rojo si se rompe) y se anota en `CANDADOS.md`.
 
 - **Dueño y gerentes:** correo + contraseña (con ojito), **segundo factor
   (código de app) obligatorio para el dueño**, opcional para gerentes.
-  Contraseñas con `argon2`, nunca en claro.
+  Contraseñas con PBKDF2-SHA256 de 100 000 iteraciones, nunca en claro
+  (*cambio al construir: `argon2` no corre en el motor de la plataforma y
+  100 000 es el máximo que acepta; el formato va versionado para migrar*).
 - **Cajeros y planta:** PIN de 4 a 6 dígitos en el dispositivo del mostrador,
   que **ya está autenticado como dispositivo de la tienda**. El PIN identifica
   quién hizo cada cosa; se bloquea 15 minutos tras 5 intentos fallidos.
@@ -541,6 +543,48 @@ navegador, se decide lo pendiente y arranca la siguiente.
 | `PENDIENTES.md` | La fila de trabajo y lo que espera por Richard | Ya |
 | `CLAUDE.md` | Reglas y perímetro del proyecto | Ya |
 | `docs/CONTRATO-YADOMINIOS.md` | Cómo publicar en la plataforma, sin depender de red | Ya |
-| `CANDADOS.md` | Cada cosa que se rompió y cómo quedó fija | Fase 0 |
-| `VERIFICAR-PAGOS.md` | Estado real de cada método de pago: probado o no | Fase 0 (vacío) → Fase 2 |
-| `/docs` en el sitio | Guías estilo Wikipedia para el dueño de la tintorería | Fase 0 (estructura) → Fase 1 (guías) |
+| `CANDADOS.md` | Cada cosa que se rompió y cómo quedó fija | Ya |
+| `VERIFICAR-PAGOS.md` | Estado real de cada método de pago: probado o no | Ya (sin procesador; todo en rojo hasta publicar) |
+| `PLAN.md` | Los 52 pasos de la Fase 0 y la Fase 1, marcados | Ya |
+| `README.md` | Cómo se corre, se prueba y se publica | Ya |
+| `/docs` en el sitio | Guías estilo Wikipedia para el dueño de la tintorería | Ya (16 guías bilingües) |
+
+---
+
+## 14. Estado de la construcción (16 de septiembre de 2026)
+
+**Fase 0 y Fase 1 construidas y probadas en local.** Nada publicado todavía:
+falta el repositorio, el plan de pago del sitio y el reloj externo
+(ver `PENDIENTES.md`).
+
+### Lo que quedó hecho
+
+- Todo el alcance de la Fase 1 del punto 5: mostrador, producción con escáner,
+  entrega con cobro, clientes con preferencias y permiso de SMS, avisos por SMS
+  y correo con plantillas bilingües, página pública del estado, caja con cierre
+  a ciegas, empleados con PIN y roles, autorizaciones de gerente, dispositivos
+  registrados, reportes, exportación, respaldos diarios cifrados, auditoría.
+- Modo sin conexión en las tablets registradas (ver abajo).
+- Página principal bilingüe, privacidad y términos (borradores), Docs con 16
+  guías, `llms.txt`, sitemap y canario `/datos/salud`.
+- Blindaje: 215 pruebas con 80 % de cobertura (las pantallas se prueban contra
+  el servidor y la base reales), 30 pruebas de punta a punta en celular y
+  escritorio que pasan también sobre el `_worker.js` compilado (4.64 MB en gzip).
+
+### Cambios respecto a la propuesta
+
+- **Contraseñas:** PBKDF2 en vez de argon2 (punto 8.2).
+- **Catálogo:** se crea con las prendas y servicios del oficio **sin precios**;
+  cada dueño pone los suyos. Nada de precios de ejemplo que haya que borrar.
+- **Sin conexión, alcance real:** se puede crear órdenes (con cliente nuevo o
+  guardado), imprimir las etiquetas generadas en el dispositivo, mover prendas
+  en producción, entregar y registrar pagos (también en efectivo). Espera a la
+  conexión todo lo que pide PIN de gerente (descuento sobre el máximo, precio
+  rebajado, anulaciones), la caja, los reportes, los ajustes y el envío de avisos.
+- **Entrega:** la firma o PIN del cliente al recoger **no** se construyó (queda
+  para la Fase 2 si un cliente lo pide).
+- **Fin de la prueba gratis:** solo muestra un aviso; **no bloquea** la cuenta.
+  Qué pasa al terminar es decisión de negocio pendiente.
+- **Cobro con tarjeta:** no hay procesador (Fase 2). Se registran los pagos
+  hechos en la terminal propia. Estado en `VERIFICAR-PAGOS.md`.
+

@@ -9,8 +9,11 @@ Punto de venta y gestión en la nube para tintorerías y lavanderías, vendido
 como suscripción (SaaS) a dueños de negocio en EE.UU. y Latinoamérica.
 Bilingüe español/inglés. Marca: **Tintora POS**. Dueño: Richard (Windoce LLC).
 
-**Estado (16 sep 2026):** propuesta escrita, sin código. Se arranca por fases
-cuando Richard dé el «adelante» (ver `PENDIENTES.md`).
+**Estado (16 sep 2026):** Fase 0 (blindaje) y Fase 1 (MVP vendible) construidas
+y probadas en local: 215 pruebas con 80 % de cobertura, 30 pruebas de punta a
+punta en celular y escritorio, paquete `_worker.js` de 4.64 MB en gzip probado.
+**No publicado**: faltan el repositorio, el plan del sitio y el reloj externo
+(ver `PENDIENTES.md`). **No hay procesador de pagos** (ver `VERIFICAR-PAGOS.md`).
 
 ## Documentos que mandan
 
@@ -19,8 +22,10 @@ cuando Richard dé el «adelante» (ver `PENDIENTES.md`).
 | `ESTUDIO-TINTORA-POS.md` | Qué se construye, para quién, cómo se cobra, arquitectura y seguridad. Se lee antes de tocar cualquier cosa |
 | `PENDIENTES.md` | La fila de trabajo (🤖) y lo que espera por Richard (👤). Se ejecuta en orden y se marca ahí |
 | `docs/CONTRATO-YADOMINIOS.md` | Cómo se publica en YaDominios Cloud, sin depender de red |
-| `CANDADOS.md` | Cada cosa que se rompió y cómo quedó fija (se crea en la Fase 0) |
-| `VERIFICAR-PAGOS.md` | Estado real de cada método de pago: probado con fecha o NO probado (se crea en la Fase 0) |
+| `CANDADOS.md` | Cada cosa que se rompió y cómo quedó fija. **Se lee antes de un rollback o de actualizar paquetes** |
+| `VERIFICAR-PAGOS.md` | Estado real de cada pieza de dinero: probado con fecha o NO probado (en rojo) |
+| `PLAN.md` | Los 52 pasos de la Fase 0 y la Fase 1, todos marcados |
+| `README.md` | Cómo se corre, se prueba y se publica |
 
 ## Perímetro (lista cerrada; lo que no está aquí no existe para la IA)
 
@@ -58,6 +63,20 @@ cuando Richard dé el «adelante» (ver `PENDIENTES.md`).
   casillas en el panel.
 - Docs en `/docs`, estilo Wikipedia, barra lateral que nunca se pierde.
 - Pie: `© <año> <dominio> | All rights reserved. Developed by Windoce LLC`.
+
+## Cómo se trabaja (comandos)
+
+- Local: `npm run db:local` (aplica `schema.sql` a la base local y a la de
+  pruebas) y `npm run dev`. Variables en `.dev.vars` (copiar de `.dev.vars.example`).
+- Antes de cada push: `npm run verify` (lo corre el hook `pre-push`).
+- Punta a punta: `npm run test:e2e` (levanta su propio servidor en el puerto
+  3210 con base aparte; Next no deja correr dos `next dev` a la vez en la misma
+  carpeta: detener la vista previa antes).
+- Paquete que se publica: `npm run cf:bundle && npm run test:paquete`.
+- Pruebas de pantallas: `tests/pantallas/` (contra rutas y base reales, entorno
+  Node + DOM de `tests/setup/dom-nodo.ts`; no pasarlas a `jsdom`).
+- Textos: siempre en `src/lib/i18n/diccionarios/es` y `en`; sección nueva con
+  `node scripts/i18n-seccion.mjs <nombre>`.
 
 ## Cómo se reporta
 
