@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { useIdioma } from "@/lib/i18n/cliente";
 
 /** Ventana accesible sobre <dialog>: foco atrapado, Esc cierra, fondo inerte. */
@@ -20,6 +20,7 @@ export function Modal({
   pie?: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const idTitulo = useId();
   const { d } = useIdioma();
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export function Modal({
   return (
     <dialog
       ref={ref}
+      aria-labelledby={idTitulo}
       onCancel={(e) => {
         e.preventDefault();
         alCerrar();
@@ -44,7 +46,9 @@ export function Modal({
       {abierto && (
         <div className="flex max-h-[85dvh] flex-col">
           <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-3">
-            <h2 className="titulo-ancho text-lg leading-tight">{titulo}</h2>
+            <h2 id={idTitulo} className="titulo-ancho text-lg leading-tight">
+              {titulo}
+            </h2>
             <button
               type="button"
               onClick={alCerrar}

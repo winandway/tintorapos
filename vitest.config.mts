@@ -34,10 +34,20 @@ export default defineConfig({
           setupFiles: ["tests/setup/dom.ts"],
         },
       },
+      {
+        extends: true,
+        test: {
+          // Pantallas completas contra las rutas /datos reales y la base local de pruebas.
+          name: "pantallas",
+          environment: "node",
+          include: ["tests/pantallas/**/*.test.tsx"],
+          setupFiles: ["tests/setup/dom-nodo.ts"],
+        },
+      },
     ],
     coverage: {
       provider: "v8",
-      reporter: ["text-summary", "text", "html", "json-summary"],
+      reporter: ["text-summary", "text", "html", "json-summary", "json"],
       include: ["src/lib/**", "src/server/**", "src/app/datos/**", "src/app/media/**", "src/components/**"],
       exclude: ["**/*.d.ts", "src/lib/i18n/diccionarios/**"],
       thresholds: {

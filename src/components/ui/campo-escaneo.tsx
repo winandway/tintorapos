@@ -5,6 +5,15 @@ import { useIdioma } from "@/lib/i18n/cliente";
 import { Boton } from "./boton";
 import { EscanerCamara } from "./escaner";
 
+const TIPOS_SIN_TEXTO = new Set(["checkbox", "radio", "button", "submit", "reset", "file", "range", "color"]);
+
+export function escribiendoEnOtroCampo(propio: HTMLElement | null): boolean {
+  const activo = document.activeElement;
+  if (!(activo instanceof HTMLElement) || activo === propio) return false;
+  if (activo.isContentEditable || activo.tagName === "TEXTAREA" || activo.tagName === "SELECT") return true;
+  return activo instanceof HTMLInputElement && !TIPOS_SIN_TEXTO.has(activo.type);
+}
+
 /**
  * Campo que recibe lo que manda un lector USB/Bluetooth (se comporta como un
  * teclado y termina con Enter) o lo que lee la cámara.
@@ -23,8 +32,12 @@ export function CampoEscaneo({
   const [camara, setCamara] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
 
+  // Al terminar cada operación el foco vuelve al campo (el lector escribe donde esté el foco),
+  // PERO no si la persona está escribiendo en otro campo, como la ubicación en el rack.
   useEffect(() => {
-    if (!ocupado) ref.current?.focus();
+    if (ocupado) return;
+    if (escribiendoEnOtroCampo(ref.current)) return;
+    ref.current?.focus();
   }, [ocupado]);
 
   const leidoCamara = useCallback(
