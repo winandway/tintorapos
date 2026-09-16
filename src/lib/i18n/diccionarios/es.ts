@@ -13,6 +13,7 @@ import { mostrador } from "./es/mostrador";
 import { impresion } from "./es/impresion";
 import { produccion } from "./es/produccion";
 import { entrega } from "./es/entrega";
+import { publico } from "./es/publico";
 
 export const es = {
   comun,
@@ -30,4 +31,5 @@ export const es = {
   impresion,
   produccion,
   entrega,
+  publico,
 };

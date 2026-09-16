@@ -51,7 +51,7 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 - [x] 33. Producción (pantalla): escanear QR (lector USB/Bluetooth y cámara), mover prenda/orden de estado, ubicación en el rack, lista por estado
 - [x] 34. Entrega (pantalla): escanear ticket o buscar, ver saldo, cobrar lo pendiente, marcar entregada
 - [x] 35. Lista y detalle de órdenes: filtros (estado, atrasadas, fecha), detalle con historial, pagos y acciones (anular dentro de los 3 puntos)
-- [ ] 36. Página pública del cliente `/t/[código]`: estado de la orden bilingüe, solo primer nombre, sin teléfono ni importes, `noindex`, límite de intentos
+- [x] 36. Página pública del cliente `/t/[código]`: estado de la orden bilingüe, solo primer nombre, sin teléfono ni importes, `noindex`, límite de intentos
 - [ ] 37. Avisos: cola en base, plantillas bilingües editables (recibida, lista, recordatorio), SMS por Twilio y correo, reintentos, STOP con firma de Twilio verificada, solo a quien aceptó; pruebas con MSW
 - [ ] 38. Reloj `/datos/reloj` protegido con secreto: procesar avisos, recordatorios de ropa sin recoger, respaldo diario cifrado al almacén con retención 30 días, limpieza de papelera, sesiones y límites
 - [ ] 39. Respaldo y restauración probada (cifrar → descifrar → cargar en base limpia) + exportación de datos del dueño (JSON y CSV)

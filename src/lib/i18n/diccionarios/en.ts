@@ -15,6 +15,7 @@ import { mostrador } from "./en/mostrador";
 import { impresion } from "./en/impresion";
 import { produccion } from "./en/produccion";
 import { entrega } from "./en/entrega";
+import { publico } from "./en/publico";
 
 export const en: Forma<typeof es> = {
   comun,
@@ -32,4 +33,5 @@ export const en: Forma<typeof es> = {
   impresion,
   produccion,
   entrega,
+  publico,
 };
