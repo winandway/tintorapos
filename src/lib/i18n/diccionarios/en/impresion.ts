@@ -1,0 +1,31 @@
+import type { impresion as base } from "../es/impresion";
+import type { Forma } from "../../index";
+
+export const impresion: Forma<typeof base> = {
+  imprimir: "Print",
+  cerrar: "Close",
+  orden: "Order",
+  recibida: "Received",
+  lista: "Ready by",
+  cliente: "Customer",
+  cant: "Qty",
+  subtotal: "Subtotal",
+  recargo: "Rush surcharge",
+  descuento: "Discount",
+  impuesto: "Tax",
+  total: "Total",
+  pagado: "Paid",
+  saldo: "Balance due",
+  pagos: "Payments",
+  consulta: "Check your order status:",
+  politica: "We keep items for {dias} days after they're ready. Bring this receipt to pick up.",
+  gracias: "Thank you for your business!",
+  copiaInterna: "STORE COPY",
+  notas: "Notes",
+  pieza: "Item {i} of {n}",
+  urgente: "RUSH",
+  bloqueada: "Reprinting the receipt needs a manager's approval.",
+  autorizar: "Approve and print",
+  metodos: { efectivo: "Cash", tarjeta_externa: "Card", otro: "Other" },
+  lb: "lb",
+};

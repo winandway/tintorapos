@@ -12,6 +12,7 @@ import { errores } from "./en/errores";
 import { validacion } from "./en/validacion";
 import type { es } from "./es";
 import { mostrador } from "./en/mostrador";
+import { impresion } from "./en/impresion";
 
 export const en: Forma<typeof es> = {
   comun,
@@ -26,4 +27,5 @@ export const en: Forma<typeof es> = {
   ordenes,
   caja,
   mostrador,
+  impresion,
 };
