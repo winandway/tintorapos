@@ -1,0 +1,19 @@
+# dependencias y compilados
+node_modules/
+.next/
+.open-next/
+out/
+dist/
+coverage/
+_worker.js
+
+# secretos: nunca al repo
+.env
+.env.*
+!.env.example
+
+# sistema y editores
+.DS_Store
+*.log
+.vscode/
+.idea/
