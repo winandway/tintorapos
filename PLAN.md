@@ -20,16 +20,16 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 
 ## Fase 1 — Base del producto
 
-- [ ] 11. Marca: logo SVG, paleta, tipografía, `icon.png`/`apple-icon.png` (sin favicon de Next), imagen Open Graph 1200×630, metadatos sociales
-- [ ] 12. i18n ES/EN: diccionarios tipados, idioma por cookie/navegador, selector con banderas arriba, prueba de paridad de claves
-- [ ] 13. `schema.sql` completo e idempotente (tintorerías, sucursales, usuarios, dispositivos, sesiones, clientes, catálogo, precios, órdenes, prendas, estados, pagos, turnos, movimientos, avisos, auditoría con triggers de solo-agregar, límites, respaldos, sync, sistema) + `db:local` para aplicarlo
-- [ ] 14. Capa de acceso a datos: `getEnv()`, cliente D1 tipado, utilidades de dinero (centavos, impuestos, redondeo), fechas por zona horaria, generadores de códigos seguros; pruebas al 90%+
-- [ ] 15. Envoltura de rutas `/datos`: sesión desde cookie, CSRF (origen + doble token), zod, límite de intentos en base, errores bilingües, contexto de auditoría
-- [ ] 16. Candado de aislamiento: prueba estática (todo SQL de tablas de inquilino filtra `tintoreria_id`) + prueba de cruce entre dos tintorerías por cada ruta + meta-prueba que falla si una ruta nueva no está cubierta
+- [x] 11. Marca: logo SVG, paleta, tipografía, `icon.png`/`apple-icon.png` (sin favicon de Next), imagen Open Graph 1200×630, metadatos sociales
+- [x] 12. i18n ES/EN: diccionarios tipados, idioma por cookie/navegador, selector con banderas arriba, prueba de paridad de claves
+- [x] 13. `schema.sql` completo e idempotente (tintorerías, sucursales, usuarios, dispositivos, sesiones, clientes, catálogo, precios, órdenes, prendas, estados, pagos, turnos, movimientos, avisos, auditoría con triggers de solo-agregar, límites, respaldos, sync, sistema) + `db:local` para aplicarlo
+- [x] 14. Capa de acceso a datos: `getEnv()`, cliente D1 tipado, utilidades de dinero (centavos, impuestos, redondeo), fechas por zona horaria, generadores de códigos seguros; pruebas al 90%+
+- [x] 15. Envoltura de rutas `/datos`: sesión desde cookie, CSRF (origen + doble token), zod, límite de intentos en base, errores bilingües, contexto de auditoría
+- [x] 16. Candado de aislamiento: prueba estática (todo SQL de tablas de inquilino filtra `tintoreria_id`) + prueba de cruce entre dos tintorerías por cada ruta + meta-prueba que falla si una ruta nueva no está cubierta
 
 ## Fase 1 — Cuentas y seguridad
 
-- [ ] 17. Contraseñas PBKDF2-SHA256 (100k, sal por usuario, pimienta del entorno) y hash de PIN; pruebas
+- [x] 17. Contraseñas PBKDF2-SHA256 (100k, el máximo de Workers; sal por usuario; formato versionado para subir parámetros) y hash de PIN; secreto de dos pasos cifrado con AES-GCM; pruebas
 - [ ] 18. Registro de tintorería (prueba 14 días, sucursal principal, dueño, catálogo estándar sin precios inventados, regla «Soporte» para @windoce.com) con Turnstile opcional
 - [ ] 19. Entrar / salir: sesiones del servidor (cookie httpOnly, caducidad, cierre real + recarga completa), límite de intentos por correo e IP, Turnstile en servidor antes de mirar la clave
 - [ ] 20. Verificación en dos pasos (TOTP) obligatoria para el dueño: alta con QR, códigos de respaldo, verificación al entrar; pruebas con vectores RFC 6238

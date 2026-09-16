@@ -1,0 +1,16 @@
+export const validacion = {
+  requerido: "Este campo es obligatorio.",
+  invalido: "El valor no es válido.",
+  muy_corto: "Es demasiado corto.",
+  muy_largo: "Es demasiado largo.",
+  correo: "Escribe un correo válido, como nombre@ejemplo.com.",
+  telefono: "Escribe un número de teléfono válido, con código de área.",
+  debe_cambiar_clave: "Primero cambia tu contraseña.",
+  zona: "Elige una zona horaria válida.",
+  acepta_terminos: "Debes aceptar los términos para continuar.",
+  clave_corta: "Al menos 10 caracteres.",
+  clave_simple: "Usa letras y números.",
+  clave_igual_correo: "No puede contener tu correo.",
+  pin_debil: "De 4 a 6 números, no consecutivos ni repetidos.",
+  claves_distintas: "Las contraseñas no coinciden.",
+};

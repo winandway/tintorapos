@@ -1,26 +1,102 @@
 @import "tailwindcss";
 
+/*
+ * Tintora POS — tokens de marca.
+ * Tinta violeta (Tintora viene de tinta) sobre papel; el color de cada ticket
+ * indica el DÍA en que entró la orden, como en las tintorerías de verdad.
+ */
+@theme {
+  --color-tinta: #3524a8;
+  --color-tinta-oscura: #2a1c8a;
+  --color-tinta-suave: #eceafb;
+  --color-noche: #16122b;
+  --color-papel: #f6f5fb;
+  --color-superficie: #ffffff;
+  --color-percha: #d9d6e5;
+  --color-gris: #5e5a73;
+  --color-gris-claro: #8f8aa6;
+  --color-ok: #1e7f4f;
+  --color-ok-suave: #e3f4ea;
+  --color-alerta: #9a6400;
+  --color-alerta-suave: #fdf1d8;
+  --color-peligro: #c8322b;
+  --color-peligro-suave: #fbe7e5;
+
+  /* Colores de ticket por día de la semana (0 = domingo). */
+  --color-dia-0: #e9e7f0;
+  --color-dia-1: #9ccbf2;
+  --color-dia-2: #f6b3c6;
+  --color-dia-3: #f4dc6b;
+  --color-dia-4: #9fddb6;
+  --color-dia-5: #ffbe85;
+  --color-dia-6: #c9b5f0;
+
+  --font-titulo: var(--fuente-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--fuente-atkinson), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-ticket: 14px;
+  --shadow-ticket: 0 1px 0 rgb(22 18 43 / 0.06), 0 8px 24px -12px rgb(22 18 43 / 0.25);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-papel);
+  color: var(--color-noche);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Títulos: Archivo ancho; números de ticket: Archivo angosto y pesado. */
+.titulo-ancho {
+  font-family: var(--font-titulo);
+  font-stretch: 112%;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.numero-ticket {
+  font-family: var(--font-titulo);
+  font-stretch: 70%;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.cifra {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-tinta);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Impresión: solo lo que va al papel. */
+@media print {
+  .no-imprimir {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
 }
