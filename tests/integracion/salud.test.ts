@@ -36,6 +36,19 @@ describe("canario /datos/salud (candado de piezas)", () => {
     expect(JSON.stringify(r.datos).includes(String(e.env.APP_SECRET))).toBe(false);
   });
 
+  it("en público no dice POR QUÉ falla (no delata configuración); con el secreto del reloj sí (comprobado en rojo)", async () => {
+    const publica = await new Navegador().llamar<Salud>(salud);
+    expect(JSON.stringify(publica.datos)).not.toContain("detalle");
+    const conSecreto = await new Navegador().llamar<Salud>(salud, {
+      cabeceras: { authorization: `Bearer ${String(e.env.RELOJ_SECRETO)}` },
+    });
+    expect(conSecreto.datos.piezas.reloj?.detalle).toBeTruthy();
+    const secretoMalo = await new Navegador().llamar<Salud>(salud, {
+      cabeceras: { authorization: "Bearer otro" },
+    });
+    expect(JSON.stringify(secretoMalo.datos)).not.toContain("detalle");
+  });
+
   it("con el reloj corriendo y respaldos al día: verde", async () => {
     const vars = variablesDe(e.env);
     const t = await crearTintoreria(e.env.DB);

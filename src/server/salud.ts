@@ -29,7 +29,8 @@ export async function revisarSalud(env: CloudflareEnv, vars: Variables, ahora = 
     piezas.base =
       f?.n === 3 ? { estado: "ok" } : { estado: "error", detalle: "faltan tablas: ¿se aplicó schema.sql?" };
   } catch (e) {
-    piezas.base = { estado: "error", detalle: e instanceof Error ? e.message : String(e) };
+    console.error("[salud] base:", e);
+    piezas.base = { estado: "error", detalle: "la consulta a la base falló (ver registro de errores)" };
   }
   try {
     const clave = "salud/latido.txt";
@@ -40,7 +41,11 @@ export async function revisarSalud(env: CloudflareEnv, vars: Variables, ahora = 
         ? { estado: "ok" }
         : { estado: "error", detalle: "lectura distinta a la escritura" };
   } catch (e) {
-    piezas.almacen = { estado: "error", detalle: e instanceof Error ? e.message : String(e) };
+    console.error("[salud] almacén:", e);
+    piezas.almacen = {
+      estado: "error",
+      detalle: "la escritura en el almacén falló (ver registro de errores)",
+    };
   }
   const faltan = faltantesProduccion(vars);
   piezas.variables = faltan.length
@@ -98,4 +103,17 @@ export async function revisarSalud(env: CloudflareEnv, vars: Variables, ahora = 
   }
   const estado = Object.values(piezas).some((p) => p.estado === "error") ? "error" : "ok";
   return { estado, piezas, revisadoEn: ahora };
+}
+
+/**
+ * Lo que ve cualquiera: solo ok / error / no_configurado por pieza. Los motivos
+ * (variables que faltan, errores del reloj) pueden delatar la configuración, así
+ * que solo salen con «Authorization: Bearer RELOJ_SECRETO».
+ */
+export function saludPublica(s: Salud): Salud {
+  return {
+    estado: s.estado,
+    revisadoEn: s.revisadoEn,
+    piezas: Object.fromEntries(Object.entries(s.piezas).map(([k, p]) => [k, { estado: p.estado }])),
+  };
 }
