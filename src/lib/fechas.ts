@@ -102,3 +102,8 @@ export function fechaPromesa(ahora: number, zona: string, dias: number, urgente:
 }
 
 export const MS_DIA = 24 * 60 * 60 * 1000;
+
+/** Hora actual. Envuelta para usarla desde componentes sin romper las reglas de pureza. */
+export function ahoraMs(): number {
+  return Date.now();
+}

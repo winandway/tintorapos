@@ -45,8 +45,8 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 - [x] 27. Clientes: buscar por teléfono o nombre, crear/editar, idioma, preferencias, consentimiento de SMS y correo con fecha, historial, borrado con papelera de 30 días (dentro de los 3 puntos)
 - [x] 28. Órdenes (servidor): crear con prendas, precios, unidad pieza/libra, urgente, descuento con autorización, impuesto, fecha promesa, códigos QR por prenda; cambiar estados con historial; anular con autorización; pruebas de cálculo al 90%+
 - [x] 29. Caja: abrir turno con fondo, pagos (efectivo, tarjeta en terminal propio, otro) con idempotencia, abonos, entradas/salidas y «abrir cajón» con autorización, cierre ciego con diferencia registrada; pruebas al 90%+
-- [ ] 30. Fotos de prendas: subida redimensionada en el navegador, guardado en `env.BUCKET`, servidas por `/media` con comprobación de sesión y pertenencia
-- [ ] 31. Mostrador (pantalla): nueva orden en pocos toques para tablet y celular, cliente, prendas, fotos, urgente, descuento, cobro o abono, confirmar e imprimir
+- [x] 30. Fotos de prendas: subida redimensionada en el navegador, guardado en `env.BUCKET`, servidas por `/media` con comprobación de sesión y pertenencia
+- [x] 31. Mostrador (pantalla): nueva orden en pocos toques para tablet y celular, cliente, prendas, fotos, urgente, descuento, cobro o abono, confirmar e imprimir
 - [ ] 32. Impresión: recibo 80 mm para el cliente, copia interna, etiquetas con QR por prenda (2×1 in); reimpresión de recibo con autorización y auditoría
 - [ ] 33. Producción (pantalla): escanear QR (lector USB/Bluetooth y cámara), mover prenda/orden de estado, ubicación en el rack, lista por estado
 - [ ] 34. Entrega (pantalla): escanear ticket o buscar, ver saldo, cobrar lo pendiente, marcar entregada

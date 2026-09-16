@@ -9,6 +9,7 @@ import { ordenes } from "./es/ordenes";
 import { caja } from "./es/caja";
 import { errores } from "./es/errores";
 import { validacion } from "./es/validacion";
+import { mostrador } from "./es/mostrador";
 
 export const es = {
   comun,
@@ -22,4 +23,5 @@ export const es = {
   clientes,
   ordenes,
   caja,
+  mostrador,
 };
