@@ -30,10 +30,10 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 ## Fase 1 — Cuentas y seguridad
 
 - [x] 17. Contraseñas PBKDF2-SHA256 (100k, el máximo de Workers; sal por usuario; formato versionado para subir parámetros) y hash de PIN; secreto de dos pasos cifrado con AES-GCM; pruebas
-- [ ] 18. Registro de tintorería (prueba 14 días, sucursal principal, dueño, catálogo estándar sin precios inventados, regla «Soporte» para @windoce.com) con Turnstile opcional
-- [ ] 19. Entrar / salir: sesiones del servidor (cookie httpOnly, caducidad, cierre real + recarga completa), límite de intentos por correo e IP, Turnstile en servidor antes de mirar la clave
-- [ ] 20. Verificación en dos pasos (TOTP) obligatoria para el dueño: alta con QR, códigos de respaldo, verificación al entrar; pruebas con vectores RFC 6238
-- [ ] 21. Recuperar contraseña por correo (token de un solo uso, 1 h) con adaptador de correo `env.EMAIL` que falla visible
+- [x] 18. Registro de tintorería (prueba 14 días, sucursal principal, dueño, catálogo estándar sin precios inventados, regla «Soporte» para @windoce.com) con Turnstile opcional
+- [x] 19. Entrar / salir: sesiones del servidor (cookie httpOnly, caducidad, cierre real + recarga completa), límite de intentos por correo e IP, Turnstile en servidor antes de mirar la clave
+- [x] 20. Verificación en dos pasos (TOTP) obligatoria para el dueño: alta con QR, códigos de respaldo, verificación al entrar; pruebas con vectores RFC 6238
+- [x] 21. Recuperar contraseña por correo (token de un solo uso, 1 h) con adaptador de correo `env.EMAIL` que falla visible
 - [ ] 22. Dispositivos de la tienda: registrar esta tablet, pantalla de PIN con empleados, bloqueo tras 5 intentos (15 min), bloqueo por inactividad, lista y revocación desde el panel
 - [ ] 23. Roles y permisos (dueño, gerente, cajero, planta, repartidor) + autorización con PIN de gerente + auditoría de solo-agregar; pruebas al 100% de la matriz
 - [ ] 24. Componentes base de la interfaz: `CampoClave` con ojito, botones, campos, modal, menú de 3 puntos (borrar solo ahí, con confirmación), avisos, encabezado con menú de cuenta y salir, pie con crédito Windoce LLC

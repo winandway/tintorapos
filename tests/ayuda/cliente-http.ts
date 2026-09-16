@@ -11,7 +11,10 @@ type Manejador = (
 
 export class Navegador {
   cookies = new Map<string, string>([["tp_csrf", "csrf-de-prueba-0123456789"]]);
-  cabecerasExtra: Record<string, string> = {};
+  /** Cada navegador de prueba es un visitante distinto (su propia IP). */
+  cabecerasExtra: Record<string, string> = {
+    "cf-connecting-ip": `203.0.113.${Math.floor(Math.random() * 250) + 1}`,
+  };
 
   cabeceraCookie(): string {
     return [...this.cookies].map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join("; ");

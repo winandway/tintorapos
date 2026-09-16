@@ -15,7 +15,7 @@ export interface EntornoPrueba {
  * Base de datos D1 y almacén R2 REALES (motor local de Cloudflare) en memoria,
  * con schema.sql aplicado. Una instancia por archivo de prueba.
  */
-export async function crearEntorno(extra: Record<string, string> = {}): Promise<EntornoPrueba> {
+export async function crearEntorno(extra: Record<string, unknown> = {}): Promise<EntornoPrueba> {
   const proxy = await getPlatformProxy<CloudflareEnv>({
     configPath: path.resolve(import.meta.dirname, "../../wrangler.jsonc"),
     persist: false,

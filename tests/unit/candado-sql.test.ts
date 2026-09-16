@@ -9,6 +9,7 @@ import path from "node:path";
  *   /* sistema: … *\/        tareas del reloj que recorren todas las tintorerías
  *   /* token secreto: … *\/  búsquedas por un token de 256 bits (sesión, dispositivo)
  *   /* código público: … *\/ búsqueda por código público de ticket (100 bits)
+ *   /* global: … *\/        búsqueda por un valor único en todo el sistema (correo de acceso)
  */
 const TABLAS_NEGOCIO = [
   "sucursales",
@@ -51,7 +52,7 @@ export function consultasDe(codigo: string): string[] {
 
 export function problemaDeConsulta(sql: string): string | null {
   const s = sql.toLowerCase().replace(/\s+/g, " ");
-  if (/\/\*\s*(sistema|token secreto|código público|codigo publico):/.test(s)) return null;
+  if (/\/\*\s*(sistema|token secreto|código público|codigo publico|global):/.test(s)) return null;
   const tablas = [...s.matchAll(/\b(?:from|join|into|update)\s+([a-z_]+)/g)].map((m) => m[1] ?? "");
   const deNegocio = tablas.filter((t) => TABLAS_NEGOCIO.includes(t));
   if (deNegocio.length && !s.includes("tintoreria_id"))

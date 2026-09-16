@@ -102,13 +102,14 @@ export function camposDeZod(error: z.ZodError): Record<string, string> {
     const ruta = i.path.join(".") || "_";
     if (campos[ruta]) continue;
     let codigo = "invalido";
-    if (i.code === "invalid_type" && (i as { input?: unknown }).input === undefined) codigo = "requerido";
+    // Los mensajes propios del código son claves en snake_case (p. ej. «acepta_terminos»).
+    if (/^[a-z_]+$/.test(i.message)) codigo = i.message;
+    else if (i.code === "invalid_type" && (i as { input?: unknown }).input === undefined)
+      codigo = "requerido";
     else if (i.code === "too_small")
       codigo = (i as { minimum?: unknown }).minimum === 1 ? "requerido" : "muy_corto";
     else if (i.code === "too_big") codigo = "muy_largo";
     else if (i.code === "invalid_format" && (i as { format?: string }).format === "email") codigo = "correo";
-    else if (i.code === "custom" && typeof i.message === "string" && /^[a-z_]+$/.test(i.message))
-      codigo = i.message;
     campos[ruta] = codigo;
   }
   return campos;
