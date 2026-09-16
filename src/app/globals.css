@@ -9,6 +9,9 @@
   --color-tinta: #3524a8;
   --color-tinta-oscura: #2a1c8a;
   --color-tinta-suave: #eceafb;
+  /* Marcas de gráficas: paso de la rampa de tinta validado con el validador de paletas. */
+  --color-grafica: #5a49d1;
+  --color-grafica-rejilla: #ecebf2;
   --color-noche: #16122b;
   --color-papel: #f6f5fb;
   --color-superficie: #ffffff;

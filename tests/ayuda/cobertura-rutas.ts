@@ -262,6 +262,17 @@ export const COBERTURA: Record<string, Cobertura> = {
     ],
   },
   "/datos/respaldos": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/reportes": {
+    casos: () => [
+      { metodo: "GET", url: "/datos/reportes?preset=30", esperado: [200] },
+      {
+        metodo: "GET",
+        url: "/datos/reportes?desde=2000-01-01&hasta=2999-12-31&formato=csv",
+        esperado: [200],
+      },
+    ],
+  },
+  "/datos/reportes/operacion": { casos: () => [{ metodo: "GET", esperado: [200] }] },
   "/datos/empleados": {
     casos: () => [
       { metodo: "GET", esperado: [200] },

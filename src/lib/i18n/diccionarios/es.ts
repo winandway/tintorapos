@@ -17,6 +17,7 @@ import { publico } from "./es/publico";
 import { avisos } from "./es/avisos";
 import { seguridad } from "./es/seguridad";
 import { datos } from "./es/datos";
+import { reportes } from "./es/reportes";
 
 export const es = {
   comun,
@@ -38,4 +39,5 @@ export const es = {
   avisos,
   seguridad,
   datos,
+  reportes,
 };
