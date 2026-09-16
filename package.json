@@ -22,7 +22,8 @@
     "audit": "npm audit --audit-level=high",
     "secrets": "gitleaks git --no-banner --redact .",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run build && npm run audit && npm run secrets",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:paquete": "node scripts/probar-paquete.mjs"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.20.6",
