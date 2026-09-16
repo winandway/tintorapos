@@ -58,7 +58,7 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 - [x] 40. Reportes: ventas por día/semana/mes, por servicio, por empleado, por forma de pago; órdenes atrasadas; ropa sin recoger; exportar CSV
 - [x] 41. Tablero de inicio `/app` con cifras de hoy y lista de primeros pasos (tienda, precios, empleados, tablet, etiqueta de prueba)
 - [x] 42. Modo sin conexión: PWA (manifest + service worker), caché local en IndexedDB (catálogo, clientes, órdenes abiertas), cola de operaciones con identificadores del dispositivo, sincronización idempotente `/datos/sync`, indicador de conexión
-- [ ] 43. Canario `/datos/salud`: base, almacén, variables, correo, SMS, Turnstile, última corrida del reloj, último respaldo
+- [x] 43. Canario `/datos/salud`: base, almacén, variables, correo, SMS, Turnstile, última corrida del reloj, último respaldo
 
 ## Fase 1 — Cara pública y documentos
 

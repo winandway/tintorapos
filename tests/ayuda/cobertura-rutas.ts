@@ -308,6 +308,7 @@ export const COBERTURA: Record<string, Cobertura> = {
     ],
   },
   "/datos/mostrador/cache": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/salud": { publica: "canario sin datos de ninguna tintorería" },
   "/datos/empleados": {
     casos: () => [
       { metodo: "GET", esperado: [200] },
