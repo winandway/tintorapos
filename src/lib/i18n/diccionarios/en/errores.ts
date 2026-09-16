@@ -35,6 +35,7 @@ export const errores: Record<CodigoError, string> = {
   clave_igual_correo: "Your password can't contain your email.",
   pin_debil: "The PIN must be 4 to 6 digits and can't be 1111 or 1234.",
   soporte_nombre: "Accounts for our team (@windoce.com) must include “Soporte” in the name.",
+  cliente_repetido: "A customer with that phone already exists: {nombre}.",
   ultimo_dueno: "At least one active owner must remain.",
   saldo_pendiente: "This order has a balance due of {monto}. Collect it before handing it over.",
   orden_cerrada: "This order is already closed (picked up or voided).",

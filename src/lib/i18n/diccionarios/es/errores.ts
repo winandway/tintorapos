@@ -36,6 +36,7 @@ export const errores: Record<CodigoError, string> = {
   clave_igual_correo: "La contraseña no puede contener tu correo.",
   pin_debil: "El PIN debe tener de 4 a 6 números y no puede ser 1111 ni 1234.",
   soporte_nombre: "Las cuentas de nuestro equipo (@windoce.com) deben llevar «Soporte» en el nombre.",
+  cliente_repetido: "Ya existe un cliente con ese teléfono: {nombre}.",
   ultimo_dueno: "Tiene que quedar al menos un dueño activo.",
   saldo_pendiente: "La orden tiene un saldo pendiente de {monto}. Cóbralo antes de entregar.",
   orden_cerrada: "Esta orden ya está cerrada (entregada o anulada).",

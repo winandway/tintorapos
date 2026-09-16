@@ -42,7 +42,7 @@ nube (necesitan el sí de Richard, van en el bloque de preguntas).
 
 - [x] 25. Administración: datos de la tienda (dirección, teléfono, zona horaria, moneda, impuesto, recargo urgente, descuento máximo sin autorización, política de recogida), catálogo bilingüe de prendas y servicios, matriz de precios
 - [x] 26. Empleados: alta con rol y PIN, correo y clave para gerentes, cambio de clave obligatorio al primer ingreso, desactivar dentro de los 3 puntos
-- [ ] 27. Clientes: buscar por teléfono o nombre, crear/editar, idioma, preferencias, consentimiento de SMS y correo con fecha, historial, borrado con papelera de 30 días (dentro de los 3 puntos)
+- [x] 27. Clientes: buscar por teléfono o nombre, crear/editar, idioma, preferencias, consentimiento de SMS y correo con fecha, historial, borrado con papelera de 30 días (dentro de los 3 puntos)
 - [ ] 28. Órdenes (servidor): crear con prendas, precios, unidad pieza/libra, urgente, descuento con autorización, impuesto, fecha promesa, códigos QR por prenda; cambiar estados con historial; anular con autorización; pruebas de cálculo al 90%+
 - [ ] 29. Caja: abrir turno con fondo, pagos (efectivo, tarjeta en terminal propio, otro) con idempotencia, abonos, entradas/salidas y «abrir cajón» con autorización, cierre ciego con diferencia registrada; pruebas al 90%+
 - [ ] 30. Fotos de prendas: subida redimensionada en el navegador, guardado en `env.BUCKET`, servidas por `/media` con comprobación de sesión y pertenencia

@@ -99,6 +99,27 @@ export const COBERTURA: Record<string, Cobertura> = {
       },
     ],
   },
+  "/datos/clientes": {
+    casos: () => [
+      { metodo: "GET", url: "/datos/clientes?q=3125550199", esperado: [200] },
+      { metodo: "GET", url: "/datos/clientes?q=marca-unica-aaaa", esperado: [200] },
+      {
+        metodo: "POST",
+        cuerpo: { nombre: "Cliente nuevo B", idioma: "es", telefono: "3125550111" },
+        esperado: [200],
+      },
+    ],
+  },
+  "/datos/clientes/[id]": {
+    casos: (e) => [
+      { metodo: "GET", params: { id: e.a.ids.clienteId! } },
+      { metodo: "PUT", params: { id: e.a.ids.clienteId! }, cuerpo: { nombre: "Robado", idioma: "en" } },
+      { metodo: "DELETE", params: { id: e.a.ids.clienteId! } },
+    ],
+  },
+  "/datos/clientes/[id]/restaurar": {
+    casos: (e) => [{ metodo: "POST", params: { id: e.a.ids.clienteId! } }],
+  },
   "/datos/empleados": {
     casos: () => [
       { metodo: "GET", esperado: [200] },

@@ -37,6 +37,7 @@ export const CODIGOS_ERROR = [
   "pin_debil",
   "soporte_nombre",
   "ultimo_dueno",
+  "cliente_repetido",
   "saldo_pendiente",
   "orden_cerrada",
   "precio_faltante",

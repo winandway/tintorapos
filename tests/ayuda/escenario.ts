@@ -49,13 +49,20 @@ export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario>
       )
       .bind(t.id, servicio!.id, prenda!.id, Date.now())
       .run();
+    const clienteId = nuevoId();
+    await db
+      .prepare(
+        "insert into clientes (id, tintoreria_id, nombre, telefono, telefono_digitos, idioma, creado_en, actualizado_en) values (?, ?, ?, ?, ?, 'es', ?, ?)",
+      )
+      .bind(clienteId, t.id, `Cliente ${nombre}`, "+13125550199", "3125550199", Date.now(), Date.now())
+      .run();
     return {
       ...t,
       sesionDueno: await sesionPara(db, t.id, t.duenoId),
       dispositivoId: d.id,
       dispositivoToken: d.token,
-      marcas: [t.id, t.duenoId, nombre, empleadoId, prenda!.id, servicio!.id, d.id],
-      ids: { prendaId: prenda!.id, servicioId: servicio!.id, empleadoId },
+      marcas: [t.id, t.duenoId, nombre, empleadoId, prenda!.id, servicio!.id, d.id, clienteId],
+      ids: { prendaId: prenda!.id, servicioId: servicio!.id, empleadoId, clienteId },
     };
   };
   const a = await lado("Tintoreria A marca-unica-aaaa");
