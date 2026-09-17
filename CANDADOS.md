@@ -365,6 +365,14 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   (MCP de punta a punta y que no se escape dinero ni teléfono),
   `tests/ayuda/cobertura-rutas.ts` (aislamiento) y el humo post-publicación, que
   comprueba en vivo el Markdown, la cabecera Link, las señales y `/mcp`.
+- **Resultado medido:** el escáner de isitagentready.com pasó de **nivel 1
+  «Basic Web Presence» (20/100)** a **nivel 5 «Agent-Native»** el 17 sep 2026,
+  con 12 comprobaciones en verde. Se vuelve a medir con:
+  `curl -s -X POST https://isitagentready.com/api/scan -H "content-type: application/json" -d '{"url":"https://tintorapos.com"}'`
+- **A2A:** `/a2a` responde `message/send` de otro agente y elige la herramienta
+  por el texto (`elegirHerramienta`). El código del recibo se busca como el token
+  MÁS LARGO del mensaje: con la primera versión, «el código del recibo es …»
+  tomaba la palabra «RECIBO» como código (la prueba lo fija).
 - **NO tocar:** no publicar metadatos de OAuth (`openid-configuration`,
   `oauth-protected-resource`, `auth.md`) mientras no exista el servidor OAuth de
   verdad: anunciar una puerta que no existe rompe a los agentes que la usen.
