@@ -60,6 +60,19 @@ SOLO en la base local: nunca toca la base publicada.
 | `npm run cf:bundle` | Compila y arma `out-deploy/` con el `_worker.js` (corta si pasa de 10 MB en gzip) |
 | `npm run test:paquete` | Levanta ese `_worker.js` con wrangler y le corre todas las pruebas de punta a punta |
 
+## Para agentes de IA
+
+| Dirección | Qué es |
+| --- | --- |
+| `https://tintorapos.com/mcp` | Servidor MCP público (JSON-RPC 2.0, solo lectura) |
+| `https://tintorapos.com/.well-known/mcp/server-card.json` | Tarjeta del servidor MCP |
+| `https://tintorapos.com/.well-known/api-catalog` | Catálogo de API (RFC 9727) |
+| `https://tintorapos.com/.well-known/openapi.json` | Especificación de la parte pública |
+| `https://tintorapos.com/.well-known/agent-skills/index.json` | Habilidades publicadas |
+| `https://tintorapos.com/.well-known/agent-card.json` | Tarjeta de agente (A2A) |
+| `https://tintorapos.com/.well-known/ai-catalog.json` | Manifiesto de recursos (ARD) |
+| Cualquier página pública con `Accept: text/markdown` | La misma página en Markdown |
+
 ## Estructura
 
 ```

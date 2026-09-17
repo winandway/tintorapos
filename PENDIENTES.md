@@ -29,7 +29,12 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
    **Destranca:** cobrar con tarjeta dentro del sistema (Fase 2).
 8. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU.
    **Destranca:** avisos por SMS reales.
-9. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
+9. 👤 **Registros DNS para agentes (DNS-AID)** en el panel de YaDominios →
+   Mis dominios → `tintorapos.com` → DNS: un TXT `_catalog._agents` con
+   `url=https://tintorapos.com/.well-known/ai-catalog.json` y, si el panel ofrece
+   el tipo SVCB/HTTPS, `_index._agents`.
+   **Destranca:** la última casilla de descubrimiento por DNS del informe de agentes.
+10. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
    **Destranca:** protección de entrar, registrarse y recuperar contraseña.
 
 ## Fila de la IA (🤖), en orden
@@ -78,3 +83,6 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
   en la etiqueta.
 - ✅ 2026-09-17 · Conectar un celular escaneando un QR desde la tablet (enlace de
   un solo uso de 10 minutos, entra con PIN).
+- ✅ 2026-09-17 · Sitio listo para agentes de IA: servidor MCP público (`/mcp`),
+  catálogo de API con OpenAPI, tarjetas MCP y A2A, habilidades con huella,
+  manifiesto ARD, Markdown por negociación, cabeceras Link y señales de contenido.

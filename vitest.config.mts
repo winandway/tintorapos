@@ -4,6 +4,14 @@ import path from "node:path";
 
 const alias = { "@": path.resolve(import.meta.dirname, "src") };
 
+/**
+ * Las pruebas que levantan el servidor real (integración y pantallas) montan su
+ * propio miniflare. Corriendo varios archivos a la vez, una máquina cargada (la
+ * de GitHub) devuelve «poisoned stub» o corta la conexión y la prueba falla sin
+ * que nada esté roto. En CI van de a un archivo por vez, con un reintento.
+ */
+const enCI = Boolean(process.env.CI);
+
 // Umbral estricto para todo lo que toca dinero, sesiones, permisos o datos personales.
 const estricto = { lines: 90, statements: 90, functions: 90, branches: 85 };
 
@@ -13,6 +21,8 @@ export default defineConfig({
   test: {
     globals: false,
     restoreMocks: true,
+    fileParallelism: !enCI,
+    retry: enCI ? 1 : 0,
     testTimeout: 30_000,
     hookTimeout: 60_000,
     projects: [

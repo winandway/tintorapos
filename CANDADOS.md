@@ -336,6 +336,55 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   comparación por pedazos, «Vestido» daba `sueter`).
 - **NO tocar:** no volver a `texto.includes(palabra)` para elegir el dibujo.
 
+### B20. La cara del sitio para los agentes de IA
+
+- **Qué resuelve:** un escáner de preparación para agentes (isitagentready.com) dio
+  20/100: sin cabeceras Link, sin señales de contenido, sin catálogo de API, sin
+  Markdown, sin MCP y sin habilidades. Un agente no encontraba nada.
+- **Cómo está hecho (todo público y de SOLO LECTURA):**
+  - `src/lib/agentes/enlaces.ts` es la ÚNICA fuente de las direcciones: de ahí
+    salen la cabecera `Link` (`next.config.ts`), el catálogo, el manifiesto y las
+    pruebas. Importa `../sitio` con ruta relativa **a propósito**: `next.config.ts`
+    no resuelve el alias `@/`.
+  - Rutas: `/.well-known/api-catalog` (RFC 9727), `/.well-known/openapi.json`,
+    `/.well-known/agent-skills/index.json` + un `SKILL.md` por habilidad,
+    `/.well-known/mcp/server-card.json`, `/.well-known/agent-card.json` (A2A),
+    `/.well-known/ai-catalog.json` (ARD) y `/mcp` (servidor MCP, JSON-RPC 2.0).
+  - Markdown por negociación: `next.config.ts` reescribe a `/md/...` cuando la
+    petición trae `Accept: text/markdown`; el navegador sigue recibiendo HTML.
+    El texto se arma de los MISMOS contenidos (`src/lib/agentes/markdown.ts`).
+  - `robots.txt` se escribe a mano (`src/lib/agentes/robots.ts`) para poder llevar
+    `Content-Signal: search=yes, ai-input=yes, ai-train=no` y `Agentmap`.
+  - Las herramientas MCP viven en `src/server/agentes/herramientas.ts` y se
+    publican igual por WebMCP en el navegador (`herramientas-agente.tsx`).
+- **Lo que un agente NO puede hacer:** entrar a una cuenta, ver importes,
+  teléfonos o datos de clientes. La única puerta pública es el código del recibo,
+  que ya era público, con límite de 60 consultas cada 10 minutos por IP.
+- **Candados:** `tests/unit/agentes.test.ts` (cabecera Link, señales, huellas de
+  las habilidades, Markdown de todas las guías), `tests/integracion/publico.test.ts`
+  (MCP de punta a punta y que no se escape dinero ni teléfono),
+  `tests/ayuda/cobertura-rutas.ts` (aislamiento) y el humo post-publicación, que
+  comprueba en vivo el Markdown, la cabecera Link, las señales y `/mcp`.
+- **NO tocar:** no publicar metadatos de OAuth (`openid-configuration`,
+  `oauth-protected-resource`, `auth.md`) mientras no exista el servidor OAuth de
+  verdad: anunciar una puerta que no existe rompe a los agentes que la usen.
+
+### B21. La compuerta se ponía roja sola en GitHub
+
+- **Cómo se veía:** `verify` fallaba en GitHub con pruebas que pasan en la
+  computadora: «Attempted to use poisoned stub», «read ECONNRESET» o un texto que
+  no aparece. Al repetir el trabajo, verde. Dos veces seguidas bloqueó una
+  publicación buena.
+- **Causa real:** las pruebas de integración y de pantallas levantan CADA archivo
+  su propio miniflare (servidor real + base). En paralelo, sobre una máquina
+  prestada y cargada, los objetos de un miniflare se envenenan al cerrarse otro.
+- **Arreglo:** en `vitest.config.mts`, con `CI=1` los archivos corren de a uno
+  (`fileParallelism: false`) y hay un reintento (`retry: 1`). En la computadora
+  sigue en paralelo, que es más rápido.
+- **Cómo se comprueba:** `CI=1 npx vitest run tests/pantallas --coverage=false`.
+- **NO tocar:** no volver a poner las pruebas de pantallas en paralelo en CI para
+  ganar minutos: el precio es una compuerta que miente.
+
 ---
 
 ## C. Candados de publicación

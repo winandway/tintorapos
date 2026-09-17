@@ -79,6 +79,13 @@ y reportes) quedó probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.m
   datos estructurados JSON-LD; `tintorapos.sitios.dev` con `X-Robots-Tag: noindex`;
   IndexNow (`scripts/indexnow.mjs`, clave pública en `public/<clave>.txt`) después
   de cada publicación. Página pública nueva = agregarla a `RUTAS_INDEXABLES`.
+- **Para agentes de IA:** las direcciones salen SIEMPRE de `src/lib/agentes/enlaces.ts`
+  (cabecera `Link`, catálogo, manifiesto y pruebas). Hay servidor MCP público en
+  `/mcp` (solo lectura: estado de una orden por su código, búsqueda en las guías y
+  qué es el producto), `/.well-known/api-catalog`, `openapi.json`, `agent-skills`,
+  `mcp/server-card.json`, `agent-card.json` y `ai-catalog.json`. Las páginas
+  públicas responden Markdown con `Accept: text/markdown` (reescritura a `/md`).
+  **PROHIBIDO publicar metadatos de OAuth mientras no exista el servidor OAuth.**
 - Pie: `© <año> <dominio> | All rights reserved. Developed by Windoce LLC`.
 
 ## Cómo se trabaja (comandos)
