@@ -204,6 +204,24 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
 - **Commit:** `6b85b86`.
 - **Candado:** las pruebas de `tests/pantallas/` buscan cada ventana por su nombre.
 
+### B12. El correo usaba una forma que la plataforma no acepta
+
+- **Cómo se habría visto:** ningún correo de recuperación ni aviso salía en
+  producción, y el panel no mostraba nada porque la llamada ni llegaba.
+- **Causa real:** el código usaba la binding `env.EMAIL` con formato de Workers.
+  La guía oficial de YaDominios dice que el envío es por
+  `POST https://yapanel.yadominios.com/api/hosting/correo/enviar` con el token del
+  sitio, y que el formato de la binding de Workers «aquí no aplica».
+- **Arreglo:** `src/server/correo.ts` llama a esa API con `sitio`, `token`,
+  `from.address` del dominio conectado, `to[]`, `reply_to` en texto plano y `text`
+  siempre. Solo reintenta lo pasajero (5xx o red); token malo, remitente ajeno,
+  límite del día y rebote permanente no se reintentan.
+- **Variables:** `YADOMINIOS_TOKEN`, `EMAIL_FROM` y opcional `YADOMINIOS_SITIO`
+  (por defecto `tintorapos`).
+- **Candado:** `tests/integracion/correo.test.ts`, comprobado en rojo usando
+  `replyTo` (el error que la guía dice que ya le costó una hora a otra IA).
+- **NO tocar:** los nombres de los campos del cuerpo.
+
 ---
 
 ## C. Candados de publicación

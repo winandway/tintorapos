@@ -270,7 +270,7 @@ flowchart LR
 ### 7.1 Dónde corre
 
 **En YaDominios Cloud**, como manda la regla de la casa. Un solo sitio,
-`tintora-pos.sitios.dev` al principio y el dominio propio después. La
+`tintorapos.sitios.dev` al principio y el dominio propio después. La
 plataforma le da al código la base de datos (`env.DB`), el almacén de archivos
 (`env.BUCKET`), el correo saliente (`env.EMAIL`, cuando haya dominio propio) y
 las variables del panel. Cada `git push` a la rama conectada republica solo.

@@ -30,10 +30,17 @@ punta en celular y escritorio, paquete `_worker.js` de 4.64 MB en gzip probado.
 ## Perímetro (lista cerrada; lo que no está aquí no existe para la IA)
 
 - **Carpeta de trabajo:** `/Users/windocellc/Software-Tintora POS` y nada más.
-- **Publicación:** YaDominios Cloud, sitio `tintora-pos` (`tintora-pos.sitios.dev`).
-  **Todavía no creado.** Se crea con el OK de Richard.
-- **Repositorio:** GitHub público `tintora-pos`. **Todavía no creado.** Se crea
-  con el OK de Richard.
+- **Publicación:** YaDominios Cloud, sitio `tintorapos` (`https://tintorapos.sitios.dev`),
+  plan Galaxia, creado por Richard el 17 sep 2026. Se conecta a la rama
+  `yapanel-build`. Token del sitio (base de datos y correo): lo tiene Richard y va
+  en la variable `YADOMINIOS_TOKEN` del panel; **nunca** en el repo.
+- **Dominio:** `tintorapos.com`, conectado al sitio en el panel. El 17 sep 2026 el
+  registro .com respondía que NO existe y no tenía DNS: confirmar la compra.
+- **Repositorio:** GitHub público `winandway/tintorapos` (cuenta `winandway` de Richard).
+  Se trabaja en `main`; la Action `publicar` escribe `yapanel-build` solo si
+  `verify` pasó en verde.
+- **Correo saliente:** API de YaDominios (`src/server/correo.ts`), no la binding
+  `env.EMAIL`. Guía: `https://yadominios.com/docs/correos-desde-tu-dominio`.
 - **Cuenta de Cloudflare de Richard:** solo para UN Cron Trigger (el reloj
   externo que llama a `/datos/reloj`). **Todavía no creado.** Nada más se toca
   en esa cuenta.

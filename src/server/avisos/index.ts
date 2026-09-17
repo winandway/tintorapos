@@ -157,10 +157,10 @@ export async function procesarCola(
         a.destino,
         a.cuerpo,
       );
-    } else if (!correoConfigurado(env, vars)) {
+    } else if (!correoConfigurado(vars)) {
       resultado = { ok: false, error: "no_configurado", reintentar: false };
     } else {
-      const c = await enviarCorreo(env, vars, {
+      const c = await enviarCorreo(vars, {
         para: a.destino,
         asunto: a.asunto ?? "Tintora POS",
         texto: a.cuerpo,
@@ -171,7 +171,7 @@ export async function procesarCola(
           : {
               ok: false,
               error: c.estado === "fallido" ? c.error : "no_configurado",
-              reintentar: c.estado === "fallido",
+              reintentar: c.estado === "fallido" && c.reintentar,
             };
     }
     if (resultado.ok) {

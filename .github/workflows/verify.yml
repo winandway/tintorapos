@@ -40,6 +40,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Navegador para pruebas de punta a punta
         run: npx playwright install --with-deps chromium
+      - name: Base local de las pruebas de punta a punta (schema.sql)
+        run: npm run db:local
       - name: Pruebas de punta a punta
         run: |
           printf 'APP_SECRET=%s\nAPP_URL=http://localhost:3210\n' "$(openssl rand -base64 48 | tr -d '\n')" > .dev.vars

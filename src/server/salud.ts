@@ -51,9 +51,12 @@ export async function revisarSalud(env: CloudflareEnv, vars: Variables, ahora = 
   piezas.variables = faltan.length
     ? { estado: "error", detalle: `faltan: ${faltan.join(", ")}` }
     : { estado: "ok" };
-  piezas.correo = correoConfigurado(env, vars)
+  piezas.correo = correoConfigurado(vars)
     ? { estado: "ok" }
-    : { estado: "no_configurado", detalle: "EMAIL (dominio propio) y EMAIL_FROM" };
+    : {
+        estado: "no_configurado",
+        detalle: "YADOMINIOS_TOKEN y EMAIL_FROM (dominio propio con «Correos desde tu dominio» activado)",
+      };
   piezas.sms = twilioConfigurado({
     sid: vars.TWILIO_ACCOUNT_SID,
     token: vars.TWILIO_AUTH_TOKEN,

@@ -25,7 +25,12 @@ export const esquemaEnv = z.object({
   TWILIO_ACCOUNT_SID: opcional,
   TWILIO_AUTH_TOKEN: opcional,
   TWILIO_FROM: opcional,
+  /** Remitente de los correos: una dirección del dominio conectado al sitio (ej. avisos@tudominio.com). */
   EMAIL_FROM: opcional,
+  /** Token del sitio en YaDominios Cloud (panel → tarjeta del sitio → «Ver token»). Envía los correos. */
+  YADOMINIOS_TOKEN: opcional,
+  /** Nombre del sitio en YaDominios Cloud. Por defecto «tintorapos». */
+  YADOMINIOS_SITIO: opcional,
   /** Correo de contacto que se publica en privacidad y términos. */
   SUPPORT_EMAIL: opcional.refine(
     (v) => v === undefined || z.email().safeParse(v).success,

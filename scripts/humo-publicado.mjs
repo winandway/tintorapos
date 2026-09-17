@@ -1,6 +1,6 @@
 // Prueba de humo DESPUÉS de publicar: las rutas críticas tienen que responder 200
 // y el canario /datos/salud tiene que decir ok. Si algo falla, es una EMERGENCIA.
-// Uso: node scripts/humo-publicado.mjs https://tintora-pos.sitios.dev
+// Uso: node scripts/humo-publicado.mjs https://tintorapos.sitios.dev
 const base = (process.argv[2] ?? process.env.SITIO_URL ?? "").replace(/\/$/, "");
 if (!base.startsWith("https://")) {
   console.error("Falta la dirección del sitio publicado (https://…).");

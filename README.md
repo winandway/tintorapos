@@ -70,7 +70,7 @@ la Action `.github/workflows/publicar.yml` compila y empuja a la rama
 `yapanel-build`, que es la que se conecta en el panel. Después de publicar:
 
 ```bash
-cd "/Users/windocellc/Software-Tintora POS" && node scripts/humo-publicado.mjs https://tintora-pos.sitios.dev
+cd "/Users/windocellc/Software-Tintora POS" && node scripts/humo-publicado.mjs https://tintorapos.sitios.dev
 ```
 
 Variables en el panel: `APP_SECRET`, `APP_URL`, `RELOJ_SECRETO`, `BACKUP_KEY`

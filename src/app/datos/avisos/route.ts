@@ -26,7 +26,7 @@ export const GET = ruta({
           token: c.vars.TWILIO_AUTH_TOKEN,
           desde: c.vars.TWILIO_FROM,
         }),
-        correo: correoConfigurado(c.env, c.vars),
+        correo: correoConfigurado(c.vars),
       },
       plantillas: configuracionAvisos(plantillas),
       avisos: lista?.results ?? [],

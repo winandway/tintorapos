@@ -17,7 +17,7 @@ import { enviarSms, firmaTwilio } from "@/server/avisos/twilio";
 import { variablesDe } from "@/server/entorno";
 import { crearEntorno, type EntornoPrueba } from "../ayuda/entorno";
 import { usarEntorno } from "../ayuda/mock-entorno";
-import { enviados, servidorMsw } from "../ayuda/msw";
+import { enviados, servidorMsw, TOKEN_CORREO_PRUEBA } from "../ayuda/msw";
 import { Navegador } from "../ayuda/cliente-http";
 import { escenarioAislamiento, type Escenario } from "../ayuda/escenario";
 
@@ -25,14 +25,13 @@ describe("avisos por SMS y correo", () => {
   let e: EntornoPrueba;
   let esc: Escenario;
   let dueno: Navegador;
-  const correos: { to: string; text: string }[] = [];
 
   beforeAll(async () => {
     e = await crearEntorno({
       TWILIO_ACCOUNT_SID: "AC" + "1".repeat(32),
       TWILIO_AUTH_TOKEN: "token-de-prueba-twilio",
       TWILIO_FROM: "+13055550100",
-      EMAIL: { send: async (m: { to: string; text: string }) => void correos.push(m) },
+      YADOMINIOS_TOKEN: TOKEN_CORREO_PRUEBA,
       EMAIL_FROM: "avisos@tintora.prueba",
     });
     usarEntorno(e);
@@ -47,7 +46,7 @@ describe("avisos por SMS y correo", () => {
   });
   beforeEach(() => {
     enviados.twilio.length = 0;
-    correos.length = 0;
+    enviados.correo.length = 0;
   });
   afterAll(() => e.cerrar());
 
@@ -82,7 +81,12 @@ describe("avisos por SMS y correo", () => {
     expect(sms.get("From")).toBe("+13055550100");
     expect(sms.get("Body")).toContain("Hi Rosa!");
     expect(sms.get("Body")).toContain(`/t/${esc.a.ids.codigoPublico}`);
-    expect(correos).toHaveLength(1);
+    expect(enviados.correo).toHaveLength(1);
+    expect(enviados.correo[0]).toMatchObject({
+      sitio: "tintorapos",
+      to: [{ address: "rosa@correo.com" }],
+      from: { address: "avisos@tintora.prueba" },
+    });
     const lista = await dueno.llamar<{
       avisos: { estado: string; canal: string }[];
       canales: { sms: boolean; correo: boolean };

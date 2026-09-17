@@ -17,6 +17,7 @@ import { ruta } from "@/server/ruta";
 import { crearEntorno, type EntornoPrueba } from "../ayuda/entorno";
 import { usarEntorno } from "../ayuda/mock-entorno";
 import { Navegador } from "../ayuda/cliente-http";
+import { enviados as enviadosMsw, TOKEN_CORREO_PRUEBA } from "../ayuda/msw";
 import { crearUsuario } from "../ayuda/fabrica";
 
 type Err = { error: { codigo: string; campos?: Record<string, string> } };
@@ -38,11 +39,11 @@ const privada = ruta({ acceso: "sesion", manejar: async (c) => ({ usuario: c.ses
 
 describe("cuentas: registro, dos pasos, entrar y salir", () => {
   let e: EntornoPrueba;
-  const enviados: { to: string; text: string }[] = [];
+  const correos = () => enviadosMsw.correo.map((c) => ({ to: c.to[0]!.address, text: c.text }));
 
   beforeAll(async () => {
     e = await crearEntorno({
-      EMAIL: { send: async (m: { to: string; text: string }) => void enviados.push(m) },
+      YADOMINIOS_TOKEN: TOKEN_CORREO_PRUEBA,
       EMAIL_FROM: "avisos@tintora.prueba",
     });
     usarEntorno(e);
@@ -183,12 +184,12 @@ describe("cuentas: registro, dos pasos, entrar y salir", () => {
     expect((await n.llamar(recuperar, { cuerpo: { correo: "nadie@ninguna.com" } })).datos).toEqual({
       ok: true,
     });
-    expect(enviados).toHaveLength(0);
+    expect(correos()).toHaveLength(0);
     expect((await n.llamar(recuperar, { cuerpo: { correo: "recupera@tienda.com" } })).datos).toEqual({
       ok: true,
     });
-    expect(enviados).toHaveLength(1);
-    const token = decodeURIComponent(enviados[0]!.text.match(/token=([^\s]+)/)![1]!);
+    expect(correos()).toHaveLength(1);
+    const token = decodeURIComponent(correos()[0]!.text.match(/token=([^\s]+)/)![1]!);
 
     const debil = await n.llamar<Err>(restablecer, { cuerpo: { token, clave: "123" } });
     expect(debil.datos.error.codigo).toBe("clave_corta");
