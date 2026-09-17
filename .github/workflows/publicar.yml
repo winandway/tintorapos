@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # El commit exacto que pasó la verificación, no el último de main.
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
@@ -50,7 +50,7 @@ jobs:
     # Solo si ya está configurada la dirección del sitio (Settings → Variables → SITIO_URL).
     if: ${{ vars.SITIO_URL != '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 22
