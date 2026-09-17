@@ -286,6 +286,24 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
 - **NO tocar:** no quitar `hidratada` del flujo; no abrir la CSP a otros dominios
   «para que no moleste».
 
+### B17. La compuerta de secretos frenaba el push por claves de Next
+
+- **Cómo se veía:** `git push` cortaba con «gitleaks: leaks found: 7», todas en
+  `_worker.js` de la rama `yapanel-build` (`previewModeSigningKey`,
+  `previewModeEncryptionKey`, `encryptionKey`). Aparece en cuanto se baja esa rama
+  con `git fetch`, porque `gitleaks git` revisa todas las ramas.
+- **Causa real:** Next.js genera esas claves en cada compilación y las deja dentro
+  del paquete. Son de Draft Mode y del cifrado de Server Actions: la app no usa
+  ninguna de las dos (no hay `"use server"` ni `draftMode`).
+- **Arreglo:** `.gitleaks.toml` (formato `[[allowlists]]`) permite SOLO esas tres por
+  nombre exacto (`regexTarget = "match"`). No se permite el archivo entero.
+- **Cómo se comprobó en rojo:** un `_worker.js` de prueba con `stripeApiKey:"<40 hex>"`
+  sigue dando «leaks found»; con solo `previewModeSigningKey` da «no leaks found».
+- **NO tocar:** no permitir `_worker.js` por ruta (con `paths` gitleaks ignora el
+  archivo completo aunque haya otra clave). Si algún día se usan Server Actions,
+  fijar `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` y revisar este punto, porque la rama
+  publicada es pública.
+
 ---
 
 ## C. Candados de publicación

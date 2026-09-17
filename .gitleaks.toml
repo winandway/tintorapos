@@ -2,7 +2,7 @@
 [extend]
 useDefault = true
 
-[allowlist]
+[[allowlists]]
 description = "Archivos de ejemplo sin valores y dependencias"
 paths = [
   '''\.dev\.vars\.example$''',
@@ -10,3 +10,12 @@ paths = [
   '''package-lock\.json$''',
   '''cloudflare-env\.d\.ts$''',
 ]
+
+# Claves que Next.js genera en CADA compilación y deja dentro de `_worker.js` (rama
+# `yapanel-build`): vista previa (Draft Mode) y cifrado de Server Actions. La app no usa
+# ninguna de las dos. Solo se permiten estas tres por nombre exacto: cualquier otra
+# clave dentro del paquete sigue haciendo saltar la alarma.
+[[allowlists]]
+description = "Claves internas que Next.js genera al compilar"
+regexTarget = "match"
+regexes = ['''(^|[^A-Za-z0-9_])(previewModeSigningKey|previewModeEncryptionKey|encryptionKey):"''']
