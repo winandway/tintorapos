@@ -57,6 +57,7 @@ export const NOMBRES = EN_PRODUCCION
       cajero: "Soporte Cajero",
       gerente: "Soporte Gerente",
       tablet: "Soporte tablet",
+      celular: "Soporte celular de planta",
       cliente: "Soporte Cliente",
     }
   : {
@@ -65,6 +66,7 @@ export const NOMBRES = EN_PRODUCCION
       cajero: "Cajero E2E",
       gerente: "Gerente E2E",
       tablet: "Tablet E2E",
+      celular: "Celular E2E",
       cliente: "Cliente E2E",
     };
 

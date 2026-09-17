@@ -48,6 +48,29 @@ test("un día completo en la tintorería", async ({ page, context }) => {
     await expect(page.getByText(NOMBRES.gerente)).toBeVisible();
   });
 
+  await test.step("conectar un celular escaneando el QR de la tablet", async () => {
+    await page.goto("/app/ajustes/dispositivos");
+    await listo(page);
+    await page.getByLabel(es.ajustes.dispositivos.nombreCelular).fill(NOMBRES.celular);
+    const respuesta = page.waitForResponse((r) => r.url().includes("/datos/dispositivos/enlace"));
+    await page.getByRole("button", { name: es.ajustes.dispositivos.crearEnlace }).click();
+    const { url } = (await (await respuesta).json()) as { url: string };
+    await expect(page.getByTestId("qr-celular")).toBeVisible();
+
+    // El celular del empleado: otro navegador, sin la sesión del dueño.
+    const celular = await page.context().browser()!.newContext();
+    const pantalla = await celular.newPage();
+    await pantalla.goto(url);
+    await expect(pantalla.getByRole("heading", { name: es.pin.titulo })).toBeVisible({ timeout: 60_000 });
+    // El mismo enlace ya no sirve para un segundo teléfono.
+    const otro = await page.context().browser()!.newContext();
+    const segundo = await otro.newPage();
+    await segundo.goto(url);
+    await expect(segundo.getByRole("heading", { name: es.pin.titulo })).toBeHidden();
+    await otro.close();
+    await celular.close();
+  });
+
   await test.step("registrar la tablet y entrar con PIN", async () => {
     await page.goto("/app/ajustes/dispositivos");
     await listo(page);
