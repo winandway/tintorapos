@@ -222,6 +222,20 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   `replyTo` (el error que la guía dice que ya le costó una hora a otra IA).
 - **NO tocar:** los nombres de los campos del cuerpo.
 
+### B13. La compilación usaba un esbuild de fuera del proyecto
+
+- **Cómo se veía:** en la computadora `npm run cf:bundle` funcionaba; en GitHub la
+  Action `publicar` fallaba con `Cannot find package 'esbuild'`.
+- **Causa real:** `@opennextjs/cloudflare` importa `esbuild` sin declararlo como
+  dependencia. En la computadora Node lo encontraba subiendo carpetas, en
+  `/Users/windocellc/node_modules/esbuild` (fuera del proyecto).
+- **Arreglo:** `esbuild` 0.27 (la que usa el adaptador) en `devDependencies`, y
+  `scripts/empaquetar-worker.mjs` corta si `esbuild` o `wrangler` se resuelven
+  fuera del `node_modules` del proyecto.
+- **Cómo se comprueba:** la Action `publicar` en GitHub termina en verde y deja la
+  rama `yapanel-build`.
+- **NO tocar:** no quitar `esbuild` de `devDependencies` aunque «nadie lo importe».
+
 ---
 
 ## C. Candados de publicación

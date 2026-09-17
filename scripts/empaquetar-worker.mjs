@@ -6,6 +6,7 @@
 // Uso: npm run cf:bundle            (compila y empaqueta)
 //      npm run cf:bundle -- --sin-build   (solo empaqueta lo ya compilado)
 import { execSync } from "node:child_process";
+import { createRequire } from "node:module";
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import path from "node:path";
@@ -28,6 +29,26 @@ if (!semver.satisfies(mia, rango)) {
   process.exit(1);
 }
 console.info(`Versiones compatibles: next ${mia} dentro de ${rango}`);
+
+// 1b. Las herramientas del empaquetado tienen que salir de ESTE proyecto. Ya pasó: en la
+// computadora se usaba un esbuild suelto de la carpeta personal y en GitHub no existía.
+const desdeAdaptador = createRequire(
+  path.join(raiz, "node_modules/@opennextjs/cloudflare/dist/cli/build/x.js"),
+);
+for (const herramienta of ["esbuild", "wrangler"]) {
+  let ruta = "";
+  try {
+    ruta = desdeAdaptador.resolve(herramienta);
+  } catch {
+    ruta = "";
+  }
+  if (!ruta.startsWith(path.join(raiz, "node_modules") + path.sep)) {
+    console.error(
+      `«${herramienta}» no está instalado en el proyecto (se resolvió a: ${ruta || "ningún lado"}). Agrégalo a devDependencies.`,
+    );
+    process.exit(1);
+  }
+}
 
 // 2. Compilar.
 if (!process.argv.includes("--sin-build")) correr("npx opennextjs-cloudflare build");
