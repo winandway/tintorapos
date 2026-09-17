@@ -170,6 +170,27 @@ export const GUIAS_EMPEZAR: Guia[] = [
           texto:
             "Agrega Tintora POS a la pantalla de inicio de la tablet desde el menú del navegador («Agregar a la pantalla de inicio»). Se abre a pantalla completa, como una app.",
         },
+        { t: "h2", texto: "Conectar un celular escaneando un QR" },
+        {
+          t: "p",
+          texto:
+            "Para que un empleado use su celular (por ejemplo, para marcar prendas listas en la planta sin cargar la tablet) no hace falta darle la contraseña del dueño.",
+        },
+        {
+          t: "pasos",
+          items: [
+            "En la tablet ve a **Ajustes → Dispositivos → Conectar un celular**.",
+            "Escribe un nombre, como «Celular de planta», y toca **Mostrar el código**.",
+            "En el celular, abre la cámara, apúntala al código y toca el aviso que aparece.",
+            "El celular queda registrado y cae en la pantalla de PIN: el empleado toca su nombre y escribe su PIN.",
+          ],
+        },
+        {
+          t: "nota",
+          tono: "importante",
+          texto:
+            "El código vence en 10 minutos y sirve una sola vez. Si alguien más lo escanea antes, pide otro y listo: con el código solo no se entra a nada, siempre hace falta el PIN.",
+        },
         { t: "h2", texto: "La pantalla de PIN" },
         {
           t: "lista",
@@ -226,6 +247,27 @@ export const GUIAS_EMPEZAR: Guia[] = [
           tono: "consejo",
           texto:
             "Add Tintora POS to the tablet’s home screen from the browser menu (“Add to Home Screen”). It opens full screen, just like an app.",
+        },
+        { t: "h2", texto: "Connect a phone by scanning a QR" },
+        {
+          t: "p",
+          texto:
+            "To let an employee use their own phone (for example, to mark items ready in the plant without carrying the tablet), you don’t have to share the owner’s password.",
+        },
+        {
+          t: "pasos",
+          items: [
+            "On the tablet go to **Settings → Devices → Connect a phone**.",
+            "Type a name, such as “Plant phone”, and tap **Show the code**.",
+            "On the phone, open the camera, point it at the code and tap the notification that appears.",
+            "The phone is registered and lands on the PIN screen: the employee taps their name and types their PIN.",
+          ],
+        },
+        {
+          t: "nota",
+          tono: "importante",
+          texto:
+            "The code expires in 10 minutes and works only once. If someone else scans it first, just ask for another one: the code alone opens nothing — the PIN is always required.",
         },
         { t: "h2", texto: "The PIN screen" },
         {

@@ -43,6 +43,9 @@ export const COBERTURA: Record<string, Cobertura> = {
       { metodo: "POST", cuerpo: { nombre: "Tablet B" }, esperado: [200] },
     ],
   },
+  "/datos/dispositivos/enlace": {
+    casos: () => [{ metodo: "POST", cuerpo: { nombre: "Celular B" }, esperado: [200] }],
+  },
   "/datos/dispositivos/[id]": { casos: (e) => [{ metodo: "DELETE", params: { id: e.a.dispositivoId } }] },
   "/datos/pin/empleados": { casos: () => [{ metodo: "GET", como: "dispositivoB", esperado: [200] }] },
   "/datos/pin/entrar": {

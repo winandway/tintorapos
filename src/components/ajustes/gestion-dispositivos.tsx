@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { renderSVG } from "uqr";
 import { Aviso, useAvisar } from "@/components/ui/aviso";
 import { Boton, clasesBoton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo";
@@ -41,6 +42,39 @@ export function GestionDispositivos({
   const [campos, setCampos] = useState<Record<string, string>>({});
   const [errorRegistro, setErrorRegistro] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  const [enlace, setEnlace] = useState<{ url: string; expiraEn: number; minutos: number } | null>(null);
+  const [nombreCelular, setNombreCelular] = useState("");
+  const [creandoEnlace, setCreandoEnlace] = useState(false);
+  const [copiado, setCopiado] = useState(false);
+  const [restan, setRestan] = useState(0);
+
+  useEffect(() => {
+    if (!enlace) return;
+    const tic = () => setRestan(Math.max(0, Math.ceil((enlace.expiraEn - Date.now()) / 60_000)));
+    tic();
+    const id = setInterval(tic, 15_000);
+    return () => clearInterval(id);
+  }, [enlace]);
+
+  async function crearEnlace() {
+    setCreandoEnlace(true);
+    setErrorRegistro(null);
+    setCampos({});
+    try {
+      const r = await pedir<{ url: string; expiraEn: number; minutos: number }>(
+        "/datos/dispositivos/enlace",
+        { cuerpo: { nombre: nombreCelular.trim() || dd.nombreCelularPlaceholder } },
+      );
+      setEnlace(r);
+      setCopiado(false);
+      recargar();
+    } catch (err) {
+      setErrorRegistro(textoError(d, err));
+      setCampos(camposDe(err));
+    } finally {
+      setCreandoEnlace(false);
+    }
+  }
 
   async function registrar(e: React.FormEvent) {
     e.preventDefault();
@@ -102,6 +136,54 @@ export function GestionDispositivos({
             )}
           </Tarjeta>
         )
+      )}
+      {puedeRegistrar && (
+        <Tarjeta>
+          <TituloSeccion>{dd.conectarCelular}</TituloSeccion>
+          <p className="mb-4 text-[15px] text-gris">{dd.conectarCelularTexto}</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <CampoTexto
+              className="flex-1"
+              etiqueta={dd.nombreCelular}
+              placeholder={dd.nombreCelularPlaceholder}
+              value={nombreCelular}
+              onChange={(e) => setNombreCelular(e.target.value)}
+              error={textoCampo(d, campos.nombre)}
+            />
+            <Boton onClick={crearEnlace} cargando={creandoEnlace}>
+              {enlace ? dd.otroEnlace : dd.crearEnlace}
+            </Boton>
+          </div>
+          {enlace && (
+            <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl bg-papel p-4 sm:flex-row sm:items-center">
+              <div
+                data-testid="qr-celular"
+                className="w-48 shrink-0 rounded-xl bg-white p-2 [&_svg]:h-auto [&_svg]:w-full"
+                dangerouslySetInnerHTML={{
+                  __html: renderSVG(enlace.url, { border: 1, ecc: "M", pixelSize: 4 }),
+                }}
+              />
+              <div className="min-w-0 flex-1 text-center sm:text-left">
+                <p className="text-[15px] font-semibold">{dd.comoEscanear}</p>
+                <p className="mt-1 text-[14px] text-gris">
+                  {fmt(dd.enlaceVence, { min: restan || enlace.minutos })}
+                </p>
+                <Boton
+                  variante="secundario"
+                  tamano="chico"
+                  className="mt-3"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(enlace.url);
+                    setCopiado(true);
+                    avisar(dd.enlaceCopiado);
+                  }}
+                >
+                  {copiado ? dd.enlaceCopiado : dd.enlaceCopiar}
+                </Boton>
+              </div>
+            </div>
+          )}
+        </Tarjeta>
       )}
       <Tarjeta className="p-0 md:p-0">
         <h2 className="px-5 pt-5 pb-2 text-[17px] font-bold md:px-6">{dd.lista}</h2>

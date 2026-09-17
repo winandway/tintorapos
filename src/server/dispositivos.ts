@@ -129,3 +129,106 @@ export async function empleadosConPin(db: D1Database, tintoreriaId: string) {
     .all<{ id: string; nombre: string; rol: string; bloqueado: number }>();
   return results.map((r) => ({ id: r.id, nombre: r.nombre, rol: r.rol, bloqueado: r.bloqueado === 1 }));
 }
+
+/** Un enlace para conectar un celular dura poco y se usa UNA sola vez. */
+export const ENLACE_DISPOSITIVO_MIN = 10;
+
+/**
+ * Crea el enlace que se muestra como QR en la tablet. El celular lo escanea con
+ * su cámara, queda registrado como dispositivo de la tienda y entra con su PIN.
+ * El enlace se guarda cifrado (hash): en la base no queda nada que sirva solo.
+ */
+export async function crearEnlaceDispositivo(
+  db: D1Database,
+  s: Sesion,
+  nombre: string,
+  ahora = Date.now(),
+): Promise<{ token: string; expiraEn: number }> {
+  const token = tokenSecreto();
+  const expiraEn = ahora + ENLACE_DISPOSITIVO_MIN * 60_000;
+  await db.batch([
+    db.prepare("delete from enlaces_dispositivo where expira_en <= ?").bind(ahora),
+    db
+      .prepare(
+        `insert into enlaces_dispositivo (hash, tintoreria_id, sucursal_id, nombre, creado_por, creado_en, expira_en)
+         values (?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(await sha256Hex(token), s.tintoreria.id, s.sucursalId, nombre, s.usuario.id, ahora, expiraEn),
+    sentenciaAuditoria(
+      db,
+      {
+        tintoreriaId: s.tintoreria.id,
+        usuarioId: s.usuario.id,
+        accion: "dispositivo.enlace_creado",
+        entidad: "dispositivo",
+        detalle: { nombre },
+      },
+      ahora,
+    ),
+  ]);
+  return { token, expiraEn };
+}
+
+/**
+ * El celular abre el enlace: si sirve, queda registrado como dispositivo y se
+ * devuelve su token para la cookie. Si ya se usó o venció, devuelve null (y no
+ * dice cuál de las dos cosas: eso no se le cuenta a quien no debería estar ahí).
+ */
+export async function usarEnlaceDispositivo(
+  db: D1Database,
+  token: string,
+  agente: string | null,
+  ahora = Date.now(),
+): Promise<{ tokenDispositivo: string } | null> {
+  const hash = await sha256Hex(token);
+  const fila = await db
+    .prepare(
+      `select tintoreria_id, sucursal_id, nombre, creado_por from enlaces_dispositivo
+       where hash = ? and usado_en is null and expira_en > ?`,
+    )
+    .bind(hash, ahora)
+    .first<{ tintoreria_id: string; sucursal_id: string; nombre: string; creado_por: string }>();
+  if (!fila) return null;
+  const id = nuevoId();
+  const tokenDispositivo = tokenSecreto();
+  // Primero se marca usado (sin el dispositivo, que todavía no existe): así dos
+  // teléfonos que abran el mismo enlace a la vez no registran dos dispositivos.
+  const r = await db
+    .prepare("update enlaces_dispositivo set usado_en = ? where hash = ? and usado_en is null")
+    .bind(ahora, hash)
+    .run();
+  // Si otro lo usó primero, el update no cambia nada: no se registra el dispositivo.
+  if ((r.meta.changes ?? 0) === 0) return null;
+  await db.batch([
+    db
+      .prepare(
+        `insert into dispositivos (id, tintoreria_id, sucursal_id, nombre, token_hash, agente, creado_por, creado_en, ultimo_uso_en)
+         values (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(
+        id,
+        fila.tintoreria_id,
+        fila.sucursal_id,
+        fila.nombre,
+        await sha256Hex(tokenDispositivo),
+        (agente ?? "").slice(0, 200),
+        fila.creado_por,
+        ahora,
+        ahora,
+      ),
+    db.prepare("update enlaces_dispositivo set dispositivo_id = ? where hash = ?").bind(id, hash),
+    sentenciaAuditoria(
+      db,
+      {
+        tintoreriaId: fila.tintoreria_id,
+        usuarioId: fila.creado_por,
+        accion: "dispositivo.registrado",
+        entidad: "dispositivo",
+        entidadId: id,
+        detalle: { por: "enlace" },
+      },
+      ahora,
+    ),
+  ]);
+  return { tokenDispositivo };
+}

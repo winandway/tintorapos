@@ -304,6 +304,38 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   fijar `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` y revisar este punto, porque la rama
   publicada es pública.
 
+### B18. Conectar un celular con un QR (enlace de un solo uso)
+
+- **Qué resuelve:** para que un empleado trabaje desde su celular había que
+  entrar con la contraseña del dueño en ese teléfono. Ahora la tablet muestra un
+  QR, el celular lo escanea con su cámara y queda registrado como dispositivo.
+- **Cómo está hecho:** `POST /datos/dispositivos/enlace` (permiso
+  `dispositivos.gestionar`, máximo 20 cada 10 minutos por tintorería) guarda el
+  enlace **cifrado** (hash SHA-256) en `enlaces_dispositivo` con 10 minutos de
+  vida. `GET /v/<token>` lo consume: primero marca `usado_en` y solo si ESE
+  update cambió una fila registra el dispositivo, así dos teléfonos que abran el
+  mismo enlace a la vez no registran dos. Responde 303 a `/app/pin` con la cookie
+  del dispositivo; si no sirve, a `/entrar?vinculo=vencido` sin decir por qué.
+  El código solo, sin PIN, no abre nada.
+- **Candado:** `tests/integracion/dispositivos-pin.test.ts` («conectar un celular
+  con el QR…»), comprobado en rojo quitando `and usado_en is null`: el enlace se
+  volvía reusable y la prueba falló. Más el caso en `tests/ayuda/cobertura-rutas.ts`
+  (aislamiento entre tintorerías) y `/v/` en `robots.ts`.
+- **NO tocar:** no guardar el token en claro, no alargar los 10 minutos, no
+  registrar el dispositivo antes de marcar el enlace como usado (el orden
+  importa: al revés falla la clave foránea y se cuelan dos dispositivos).
+
+### B19. El dibujo de una prenda salía en otra («vest» dentro de «vestido»)
+
+- **Cómo se veía:** al poner dibujo a cada prenda del mostrador, «Vestido /
+  Dress» aparecía con el ícono de suéter, porque la palabra inglesa `vest`
+  (chaleco) está DENTRO de «vestido».
+- **Arreglo:** `src/lib/mostrador/iconos.ts` compara palabras completas
+  (admitiendo el plural), no pedazos de palabra.
+- **Candado:** `tests/unit/iconos-prendas.test.ts`, comprobado en rojo (con la
+  comparación por pedazos, «Vestido» daba `sueter`).
+- **NO tocar:** no volver a `texto.includes(palabra)` para elegir el dibujo.
+
 ---
 
 ## C. Candados de publicación

@@ -3,6 +3,8 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 vi.mock("@/server/entorno", () => import("../ayuda/mock-entorno"));
 
 import { GET as listar, POST as registrar } from "@/app/datos/dispositivos/route";
+import { POST as crearEnlace } from "@/app/datos/dispositivos/enlace/route";
+import { GET as abrirEnlace } from "@/app/v/[token]/route";
 import { DELETE as revocar } from "@/app/datos/dispositivos/[id]/route";
 import { GET as empleados } from "@/app/datos/pin/empleados/route";
 import { POST as entrarPin } from "@/app/datos/pin/entrar/route";
@@ -123,5 +125,66 @@ describe("dispositivos de la tienda y entrada con PIN", () => {
     expect(bloqueado.estado).toBe(429);
     const pantalla = await tablet.llamar<{ empleados: { nombre: string; bloqueado: boolean }[] }>(empleados);
     expect(pantalla.datos.empleados.find((x) => x.nombre === "Planta 2")?.bloqueado).toBe(true);
+  });
+
+  it("conectar un celular con el QR: sirve una sola vez, registra el teléfono y el enlace vencido no sirve", async () => {
+    const tablet = new Navegador();
+    tablet.cookies.set("tp_sesion", await sesionPara(e.env.DB, t.id, t.duenoId));
+    const r = await tablet.llamar<{ url: string; expiraEn: number; minutos: number }>(crearEnlace, {
+      cuerpo: { nombre: "Celular de planta" },
+    });
+    expect(r.estado).toBe(200);
+    expect(r.datos.minutos).toBe(10);
+    const token = r.datos.url.split("/v/")[1]!;
+
+    // El celular abre el enlace: queda registrado y va a la pantalla de PIN.
+    const celular = new Navegador();
+    const uno = await abrirEnlace(new Request(`https://tintorapos.com/v/${token}`), {
+      params: Promise.resolve({ token }),
+    });
+    expect(uno.status).toBe(303);
+    expect(uno.headers.get("location")).toBe("https://tintorapos.com/app/pin");
+    const cookie = uno.headers.get("set-cookie") ?? "";
+    expect(cookie).toContain("tp_disp=");
+    celular.cookies.set("tp_disp", cookie.split("tp_disp=")[1]!.split(";")[0]!);
+    const pantalla = await celular.llamar<{ empleados: { nombre: string }[] }>(empleados);
+    expect(pantalla.estado).toBe(200);
+    expect(pantalla.datos.empleados.map((x) => x.nombre)).toContain("Cajera turno mañana");
+
+    // El MISMO enlace no vuelve a servir: nadie más registra un teléfono con él.
+    const dos = await abrirEnlace(new Request(`https://tintorapos.com/v/${token}`), {
+      params: Promise.resolve({ token }),
+    });
+    expect(dos.status).toBe(303);
+    expect(dos.headers.get("location")).toBe("https://tintorapos.com/entrar?vinculo=vencido");
+    expect(dos.headers.get("set-cookie")).toBeNull();
+
+    // Un enlace inventado tampoco.
+    const falso = await abrirEnlace(new Request("https://tintorapos.com/v/inventado"), {
+      params: Promise.resolve({ token: "inventado" }),
+    });
+    expect(falso.headers.get("location")).toBe("https://tintorapos.com/entrar?vinculo=vencido");
+
+    // Y uno vencido tampoco: se le cambia la fecha a mano en la base.
+    const r2 = await tablet.llamar<{ url: string }>(crearEnlace, { cuerpo: { nombre: "Otro celular" } });
+    const token2 = r2.datos.url.split("/v/")[1]!;
+    await e.env.DB.prepare("update enlaces_dispositivo set expira_en = ? where usado_en is null")
+      .bind(Date.now() - 1000)
+      .run();
+    const vencido = await abrirEnlace(new Request(`https://tintorapos.com/v/${token2}`), {
+      params: Promise.resolve({ token: token2 }),
+    });
+    expect(vencido.headers.get("location")).toBe("https://tintorapos.com/entrar?vinculo=vencido");
+
+    // Solo quedó registrado el teléfono del primer enlace.
+    const nombres = await tablet.llamar<{ dispositivos: { nombre: string }[] }>(listar);
+    expect(nombres.datos.dispositivos.filter((d) => d.nombre === "Celular de planta")).toHaveLength(1);
+    expect(nombres.datos.dispositivos.some((d) => d.nombre === "Otro celular")).toBe(false);
+  });
+
+  it("un cajero no puede crear el enlace para conectar un celular", async () => {
+    const caja = new Navegador();
+    caja.cookies.set("tp_sesion", await sesionPara(e.env.DB, t.id, cajera, { tipo: "pin" }));
+    expect((await caja.llamar(crearEnlace, { cuerpo: { nombre: "Mi celular" } })).estado).toBe(403);
   });
 });

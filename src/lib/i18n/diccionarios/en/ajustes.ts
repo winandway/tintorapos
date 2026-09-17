@@ -98,6 +98,19 @@ export const ajustes: Forma<typeof base> = {
     },
   },
   dispositivos: {
+    conectarCelular: "Connect a phone",
+    conectarCelularTexto:
+      "Show this code on the screen and scan it with the phone camera. The phone is then ready to work: it only asks for the PIN.",
+    nombreCelular: "Phone name",
+    nombreCelularPlaceholder: "Plant phone",
+    crearEnlace: "Show the code",
+    otroEnlace: "Show another code",
+    enlaceVence: "The code expires in {min} minutes and works only once.",
+    enlaceVencido:
+      "That code to connect the phone was already used or expired. Ask for a new one on the tablet: Settings → Devices → Connect a phone.",
+    enlaceCopiar: "Copy the link",
+    enlaceCopiado: "Link copied",
+    comoEscanear: "Open the phone camera, point it at the code and tap the notification that appears.",
     registrarEste: "Register this device",
     registrarTexto: "Register the store tablet or phone so your employees can sign in with their PIN.",
     nombre: "Device name",

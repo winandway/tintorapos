@@ -84,6 +84,20 @@ CREATE TABLE IF NOT EXISTS dispositivos (
 );
 CREATE INDEX IF NOT EXISTS idx_dispositivos_tintoreria ON dispositivos (tintoreria_id);
 
+-- Enlace de un solo uso para conectar un celular escaneando un QR desde la tablet.
+CREATE TABLE IF NOT EXISTS enlaces_dispositivo (
+  hash TEXT PRIMARY KEY,
+  tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
+  sucursal_id TEXT NOT NULL REFERENCES sucursales(id),
+  nombre TEXT NOT NULL,
+  creado_por TEXT NOT NULL REFERENCES usuarios(id),
+  creado_en INTEGER NOT NULL,
+  expira_en INTEGER NOT NULL,
+  usado_en INTEGER,
+  dispositivo_id TEXT REFERENCES dispositivos(id)
+);
+CREATE INDEX IF NOT EXISTS idx_enlaces_dispositivo_expira ON enlaces_dispositivo (expira_en);
+
 CREATE TABLE IF NOT EXISTS sesiones (
   id_hash TEXT PRIMARY KEY,
   tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),

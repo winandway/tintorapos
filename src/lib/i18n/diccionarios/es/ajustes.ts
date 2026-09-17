@@ -98,6 +98,19 @@ export const ajustes = {
     },
   },
   dispositivos: {
+    conectarCelular: "Conectar un celular",
+    conectarCelularTexto:
+      "Muestra este código en la pantalla y escanéalo con la cámara del celular. El teléfono queda listo para trabajar: solo pide el PIN.",
+    nombreCelular: "Nombre del celular",
+    nombreCelularPlaceholder: "Celular de planta",
+    crearEnlace: "Mostrar el código",
+    otroEnlace: "Mostrar otro código",
+    enlaceVence: "El código vence en {min} minutos y sirve una sola vez.",
+    enlaceVencido:
+      "Ese código para conectar el celular ya se usó o venció. Pide uno nuevo en la tablet: Ajustes → Dispositivos → Conectar un celular.",
+    enlaceCopiar: "Copiar el enlace",
+    enlaceCopiado: "Enlace copiado",
+    comoEscanear: "Abre la cámara del celular, apúntala al código y toca el aviso que aparece.",
     registrarEste: "Registrar este dispositivo",
     registrarTexto: "Registra la tablet o el celular de la tienda para que tus empleados entren con su PIN.",
     nombre: "Nombre del dispositivo",
