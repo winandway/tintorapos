@@ -23,6 +23,15 @@ const rutas = [
   "/sitemap.xml",
   "/robots.txt",
   "/manifest.webmanifest",
+  // Lo que ven los agentes de IA.
+  "/.well-known/api-catalog",
+  "/.well-known/openapi.json",
+  "/.well-known/agent-skills/index.json",
+  "/.well-known/agent-skills/estado-de-orden/SKILL.md",
+  "/.well-known/mcp/server-card.json",
+  "/.well-known/agent-card.json",
+  "/.well-known/ai-catalog.json",
+  "/md",
 ];
 let fallos = 0;
 for (const ruta of rutas) {
@@ -37,6 +46,35 @@ if (!sitemap.includes("<loc>https://tintorapos.com") || sitemap.includes("sitios
   fallos++;
   console.info("MAL sitemap.xml: no trae direcciones de https://tintorapos.com");
 }
+// robots.txt tiene que declarar las señales de contenido.
+const robots = await (await fetch(base + "/robots.txt")).text();
+if (!robots.includes("Content-Signal:")) {
+  fallos++;
+  console.info("MAL robots.txt: sin señales de contenido");
+}
+// La portada responde en Markdown a quien lo pide, y en HTML a quien no.
+const md = await fetch(base + "/", { headers: { accept: "text/markdown" } });
+const tipoMd = md.headers.get("content-type") ?? "";
+if (!tipoMd.includes("text/markdown")) {
+  fallos++;
+  console.info(`MAL Markdown para agentes: la portada devolvió ${tipoMd}`);
+} else console.info("ok  200 / (Accept: text/markdown)");
+if (!(await fetch(base + "/")).headers.get("link")?.includes('rel="api-catalog"')) {
+  fallos++;
+  console.info("MAL cabecera Link: la portada no anuncia el catálogo de API");
+}
+// El servidor MCP contesta a un cliente de verdad.
+const mcp = await fetch(base + "/mcp", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+});
+const herramientas = (await mcp.json().catch(() => ({})))?.result?.tools ?? [];
+if (!herramientas.length) {
+  fallos++;
+  console.info("MAL /mcp: no devolvió herramientas");
+} else console.info(`ok  200 /mcp (${herramientas.length} herramientas)`);
+
 // Canario: lo vital (base, almacén, variables) tumba el humo; lo que falta configurar se avisa.
 const salud = await fetch(base + "/datos/salud");
 const cuerpo = await salud.json().catch(() => ({}));

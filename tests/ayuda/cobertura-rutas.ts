@@ -47,6 +47,9 @@ export const COBERTURA: Record<string, Cobertura> = {
     casos: () => [{ metodo: "POST", cuerpo: { nombre: "Celular B" }, esperado: [200] }],
   },
   "/datos/dispositivos/[id]": { casos: (e) => [{ metodo: "DELETE", params: { id: e.a.dispositivoId } }] },
+  "/datos/publico/orden/[codigo]": {
+    publica: "el código del recibo ES la llave; devuelve estado y nada personal (ver publico.test.ts)",
+  },
   "/datos/pin/empleados": { casos: () => [{ metodo: "GET", como: "dispositivoB", esperado: [200] }] },
   "/datos/pin/entrar": {
     casos: (e) => [

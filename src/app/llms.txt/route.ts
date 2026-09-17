@@ -1,5 +1,6 @@
 import { CONTENIDO_INICIO } from "@/lib/contenido/inicio";
 import { GUIAS, SECCIONES } from "@/lib/docs";
+import { RUTAS_AGENTES, url } from "@/lib/agentes/enlaces";
 import { urlAbsoluta } from "@/lib/seo";
 
 /** Índice para asistentes de IA (llmstxt.org): qué es Tintora POS y dónde está cada guía, en inglés y en español. */
@@ -34,6 +35,16 @@ export function GET() {
     }
     lineas.push("");
   }
+  lineas.push(
+    "## For agents",
+    "",
+    `- [MCP server](${url(RUTAS_AGENTES.mcp)}): public read-only tools — order status by receipt code, docs search, product facts. Card: [server-card.json](${url(RUTAS_AGENTES.tarjetaMcp)})`,
+    `- [API catalog](${url(RUTAS_AGENTES.catalogoApi)}) · [OpenAPI](${url(RUTAS_AGENTES.openapi)}) · [Agent card (A2A)](${url(RUTAS_AGENTES.tarjetaA2a)})`,
+    `- [Agent skills](${url(RUTAS_AGENTES.habilidades)}) · [Resource manifest (ARD)](${url(RUTAS_AGENTES.catalogoIa)})`,
+    "- Every public page answers `Accept: text/markdown` with clean Markdown (or add `/md` in front of the path).",
+    "- Content signals in robots.txt: search=yes, ai-input=yes, ai-train=no.",
+    "",
+  );
   return new Response(lineas.join("\n"), {
     headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=3600" },
   });

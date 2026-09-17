@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Icono } from "@/components/marca/iconos-sitio";
 import { Pie } from "@/components/pie";
 import { EncabezadoSitio } from "@/components/sitio/encabezado-sitio";
+import { HerramientasAgente } from "@/components/sitio/herramientas-agente";
 import { clasesBoton } from "@/components/ui/boton";
 import { Ticket } from "@/components/ui/ticket";
 import { CONTENIDO_INICIO } from "@/lib/contenido/inicio";
@@ -113,6 +114,11 @@ export async function PaginaInicio({ idioma }: { idioma: Idioma }) {
 
   return (
     <div className="flex min-h-dvh flex-col">
+      {/* Para agentes: manifiesto de recursos y herramientas del navegador (WebMCP). */}
+      <link rel="ai-catalog" href="/.well-known/ai-catalog.json" />
+      <link rel="api-catalog" href="/.well-known/api-catalog" />
+      <link rel="alternate" type="text/markdown" href="/md" />
+      <HerramientasAgente />
       <script
         type="application/ld+json"
         // Datos estáticos propios, sin nada que venga del usuario.

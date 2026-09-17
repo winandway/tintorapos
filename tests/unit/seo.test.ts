@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import robots from "@/app/robots";
+import { robotsTxt } from "@/lib/agentes/robots";
 import sitemap from "@/app/sitemap";
 import { GUIAS } from "@/lib/docs";
 import { SLUG_EN } from "@/lib/docs/slugs";
@@ -70,11 +70,14 @@ describe("SEO: sitemap, robots y hreflang (candado)", () => {
     expect(entradas.map((e) => e.url)).not.toContain("https://tintorapos.com/app");
   });
 
-  it("robots apunta al sitemap del dominio y no deja indexar la app ni los datos", () => {
-    const r = robots();
-    expect(r.sitemap).toBe("https://tintorapos.com/sitemap.xml");
-    const reglas = Array.isArray(r.rules) ? r.rules[0] : r.rules;
-    expect(reglas?.disallow).toEqual(expect.arrayContaining(["/app", "/datos", "/media", "/t/", "/entrar"]));
+  it("robots apunta al sitemap del dominio, no deja indexar la app y declara las señales de contenido", () => {
+    const r = robotsTxt();
+    expect(r).toContain("Sitemap: https://tintorapos.com/sitemap.xml");
+    for (const privada of ["/app", "/datos", "/media", "/t/", "/e/", "/v/", "/entrar"])
+      expect(r).toContain(`Disallow: ${privada}`);
+    // Señales de contenido: se puede buscar y responder con el sitio; entrenar no.
+    expect(r).toContain("Content-Signal: search=yes, ai-input=yes, ai-train=no");
+    expect(r).toContain("Agentmap: https://tintorapos.com/.well-known/ai-catalog.json");
   });
 
   it("canónica y hreflang: la dirección con idioma es canónica de sí misma; sin idioma, la x-default", () => {
