@@ -24,6 +24,7 @@ import {
   carritoVacio,
   conteoPorBoton,
   diasEntregaCarrito,
+  notasDePieza,
   reducirCarrito,
   totalesCarrito,
   type Grupo,
@@ -33,7 +34,10 @@ import {
 import { crearOrden, type RespuestaOrden } from "@/lib/operaciones";
 import { useDatos } from "@/lib/use-datos";
 import { useEnLinea } from "@/lib/sin-conexion/use-en-linea";
+import { iconoDePrenda } from "@/lib/mostrador/iconos";
 import { EtiquetasLocales, type DatosEtiquetasLocales } from "./etiquetas-locales";
+import { IconoPrenda } from "./icono-prenda";
+import { BarraMarcas } from "./marcas-prenda";
 import { SelectorCliente, type ClienteElegido } from "./selector-cliente";
 
 interface Catalogo {
@@ -74,6 +78,8 @@ export function Mostrador({
     grupo?: string;
   } | null>(null);
   const [abierto, setAbierto] = useState<string | null>(null);
+  const [buscaPrenda, setBuscaPrenda] = useState("");
+  const [piezaElegida, setPiezaElegida] = useState<string | null>(null);
   const [fotos, setFotos] = useState<Map<string, Blob>>(new Map());
   const [modoPago, setModoPago] = useState<ModoPago>("recoger");
   const [metodo, setMetodo] = useState<Metodo>("efectivo");
@@ -100,6 +106,22 @@ export function Mostrador({
   const grupos = agrupar(carrito.piezas);
   const totales = totalesCarrito(carrito, servicios, tienda.reglas);
   const conteo = conteoPorBoton(carrito.piezas);
+  const prendasVisibles = useMemo(() => {
+    const activas = (cat?.prendas ?? []).filter((p) => p.activo);
+    const q = buscaPrenda.trim().toLowerCase();
+    if (!q) return activas;
+    return activas.filter((p) => `${p.nombreEs} ${p.nombreEn ?? ""}`.toLowerCase().includes(q));
+  }, [cat, buscaPrenda]);
+  /** La prenda que se está marcando: la elegida a mano, o la última que se tocó. */
+  const piezaActiva = carrito.piezas.find((p) => p.id === piezaElegida) ?? carrito.piezas.at(-1) ?? null;
+  const numeroDePieza = piezaActiva
+    ? carrito.piezas.filter(
+        (p) =>
+          p.servicioId === piezaActiva.servicioId &&
+          p.prendaId === piezaActiva.prendaId &&
+          carrito.piezas.indexOf(p) <= carrito.piezas.indexOf(piezaActiva),
+      ).length
+    : 0;
   const dinero = (n: number) => formatoDinero(n, tienda.moneda, idioma);
   const nombre = (x: { nombreEs: string; nombreEn: string | null } | undefined) =>
     x ? textoBilingue(idioma, x.nombreEs, x.nombreEn) : "—";
@@ -134,6 +156,8 @@ export function Mostrador({
       precioManual: false,
       unidad: s.unidad,
     });
+    // Las marcas pasan a la prenda recién agregada.
+    setPiezaElegida(null);
   }
 
   function agregarLibras(s: ServicioCarrito) {
@@ -206,7 +230,7 @@ export function Mostrador({
         ...(p.precioManual ? { precioUnitCents: p.precioUnitCents } : {}),
         ...(p.color ? { color: p.color } : {}),
         ...(p.marca ? { marca: p.marca } : {}),
-        ...(p.notas ? { notas: p.notas } : {}),
+        ...(notasDePieza(p) ? { notas: notasDePieza(p) } : {}),
       })),
       urgente: carrito.urgente,
       ...(carrito.fechaPromesa ? { fechaPromesa: carrito.fechaPromesa } : {}),
@@ -363,10 +387,10 @@ export function Mostrador({
   }
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="w-full">
       <EncabezadoPagina titulo={dm.titulo} />
       {errorCat ? <Aviso tono="error">{textoError(d, errorCat)}</Aviso> : null}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="min-w-0 space-y-4">
           <section aria-label={dm.pasoCliente}>
             <SelectorCliente
@@ -385,21 +409,33 @@ export function Mostrador({
               <p className="text-gris">{d.comun.cargando}</p>
             ) : (
               <>
-                <div className="-mx-4 overflow-x-auto px-4">
-                  <div className="flex w-max gap-2 pb-3" role="tablist">
-                    {serviciosActivos.map((s) => (
-                      <button
-                        key={s.id}
-                        type="button"
-                        role="tab"
-                        aria-selected={s.id === servicio?.id}
-                        onClick={() => setServicioId(s.id)}
-                        className={`rounded-full px-4 py-2 text-[15px] font-semibold ring-1 ${s.id === servicio?.id ? "bg-tinta text-white ring-tinta" : "bg-papel text-noche ring-percha"}`}
-                      >
-                        {nombre(s)}
-                      </button>
-                    ))}
+                <div className="-mx-4 flex flex-wrap items-center gap-2 px-4 pb-3">
+                  <div className="-mx-4 w-[calc(100%+2rem)] min-w-0 overflow-x-auto px-4 md:w-auto md:flex-1">
+                    <div className="flex w-max gap-2" role="tablist">
+                      {serviciosActivos.map((s) => (
+                        <button
+                          key={s.id}
+                          type="button"
+                          role="tab"
+                          aria-selected={s.id === servicio?.id}
+                          onClick={() => setServicioId(s.id)}
+                          className={`rounded-full px-4 py-2 text-[15px] font-semibold ring-1 ${s.id === servicio?.id ? "bg-tinta text-white ring-tinta" : "bg-papel text-noche ring-percha"}`}
+                        >
+                          {nombre(s)}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+                  <label className="w-full md:w-44 md:flex-none">
+                    <span className="sr-only">{dm.buscarPrenda}</span>
+                    <input
+                      type="search"
+                      value={buscaPrenda}
+                      onChange={(e) => setBuscaPrenda(e.target.value)}
+                      placeholder={dm.buscarPrenda}
+                      className="w-full rounded-full bg-papel px-4 py-2 text-[15px] ring-1 ring-percha focus:ring-2 focus:ring-tinta focus:outline-none"
+                    />
+                  </label>
                 </div>
                 {servicio?.unidad === "libra" ? (
                   <div className="flex flex-wrap items-end gap-3">
@@ -426,41 +462,89 @@ export function Mostrador({
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
-                    {(cat.prendas ?? [])
-                      .filter((p) => p.activo)
-                      .map((p) => {
-                        const precio = servicio ? precios.get(`${servicio.id}|${p.id}`) : undefined;
-                        const n = servicio ? (conteo.get(`${servicio.id}|${p.id}`) ?? 0) : 0;
-                        return (
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6">
+                    {prendasVisibles.length === 0 && (
+                      <p className="col-span-full py-6 text-center text-gris">{dm.sinPrendas}</p>
+                    )}
+                    {prendasVisibles.map((p) => {
+                      const precio = servicio ? precios.get(`${servicio.id}|${p.id}`) : undefined;
+                      const n = servicio ? (conteo.get(`${servicio.id}|${p.id}`) ?? 0) : 0;
+                      return (
+                        <div key={p.id} className="relative">
                           <button
-                            key={p.id}
                             type="button"
                             onClick={() => servicio && tocarPrenda(p.id, servicio)}
-                            className={`relative flex min-h-20 flex-col items-start justify-between rounded-2xl px-3 py-2.5 text-left ring-1 transition active:scale-[0.98] ${n ? "bg-tinta-suave ring-2 ring-tinta" : "bg-papel ring-percha hover:ring-tinta"}`}
+                            className={`flex w-full flex-col items-center gap-1.5 rounded-2xl px-2 pt-3 pb-2.5 ring-1 transition active:scale-[0.97] ${n ? "bg-tinta-suave ring-2 ring-tinta" : "bg-papel ring-percha hover:ring-tinta"}`}
                           >
-                            <span className="text-[15px] leading-tight font-semibold">{nombre(p)}</span>
+                            <IconoPrenda
+                              clave={iconoDePrenda(p.nombreEs, p.nombreEn)}
+                              className={`size-10 ${n ? "text-tinta" : "text-noche/65"}`}
+                            />
+                            <span className="line-clamp-2 min-h-8 text-center text-[13.5px] leading-tight font-semibold">
+                              {nombre(p)}
+                            </span>
                             <span
-                              className={`cifra text-[13px] ${precio === undefined ? "text-gris-claro" : "text-gris"}`}
+                              className={`cifra text-[12.5px] ${precio === undefined ? "text-gris-claro" : "text-gris"}`}
                             >
                               {precio === undefined ? dm.sinPrecio : dinero(precio)}
                             </span>
-                            {n > 0 && (
-                              <span className="absolute -top-2 -right-2 flex size-7 items-center justify-center rounded-full bg-tinta text-[13px] font-bold text-white">
+                          </button>
+                          {n > 0 && (
+                            <>
+                              <span className="pointer-events-none absolute -top-2 -left-2 flex size-7 items-center justify-center rounded-full bg-tinta text-[13px] font-bold text-white">
                                 {n}
                               </span>
-                            )}
-                          </button>
-                        );
-                      })}
+                              <button
+                                type="button"
+                                aria-label={dm.quitarUna}
+                                onClick={() =>
+                                  servicio &&
+                                  despachar({
+                                    tipo: "quitarUltimaDe",
+                                    servicioId: servicio.id,
+                                    prendaId: p.id,
+                                  })
+                                }
+                                className="absolute -top-2 -right-2 flex size-7 items-center justify-center rounded-full bg-superficie text-lg leading-none font-bold text-tinta ring-1 ring-percha"
+                              >
+                                −
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </>
             )}
           </section>
+
+          {piezaActiva && (
+            <div className="sticky bottom-28 z-10 md:bottom-4">
+              <BarraMarcas
+                pieza={piezaActiva}
+                nombrePrenda={nombre(
+                  piezaActiva.prendaId
+                    ? prendas.get(piezaActiva.prendaId)
+                    : servicios.get(piezaActiva.servicioId),
+                )}
+                numero={numeroDePieza}
+                tieneFoto={fotos.has(piezaActiva.id)}
+                alMarcar={(marca) => despachar({ tipo: "marcarPieza", id: piezaActiva.id, marca })}
+                alColor={(color) =>
+                  despachar({ tipo: "editarPieza", id: piezaActiva.id, cambios: { color } })
+                }
+                alFoto={(archivo) => tomarFoto(piezaActiva.id, archivo)}
+              />
+            </div>
+          )}
         </div>
 
-        <aside aria-label={dm.pasoCobro} className="min-w-0 space-y-3 lg:sticky lg:top-20">
+        <aside
+          aria-label={dm.pasoCobro}
+          className="min-w-0 space-y-3 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto lg:pb-2"
+        >
           <div className="rounded-3xl bg-superficie ring-1 ring-percha/80">
             {grupos.length === 0 ? (
               <p className="p-5 text-center text-gris">{cliente ? dm.agregarPrendas : dm.elegirCliente}</p>
@@ -493,6 +577,8 @@ export function Mostrador({
                     }
                     alEditar={(id, cambios) => despachar({ tipo: "editarPieza", id, cambios })}
                     alFoto={tomarFoto}
+                    piezaActivaId={piezaActiva?.id ?? null}
+                    alElegirPieza={setPiezaElegida}
                   />
                 ))}
               </ul>
@@ -780,11 +866,17 @@ function LineaGrupo(p: {
   alPrecio: () => void;
   alEditar: (id: string, cambios: { color?: string; marca?: string; notas?: string }) => void;
   alFoto: (id: string, archivo: File | undefined) => void;
+  piezaActivaId: string | null;
+  alElegirPieza: (id: string) => void;
 }) {
   const { d, idioma } = useIdioma();
   const dm = d.mostrador;
   const g = p.grupo;
   const libra = p.servicio?.unidad === "libra";
+  const marcasDelGrupo = g.piezas
+    .map((pieza) => [pieza.color, ...pieza.marcas].filter(Boolean).join(", "))
+    .filter(Boolean)
+    .join(" · ");
   const nombrePrenda = p.prenda
     ? textoBilingue(idioma, p.prenda.nombreEs, p.prenda.nombreEn)
     : p.servicio
@@ -808,6 +900,9 @@ function LineaGrupo(p: {
             {p.dinero(g.precioUnitCents)}
             {g.precioManual ? " ✎" : ""}
           </span>
+          {marcasDelGrupo && (
+            <span className="mt-0.5 block truncate text-[12.5px] text-gris">{marcasDelGrupo}</span>
+          )}
         </button>
         {!libra && (
           <div className="flex items-center rounded-full bg-papel ring-1 ring-percha">
@@ -842,10 +937,34 @@ function LineaGrupo(p: {
       {p.abierto && (
         <ul className="mt-3 space-y-3">
           {g.piezas.map((pieza, i) => (
-            <li key={pieza.id} className="rounded-2xl bg-papel p-3">
-              <p className="mb-2 text-[12px] font-bold text-gris">
-                #{i + 1} · {pieza.codigoEtiqueta}
-              </p>
+            <li
+              key={pieza.id}
+              className={`rounded-2xl p-3 ${pieza.id === p.piezaActivaId ? "bg-tinta-suave ring-1 ring-tinta" : "bg-papel"}`}
+            >
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="text-[12px] font-bold text-gris">
+                  #{i + 1} · {pieza.codigoEtiqueta}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => p.alElegirPieza(pieza.id)}
+                  className="rounded-full bg-superficie px-3 py-1 text-[12.5px] font-semibold text-tinta ring-1 ring-percha"
+                >
+                  {dm.marcas}
+                </button>
+              </div>
+              {(pieza.color || pieza.marcas.length > 0) && (
+                <div className="mb-2 flex flex-wrap gap-1">
+                  {[pieza.color, ...pieza.marcas].filter(Boolean).map((m) => (
+                    <span
+                      key={m}
+                      className="rounded-full bg-superficie px-2.5 py-1 text-[12px] font-semibold ring-1 ring-percha"
+                    >
+                      {m}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-2">
                 <CampoTexto
                   etiqueta={dm.color}

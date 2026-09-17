@@ -5,6 +5,7 @@ import {
   claveGrupo,
   conteoPorBoton,
   diasEntregaCarrito,
+  notasDePieza,
   reducirCarrito,
   totalesCarrito,
   type Accion,
@@ -153,5 +154,43 @@ describe("carrito del mostrador", () => {
     expect(diasEntregaCarrito(carritoVacio(), servicios, 3)).toBe(3);
     const desconocido = aplicar([{ ...camisa, servicioId: "otro" }]);
     expect(totalesCarrito(desconocido, servicios, reglas).impuestoCents).toBe(33);
+  });
+
+  it("las marcas de un toque se ponen y se quitan, y salen juntas en las notas de la pieza", () => {
+    const c = aplicar([camisa, camisa]);
+    const primera = c.piezas[0]!;
+    const conMarcas = [
+      { tipo: "marcarPieza", id: primera.id, marca: "Botón roto" } as const,
+      { tipo: "marcarPieza", id: primera.id, marca: "Vino" } as const,
+      { tipo: "editarPieza", id: primera.id, cambios: { color: "Azul oscuro" } } as const,
+      { tipo: "editarPieza", id: primera.id, cambios: { notas: "Sin almidón" } } as const,
+    ].reduce(reducirCarrito, c);
+    expect(conMarcas.piezas[0]!.marcas).toEqual(["Botón roto", "Vino"]);
+    expect(conMarcas.piezas[0]!.color).toBe("Azul oscuro");
+    // La segunda pieza no se contagia: cada prenda lleva lo suyo.
+    expect(conMarcas.piezas[1]!.marcas).toEqual([]);
+    expect(notasDePieza(conMarcas.piezas[0]!)).toBe("Botón roto · Vino · Sin almidón");
+
+    const quitada = reducirCarrito(conMarcas, {
+      tipo: "marcarPieza",
+      id: primera.id,
+      marca: "Vino",
+    });
+    expect(quitada.piezas[0]!.marcas).toEqual(["Botón roto"]);
+  });
+
+  it("el menos del botón de la prenda quita la última de ESA prenda, no otra", () => {
+    const pantalon = { ...camisa, prendaId: "pantalon", precioUnitCents: 750 } as const;
+    const c = aplicar([camisa, pantalon, camisa]);
+    const menos = reducirCarrito(c, {
+      tipo: "quitarUltimaDe",
+      servicioId: "seco",
+      prendaId: "camisa",
+    });
+    expect(menos.piezas.map((p) => p.prendaId)).toEqual(["camisa", "pantalon"]);
+    // Una prenda que no está en el carrito no cambia nada.
+    expect(reducirCarrito(menos, { tipo: "quitarUltimaDe", servicioId: "seco", prendaId: "falda" })).toBe(
+      menos,
+    );
   });
 });

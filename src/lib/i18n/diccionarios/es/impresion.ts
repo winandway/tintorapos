@@ -19,6 +19,7 @@ export const impresion = {
   gracias: "¡Gracias por tu preferencia!",
   copiaInterna: "COPIA INTERNA",
   notas: "Notas",
+  marcasPrendas: "Estado de las prendas al recibirlas",
   pieza: "Pieza {i} de {n}",
   urgente: "URGENTE",
   bloqueada: "Reimprimir el recibo necesita la autorización de un gerente.",

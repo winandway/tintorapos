@@ -34,7 +34,8 @@ export const GUIAS_MOSTRADOR: Guia[] = [
             "Toca una prenda dentro del servicio que corresponde. Cada toque suma una pieza.",
             "Para el lavado por libra, escribe las **Libras** y toca **Agregar**.",
             "Si una prenda no tiene precio, escríbelo en ese momento.",
-            "En **Detalles** de cada prenda anota el color, la marca y las **Manchas o daños**, y toma una foto si hace falta.",
+            "Abajo aparece la barra **Marcas de la prenda** con la última que tocaste: marca de un toque los **Daños** (botón roto, cuello roto…), las **Manchas** (vino, café, tinta…) y el **Color**. Cada toque va a ESA pieza, no a todas.",
+            "Si necesitas escribir algo distinto, abre la prenda en la orden de la derecha y usa **Manchas o daños**, la **Marca** de la prenda y la foto.",
           ],
         },
         {
@@ -101,7 +102,8 @@ export const GUIAS_MOSTRADOR: Guia[] = [
             "Tap a garment under the right service. Each tap adds one piece.",
             "For wash & fold, enter the **Pounds** and tap **Add**.",
             "If a garment has no price, type it in on the spot.",
-            "Under **Details** for each item, note the color, brand and any **Stains or damage**, and take a photo if needed.",
+            "The **Item marks** bar at the bottom shows the last item you tapped: mark **Damage** (button broken, collar torn…), **Stains** (wine, coffee, ink…) and the **Color** with one tap. Each tap applies to THAT piece, not to all of them.",
+            "If you need to write something else, open the item in the order on the right and use **Stains or damage**, the item **Brand** and the photo.",
           ],
         },
         {

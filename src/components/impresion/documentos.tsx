@@ -89,6 +89,19 @@ export function Recibo({
           ))}
         </tbody>
       </table>
+      {orden.prendas.some((p) => p.notas || p.color) && (
+        <div className="mt-2 border-t border-dashed border-black pt-2 text-[8.5pt]">
+          <p className="font-bold">{di.marcasPrendas}</p>
+          {orden.prendas
+            .filter((p) => p.notas || p.color)
+            .map((p) => (
+              <p key={p.id}>
+                • {textoBilingue(idioma, p.prendaEs, p.prendaEn)} [{p.codigoEtiqueta}]{" "}
+                {[p.color, p.notas].filter(Boolean).join(" · ")}
+              </p>
+            ))}
+        </div>
+      )}
       <dl className="mt-2 grid grid-cols-[1fr_auto] gap-x-2 border-t border-dashed border-black pt-2 text-[9.5pt]">
         <dt>{di.subtotal}</dt>
         <dd className="text-right">{dinero(orden.subtotalCents)}</dd>
@@ -207,6 +220,11 @@ export function Etiquetas({
               {formatoFecha(orden.fechaPromesa, idioma, zona, { month: "short", day: "numeric" })}
               {orden.urgente ? ` · ${d.impresion.urgente}` : ""}
             </p>
+            {(prenda.color || prenda.notas) && (
+              <p className="truncate text-[7pt] font-bold">
+                {[prenda.color, prenda.notas].filter(Boolean).join(" · ")}
+              </p>
+            )}
           </div>
         </section>
       ))}

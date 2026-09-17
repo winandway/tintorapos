@@ -40,6 +40,16 @@ cd "/Users/windocellc/Software-Tintora POS" && npm run dev
 Abre `http://localhost:3000`, crea una cuenta en «Probar gratis» y sigue los
 primeros pasos de la pantalla de inicio.
 
+Para mirar las pantallas de adentro sin registrarte cada vez (útil al diseñar),
+hay una tintorería de trabajo con catálogo, precios y clientes:
+
+```bash
+cd "/Users/windocellc/Software-Tintora POS" && npm run demo:local
+```
+
+Imprime dos cookies (`tp_sesion` y `tp_csrf`) para pegar en el navegador. Escribe
+SOLO en la base local: nunca toca la base publicada.
+
 ## Pruebas
 
 | Comando | Qué hace |

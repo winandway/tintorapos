@@ -22,6 +22,7 @@ export const impresion: Forma<typeof base> = {
   gracias: "Thank you for your business!",
   copiaInterna: "STORE COPY",
   notas: "Notes",
+  marcasPrendas: "Item condition at drop-off",
   pieza: "Item {i} of {n}",
   urgente: "RUSH",
   bloqueada: "Reprinting the receipt needs a manager's approval.",

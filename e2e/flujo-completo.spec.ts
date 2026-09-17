@@ -89,6 +89,11 @@ test("un día completo en la tintorería", async ({ page, context }) => {
     await prendas.getByRole("button", { name: /^Pantalón/ }).click();
     await expect(page.getByTestId("total-orden")).toHaveText("$17.50");
 
+    // Marcas de un toque en la última prenda: quedan en el recibo y protegen de reclamos.
+    const marcas = page.getByTestId("marcas-prenda");
+    await marcas.getByRole("button", { name: es.mostrador.listaDanos.botonRoto }).click();
+    await marcas.getByRole("button", { name: es.mostrador.listaColores.azulOscuro }).click();
+
     const cobro = page.getByRole("complementary", { name: es.mostrador.pasoCobro });
     await cobro.getByRole("radio", { name: es.mostrador.abono }).click();
     await cobro.getByLabel(es.mostrador.montoAbono).fill("5");
@@ -108,6 +113,8 @@ test("un día completo en la tintorería", async ({ page, context }) => {
     await page.goto(`/app/ordenes/${ordenId}/imprimir?tipo=recibo&vista=1`);
     const recibo = page.getByTestId("recibo");
     await expect(recibo).toBeVisible();
+    await expect(recibo).toContainText(es.mostrador.listaDanos.botonRoto);
+    await expect(recibo).toContainText(es.mostrador.listaColores.azulOscuro);
     numero = /#(\d+)/.exec((await recibo.textContent()) ?? "")?.[1] ?? "";
     expect(Number(numero)).toBeGreaterThanOrEqual(1001);
   });

@@ -39,6 +39,8 @@ export interface Pieza {
   precioManual: boolean;
   color: string;
   marca: string;
+  /** Daños y manchas marcados con un toque en el mostrador (ya en el idioma de la tienda). */
+  marcas: string[];
   notas: string;
 }
 
@@ -70,7 +72,9 @@ export type Accion =
       cantidad?: number;
       unidad: Unidad;
     }
+  | { tipo: "marcarPieza"; id: string; marca: string }
   | { tipo: "quitarUna"; clave: string }
+  | { tipo: "quitarUltimaDe"; servicioId: string; prendaId: string | null }
   | { tipo: "quitarGrupo"; clave: string }
   | { tipo: "precioGrupo"; clave: string; precioUnitCents: number; precioManual: boolean }
   | {
@@ -101,12 +105,18 @@ export function reducirCarrito(c: Carrito, a: Accion): Carrito {
         precioManual: a.precioManual,
         color: "",
         marca: "",
+        marcas: [],
         notas: "",
       };
       return { ...c, piezas: [...c.piezas, nueva] };
     }
     case "quitarUna": {
       const i = c.piezas.map((p) => claveGrupo(p)).lastIndexOf(a.clave);
+      if (i < 0) return c;
+      return { ...c, piezas: c.piezas.filter((_, j) => j !== i) };
+    }
+    case "quitarUltimaDe": {
+      const i = c.piezas.findLastIndex((p) => p.servicioId === a.servicioId && p.prendaId === a.prendaId);
       if (i < 0) return c;
       return { ...c, piezas: c.piezas.filter((_, j) => j !== i) };
     }
@@ -118,6 +128,20 @@ export function reducirCarrito(c: Carrito, a: Accion): Carrito {
         piezas: c.piezas.map((p) =>
           claveGrupo(p) === a.clave
             ? { ...p, precioUnitCents: a.precioUnitCents, precioManual: a.precioManual }
+            : p,
+        ),
+      };
+    case "marcarPieza":
+      return {
+        ...c,
+        piezas: c.piezas.map((p) =>
+          p.id === a.id
+            ? {
+                ...p,
+                marcas: p.marcas.includes(a.marca)
+                  ? p.marcas.filter((m) => m !== a.marca)
+                  : [...p.marcas, a.marca],
+              }
             : p,
         ),
       };
@@ -213,4 +237,12 @@ export function conteoPorBoton(piezas: Pieza[]): Map<string, number> {
     m.set(k, (m.get(k) ?? 0) + (p.prendaId ? 1 : 0));
   }
   return m;
+}
+
+/**
+ * Lo que se guarda en la orden como «manchas o daños»: primero lo marcado con
+ * un toque, después lo que el empleado escribió a mano.
+ */
+export function notasDePieza(p: Pick<Pieza, "marcas" | "notas">): string {
+  return [...p.marcas, p.notas.trim()].filter(Boolean).join(" · ");
 }

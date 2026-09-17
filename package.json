@@ -14,6 +14,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "db:local": "node scripts/db-local.mjs",
+    "demo:local": "node scripts/demo-local.mjs",
     "check:env": "node scripts/check-env.mjs",
     "cf:build": "opennextjs-cloudflare build",
     "cf:bundle": "node scripts/empaquetar-worker.mjs",

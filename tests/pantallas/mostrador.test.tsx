@@ -197,4 +197,39 @@ describe("mostrador: nueva orden (contra el servidor real)", () => {
       .first<{ n: number }>();
     expect(despues!.n).toBe(antes!.n + 1);
   }, 60_000);
+
+  it("las marcas de un toque (daño, mancha y color) quedan guardadas en la prenda de la orden", async () => {
+    const u = userEvent.setup();
+    montar(<Mostrador tienda={TIENDA} clienteInicial={null} />);
+    await elegirClienteNuevo(u, "Rosa Marcas");
+    const prendas = screen.getByRole("region", { name: dm.pasoPrendas });
+    await u.click(await within(prendas).findByRole("button", { name: /^Camisa/ }));
+
+    const marcas = await screen.findByTestId("marcas-prenda");
+    await u.click(within(marcas).getByRole("button", { name: dm.listaDanos.botonRoto }));
+    await u.click(within(marcas).getByRole("button", { name: dm.listaManchas.vino }));
+    await u.click(within(marcas).getByRole("button", { name: dm.listaColores.azulOscuro }));
+
+    // Una segunda camisa entra limpia: las marcas son de cada pieza, no del botón.
+    await u.click(within(prendas).getByRole("button", { name: /^Camisa/ }));
+    expect(within(screen.getByTestId("marcas-prenda")).getByText(dm.sinMarcas)).toBeInTheDocument();
+
+    const cobro = screen.getByRole("complementary", { name: dm.pasoCobro });
+    await u.click(within(cobro).getByRole("button", { name: (n: string) => n.startsWith(dm.confirmar) }));
+    await screen.findByTestId("orden-creada", undefined, { timeout: 15_000 });
+
+    const { results } = await e.env.DB.prepare(
+      `select p.color, p.notas from orden_prendas p
+       where p.tintoreria_id = ? and p.orden_id = (select id from ordenes where tintoreria_id = ? order by creada_en desc limit 1)
+       order by p.posicion`,
+    )
+      .bind(esc.tintoreriaId, esc.tintoreriaId)
+      .all<{ color: string | null; notas: string | null }>();
+    expect(results).toHaveLength(2);
+    expect(results[0]).toMatchObject({
+      color: dm.listaColores.azulOscuro,
+      notas: `${dm.listaDanos.botonRoto} · ${dm.listaManchas.vino}`,
+    });
+    expect(results[1]!.notas).toBeNull();
+  }, 60_000);
 });
