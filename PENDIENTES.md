@@ -14,9 +14,11 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 3. 👤 **Cron Trigger en tu cuenta de Cloudflare** que llame cada 5 minutos a
    `https://tintorapos.com/datos/reloj` con el secreto (lo creo yo con tu sí).
    **Destranca:** avisos automáticos, recordatorios, respaldo diario y el canario en verde.
-4. 👤 **«Activar correos de mi dominio»** en Mis dominios → `tintorapos.com`, y
-   variable `EMAIL_FROM`.
-   **Destranca:** correos de recuperación de contraseña y avisos por correo.
+4. 👤 **«Activar correos de mi dominio»** en el panel → Mis dominios → `tintorapos.com`
+   (un botón; el plan Galaxia trae 300 correos al día ya firmados). Después, la
+   variable `EMAIL_FROM` = `avisos@tintorapos.com`.
+   **Destranca:** recuperación de contraseña, avisos por correo al cliente y el
+   recibo por correo. Los SMS quedan para después (👤8).
 5. 👤 **Correo de soporte** para privacidad y términos (variable `SUPPORT_EMAIL`),
    y **revisión legal** de los dos borradores.
    **Destranca:** poder lanzar al público.
@@ -71,3 +73,8 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
   «Soporte Tintora POS (verificación)»: efectivo, tarjeta propia, otro, orden sin
   conexión, anular con PIN del gerente, cierre de caja a ciegas y reportes
   (`VERIFICAR-PAGOS.md`).
+- ✅ 2026-09-17 · Mostrador nuevo: cada prenda con su dibujo, marcas de daños,
+  manchas y color con un toque, y el estado de la prenda impreso en el recibo y
+  en la etiqueta.
+- ✅ 2026-09-17 · Conectar un celular escaneando un QR desde la tablet (enlace de
+  un solo uso de 10 minutos, entra con PIN).
