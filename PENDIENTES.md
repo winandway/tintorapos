@@ -8,7 +8,7 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 
 1. 👤 **Enviar el sitemap en Google Search Console** (propiedad `tintorapos.com` →
    Sitemaps): `https://tintorapos.com/sitemap.xml`.
-   **Destranca:** que Google descubra las 69 páginas en español e inglés.
+   **Destranca:** que Google descubra las 63 direcciones en español, inglés y x-default.
 2. 👤 **Cambiar la variable `APP_URL`** del sitio a `https://tintorapos.com`.
    **Destranca:** que los enlaces de los SMS y correos usen el dominio propio.
 3. 👤 **Cron Trigger en tu cuenta de Cloudflare** que llame cada 5 minutos a
