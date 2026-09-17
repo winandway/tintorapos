@@ -63,6 +63,30 @@ if (!(await fetch(base + "/")).headers.get("link")?.includes('rel="api-catalog"'
   fallos++;
   console.info("MAL cabecera Link: la portada no anuncia el catálogo de API");
 }
+// La puerta A2A responde a otro agente.
+const a2a = await fetch(base + "/a2a", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "message/send",
+    params: {
+      message: {
+        role: "user",
+        kind: "message",
+        messageId: "humo",
+        parts: [{ kind: "text", text: "¿Qué es Tintora POS?" }],
+      },
+    },
+  }),
+});
+const dicho = (await a2a.json().catch(() => ({})))?.result?.parts?.[0]?.text ?? "";
+if (!dicho.includes("Tintora POS")) {
+  fallos++;
+  console.info("MAL /a2a: no respondió el mensaje");
+} else console.info("ok  200 /a2a");
+
 // El servidor MCP contesta a un cliente de verdad.
 const mcp = await fetch(base + "/mcp", {
   method: "POST",

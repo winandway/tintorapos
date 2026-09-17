@@ -13,8 +13,13 @@ export function GET() {
       name: "Tintora POS",
       description:
         "Punto de venta en la nube para tintorerías y lavanderías. Consulta pública del estado de una orden, búsqueda en las guías e información del producto.",
-      url: url(RUTAS_AGENTES.mcp),
-      preferredTransport: "MCP",
+      url: url(RUTAS_AGENTES.a2a),
+      preferredTransport: "JSONRPC",
+      supportedInterfaces: [
+        { transport: "JSONRPC", url: url(RUTAS_AGENTES.a2a) },
+        { transport: "MCP", url: url(RUTAS_AGENTES.mcp) },
+      ],
+      additionalInterfaces: [{ transport: "MCP", url: url(RUTAS_AGENTES.mcp) }],
       version: "1.0.0",
       documentationUrl: url(RUTAS_AGENTES.docs),
       provider: { organization: "Windoce LLC", url: "https://windoce.com" },

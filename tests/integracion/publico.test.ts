@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 vi.mock("@/server/entorno", () => import("../ayuda/mock-entorno"));
 
 import { GET as estadoPublico } from "@/app/datos/publico/orden/[codigo]/route";
+import { POST as a2a } from "@/app/a2a/route";
 import { POST as mcp } from "@/app/mcp/route";
 import { codigoDeEtiqueta, ordenPublica } from "@/server/publico/orden";
 import { usarEntorno } from "../ayuda/mock-entorno";
@@ -126,5 +127,47 @@ describe("página pública de la orden (datos mínimos)", () => {
 
     const malo = await jsonRpc("metodo/que/no/existe");
     expect(malo.cuerpo.error!.code).toBe(-32601);
+  });
+
+  it("la puerta A2A responde un mensaje de otro agente con la herramienta que toca", async () => {
+    const enviar = async (texto: string) => {
+      const r = await a2a(
+        new Request("https://tintorapos.com/a2a", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 7,
+            method: "message/send",
+            params: {
+              message: {
+                role: "user",
+                kind: "message",
+                messageId: "m1",
+                parts: [{ kind: "text", text: texto }],
+              },
+            },
+          }),
+        }),
+      );
+      return (await r.json()) as {
+        result?: { parts?: { text: string }[]; metadata?: { herramienta: string } };
+        error?: { code: number };
+      };
+    };
+
+    const estado = await enviar(`¿Está lista mi orden? El código del recibo es ${esc.a.ids.codigoPublico}`);
+    expect(estado.result!.metadata!.herramienta).toBe("estado_de_orden");
+    expect(estado.result!.parts![0]!.text).toContain("Orden #1001");
+
+    const guia = await enviar("¿Cómo cierro la caja al final del día?");
+    expect(guia.result!.metadata!.herramienta).toBe("buscar_guias");
+
+    const producto = await enviar("What is Tintora POS?");
+    expect(producto.result!.metadata!.herramienta).toBe("sobre_tintora_pos");
+    expect(producto.result!.parts![0]!.text).toContain("does NOT process cards");
+
+    const vacio = await enviar("   ");
+    expect(vacio.error!.code).toBe(-32602);
   });
 });

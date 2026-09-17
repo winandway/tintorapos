@@ -14,6 +14,7 @@ export const RUTAS_AGENTES = {
   tarjetaA2a: "/.well-known/agent-card.json",
   catalogoIa: "/.well-known/ai-catalog.json",
   mcp: "/mcp",
+  a2a: "/a2a",
   docs: "/docs",
   llms: "/llms.txt",
   estadoApi: "/datos/salud",
