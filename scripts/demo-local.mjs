@@ -40,7 +40,7 @@ const filas = [
   `insert into sucursales (id, tintoreria_id, nombre, activa, creada_en)
    values (${txt(sucursalId)}, ${txt(tintoreriaId)}, 'Principal', 1, ${AHORA})`,
   `insert into usuarios (id, tintoreria_id, nombre, rol, correo, totp_activo, activo, creado_en, actualizado_en)
-   values (${txt(duenoId)}, ${txt(tintoreriaId)}, 'Soporte Windoce', 'dueno', 'soporte@windoce.com', 0, 1, ${AHORA}, ${AHORA})`,
+   values (${txt(duenoId)}, ${txt(tintoreriaId)}, 'Soporte Windoce', 'dueno', ${txt(`soporte+${AHORA}@windoce.com`)}, 0, 1, ${AHORA}, ${AHORA})`,
   `insert into sesiones (id_hash, tintoreria_id, usuario_id, dispositivo_id, tipo, segundo_factor_ok, creada_en, ultima_actividad_en, expira_en)
    values (${txt(sha256(token))}, ${txt(tintoreriaId)}, ${txt(duenoId)}, null, 'cuenta', 1, ${AHORA}, ${AHORA}, ${AHORA + 30 * 86400000})`,
 ];

@@ -410,7 +410,7 @@ export function Mostrador({
             ) : (
               <>
                 <div className="-mx-4 flex flex-wrap items-center gap-2 px-4 pb-3">
-                  <div className="-mx-4 w-[calc(100%+2rem)] min-w-0 overflow-x-auto px-4 md:w-auto md:flex-1">
+                  <div className="-mx-4 w-[calc(100%+2rem)] min-w-0 overflow-x-auto px-4 md:mx-0 md:w-auto md:flex-1 md:px-0 md:pr-3">
                     <div className="flex w-max gap-2" role="tablist">
                       {serviciosActivos.map((s) => (
                         <button
