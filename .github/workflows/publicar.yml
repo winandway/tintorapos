@@ -58,3 +58,5 @@ jobs:
         run: sleep 120
       - name: Humo post-publicación
         run: node scripts/humo-publicado.mjs "${{ vars.SITIO_URL }}"
+      - name: Avisar a los buscadores (IndexNow)
+        run: node scripts/indexnow.mjs

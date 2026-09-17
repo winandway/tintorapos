@@ -9,11 +9,11 @@ Punto de venta y gestión en la nube para tintorerías y lavanderías, vendido
 como suscripción (SaaS) a dueños de negocio en EE.UU. y Latinoamérica.
 Bilingüe español/inglés. Marca: **Tintora POS**. Dueño: Richard (Windoce LLC).
 
-**Estado (16 sep 2026):** Fase 0 (blindaje) y Fase 1 (MVP vendible) construidas
-y probadas en local: 215 pruebas con 80 % de cobertura, 30 pruebas de punta a
-punta en celular y escritorio, paquete `_worker.js` de 4.64 MB en gzip probado.
-**No publicado**: faltan el repositorio, el plan del sitio y el reloj externo
-(ver `PENDIENTES.md`). **No hay procesador de pagos** (ver `VERIFICAR-PAGOS.md`).
+**Estado (17 sep 2026):** Fase 0 y Fase 1 **publicadas en vivo en
+`https://tintorapos.com`** (YaDominios Cloud). Dominio verificado en Google Search
+Console. SEO bilingüe con direcciones `/es` y `/en`. Falta el reloj externo (Cron) y
+los servicios opcionales (ver `PENDIENTES.md`). **No hay procesador de pagos** (ver
+`VERIFICAR-PAGOS.md`).
 
 ## Documentos que mandan
 
@@ -69,6 +69,15 @@ punta en celular y escritorio, paquete `_worker.js` de 4.64 MB en gzip probado.
 - Idioma: bilingüe ES/EN con selector arriba; todo texto público en dos
   casillas en el panel.
 - Docs en `/docs`, estilo Wikipedia, barra lateral que nunca se pierde.
+- **SEO:** dominio canónico fijo `https://tintorapos.com` (`src/lib/sitio.ts`), no
+  `APP_URL`. Cada página pública existe en `/es/…`, `/en/…` (direcciones en inglés:
+  `/en/privacy`, `/en/terms`, `/en/signup`, slugs de guías en `src/lib/docs/slugs.ts`)
+  y sin prefijo como x-default. Son rutas reales en `src/app/[idioma]/`; **PROHIBIDO
+  `proxy.ts`/middleware** (mete `.wasm` y rompe el `_worker.js` único). Canónica y
+  hreflang con `alternatesDe()` (`src/lib/seo.ts`); sitemap bilingüe con hreflang;
+  datos estructurados JSON-LD; `tintorapos.sitios.dev` con `X-Robots-Tag: noindex`;
+  IndexNow (`scripts/indexnow.mjs`, clave pública en `public/<clave>.txt`) después
+  de cada publicación. Página pública nueva = agregarla a `RUTAS_INDEXABLES`.
 - Pie: `© <año> <dominio> | All rights reserved. Developed by Windoce LLC`.
 
 ## Cómo se trabaja (comandos)

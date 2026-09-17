@@ -11,6 +11,7 @@ import { pedir } from "@/lib/api";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { recargarEn } from "@/lib/navegacion";
+import { rutaPagina } from "@/lib/rutas-publicas";
 
 const PAISES: { codigo: string; es: string; en: string; moneda: string }[] = [
   { codigo: "US", es: "Estados Unidos", en: "United States", moneda: "USD" },
@@ -189,11 +190,19 @@ export function FormRegistro({ siteKey }: { siteKey: string | null }) {
           etiqueta={
             <>
               {antes}
-              <Link href="/terminos" target="_blank" className="font-semibold text-tinta underline">
+              <Link
+                href={rutaPagina(idioma, "terminos")}
+                target="_blank"
+                className="font-semibold text-tinta underline"
+              >
                 {d.acceso.terminos}
               </Link>
               {entre}
-              <Link href="/privacidad" target="_blank" className="font-semibold text-tinta underline">
+              <Link
+                href={rutaPagina(idioma, "privacidad")}
+                target="_blank"
+                className="font-semibold text-tinta underline"
+              >
                 {d.acceso.privacidad}
               </Link>
               {despues}

@@ -3,6 +3,7 @@ import { Logo } from "@/components/marca/logo";
 import { SelectorIdioma } from "@/components/selector-idioma";
 import { clasesBoton } from "@/components/ui/boton";
 import { diccionario, type Idioma } from "@/lib/i18n";
+import { rutaPagina } from "@/lib/rutas-publicas";
 
 /** Encabezado de las páginas públicas (portada, Docs, legales). */
 export function EncabezadoSitio({
@@ -18,7 +19,7 @@ export function EncabezadoSitio({
   return (
     <header className="sticky top-0 z-30 border-b border-percha/60 bg-papel/85 backdrop-blur-md no-imprimir">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:gap-6">
-        <Link href="/" className="shrink-0 rounded-lg" aria-label="Tintora POS">
+        <Link href={rutaPagina(idioma, "inicio")} className="shrink-0 rounded-lg" aria-label="Tintora POS">
           <Logo compacto />
         </Link>
         <nav className="hidden flex-1 items-center gap-6 text-[15px] font-semibold text-gris md:flex">
@@ -49,7 +50,10 @@ export function EncabezadoSitio({
                 {d.entrar}
               </Link>
               <span className="hidden sm:inline-flex">
-                <Link href="/registro" className={`${clasesBoton("primario", "chico")} whitespace-nowrap`}>
+                <Link
+                  href={rutaPagina(idioma, "registro")}
+                  className={`${clasesBoton("primario", "chico")} whitespace-nowrap`}
+                >
                   {d.probarGratis}
                 </Link>
               </span>

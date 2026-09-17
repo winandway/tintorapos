@@ -3,6 +3,7 @@ import { Pie } from "@/components/pie";
 import { EncabezadoSitio } from "@/components/sitio/encabezado-sitio";
 import type { DocumentoLegal } from "@/lib/contenido/legal";
 import { diccionario, type Idioma } from "@/lib/i18n";
+import { rutaPagina } from "@/lib/rutas-publicas";
 import { COOKIE_SESION } from "@/server/cookies";
 
 /** Página legal: una columna legible con índice arriba. */
@@ -19,7 +20,11 @@ export async function PaginaLegal({
   const d = diccionario(idioma).comun;
   return (
     <div className="flex min-h-dvh flex-col">
-      <EncabezadoSitio idioma={idioma} haySesion={haySesion} enlaces={[{ href: "/docs", texto: d.docs }]} />
+      <EncabezadoSitio
+        idioma={idioma}
+        haySesion={haySesion}
+        enlaces={[{ href: rutaPagina(idioma, "docs"), texto: d.docs }]}
+      />
       <main id="contenido" className="flex-1">
         <article className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
           <h1 className="titulo-ancho text-4xl leading-[1.05] sm:text-5xl">{doc.titulo}</h1>

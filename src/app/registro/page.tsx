@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { FormRegistro } from "@/components/acceso/form-registro";
 import { MarcoAcceso } from "@/components/acceso/marco-acceso";
+import { metadataRegistro } from "@/components/sitio/metadatos-publicos";
+import { obtenerIdioma } from "@/lib/i18n/servidor";
 import { obtenerContexto } from "@/server/entorno";
 
-export const metadata: Metadata = {
-  title: "Prueba gratis · Free trial",
-  description: "Crea tu cuenta de Tintora POS y pruébalo 14 días gratis, sin tarjeta.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return metadataRegistro(await obtenerIdioma(), false);
+}
 
 export const dynamic = "force-dynamic";
 

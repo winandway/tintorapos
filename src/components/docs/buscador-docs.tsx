@@ -37,7 +37,7 @@ function ListaResultados({
 }: {
   id: string;
   r: ReturnType<typeof useResultados>;
-  alElegir: (slug: string) => void;
+  alElegir: (href: string) => void;
 }) {
   const { d } = useIdioma();
   if (!r.consulta.trim()) return null;
@@ -55,7 +55,7 @@ function ListaResultados({
           aria-selected={i === r.activo}
           onMouseDown={(ev) => {
             ev.preventDefault();
-            alElegir(e.slug);
+            alElegir(e.href);
           }}
           className={`flex cursor-pointer gap-3 rounded-xl px-3 py-2.5 ${i === r.activo ? "bg-tinta-suave" : "hover:bg-papel"}`}
         >
@@ -89,7 +89,7 @@ function teclas(
       const e = r.resultados[r.activo];
       if (e) {
         ev.preventDefault();
-        alElegir(e.slug);
+        alElegir(e.href);
       }
     } else if (ev.key === "Escape") {
       alEscapar();
@@ -103,7 +103,7 @@ export function BuscadorGrande({ indice }: { indice: EntradaBuscador[] }) {
   const router = useRouter();
   const r = useResultados(indice);
   const id = useId();
-  const elegir = (slug: string) => router.push(`/docs/${slug}`);
+  const elegir = (href: string) => router.push(href);
   const abierto = r.consulta.trim() !== "";
   return (
     <div className="relative">
@@ -194,9 +194,9 @@ export function VentanaBusqueda({ indice }: { indice: EntradaBuscador[] }) {
     setAbierto(false);
     r.cambiar("");
   };
-  const elegir = (slug: string) => {
+  const elegir = (href: string) => {
     cerrar();
-    router.push(`/docs/${slug}`);
+    router.push(href);
   };
 
   if (!abierto) return null;

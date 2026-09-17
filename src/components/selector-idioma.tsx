@@ -1,10 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { fmt, type Idioma } from "@/lib/i18n";
 import { guardarIdiomaElegido } from "@/lib/i18n/navegador";
 import { useIdioma } from "@/lib/i18n/cliente";
+import { rutaEquivalente } from "@/lib/rutas-publicas";
 
 function BanderaEEUU() {
   return (
@@ -45,11 +46,20 @@ const OPCIONES: { idioma: Idioma; etiqueta: string; Bandera: () => React.JSX.Ele
 export function SelectorIdioma({ compacto = false }: { compacto?: boolean }) {
   const { idioma, d } = useIdioma();
   const router = useRouter();
+  const ruta = usePathname();
   const [pendiente, iniciar] = useTransition();
 
   function elegir(nuevo: Idioma) {
     if (nuevo === idioma) return;
     guardarIdiomaElegido(nuevo);
+    // En las páginas públicas con idioma en la dirección (/es, /en) se carga la misma página en el
+    // otro idioma. Carga completa: las dos direcciones comparten la página interna y la navegación
+    // del cliente reutilizaría el contenido ya cargado en el idioma anterior.
+    const equivalente = ruta ? rutaEquivalente(ruta, nuevo) : null;
+    if (equivalente) {
+      window.location.assign(equivalente);
+      return;
+    }
     iniciar(() => router.refresh());
   }
 

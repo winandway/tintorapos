@@ -2,6 +2,7 @@ import Link from "next/link";
 import { clasesBoton } from "@/components/ui/boton";
 import { Ticket } from "@/components/ui/ticket";
 import { diccionario, type Idioma } from "@/lib/i18n";
+import { rutaPagina } from "@/lib/rutas-publicas";
 
 /** Cuerpo del 404: se usa suelto (dentro de Docs) o con encabezado y pie (resto del sitio). */
 export function CuerpoNoEncontrada({ idioma }: { idioma: Idioma }) {
@@ -12,10 +13,10 @@ export function CuerpoNoEncontrada({ idioma }: { idioma: Idioma }) {
       <h1 className="titulo-ancho mt-8 text-3xl leading-tight sm:text-4xl">{d.noEncontradaTitulo}</h1>
       <p className="mt-3 text-lg text-gris">{d.noEncontradaTexto}</p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Link href="/" className={clasesBoton("primario", "grande")}>
+        <Link href={rutaPagina(idioma, "inicio")} className={clasesBoton("primario", "grande")}>
           {d.irInicio}
         </Link>
-        <Link href="/docs" className={clasesBoton("secundario", "grande")}>
+        <Link href={rutaPagina(idioma, "docs")} className={clasesBoton("secundario", "grande")}>
           {d.docs}
         </Link>
       </div>

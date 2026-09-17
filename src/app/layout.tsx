@@ -58,7 +58,7 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const { idioma, d } = await obtenerTextos();
   return (
-    <html lang={idioma} className={`${archivo.variable} ${atkinson.variable}`}>
+    <html lang={idioma} className={`${archivo.variable} ${atkinson.variable}`} suppressHydrationWarning>
       <body className="min-h-dvh antialiased">
         <a
           href="#contenido"

@@ -12,14 +12,23 @@ export interface SeccionBarra {
   clave: string;
   titulo: string;
   icono: IconoSitio;
-  guias: { slug: string; titulo: string }[];
+  guias: { slug: string; titulo: string; href: string }[];
 }
 
 /**
  * Barra lateral de Docs. NUNCA se pierde: vive en el layout del grupo (docs),
  * marca la guía activa, y en el celular se pliega bajo un botón.
  */
-export function BarraDocs({ secciones, indice }: { secciones: SeccionBarra[]; indice: EntradaBuscador[] }) {
+export function BarraDocs({
+  secciones,
+  indice,
+  inicioDocs,
+}: {
+  secciones: SeccionBarra[];
+  indice: EntradaBuscador[];
+  /** Dirección de la portada de Docs en el idioma actual. */
+  inicioDocs: string;
+}) {
   const { d } = useIdioma();
   const ruta = usePathname();
   const [abierta, setAbierta] = useState(false);
@@ -27,10 +36,10 @@ export function BarraDocs({ secciones, indice }: { secciones: SeccionBarra[]; in
   const nav = (
     <nav aria-label={d.docs.navegacion} className="space-y-6">
       <Link
-        href="/docs"
+        href={inicioDocs}
         onClick={() => setAbierta(false)}
-        aria-current={ruta === "/docs" ? "page" : undefined}
-        className={`flex items-center gap-2 rounded-lg px-2 py-1.5 font-bold ${ruta === "/docs" ? "bg-tinta-suave text-tinta" : "text-noche hover:bg-percha/40"}`}
+        aria-current={ruta === "/docs" || ruta === inicioDocs ? "page" : undefined}
+        className={`flex items-center gap-2 rounded-lg px-2 py-1.5 font-bold ${ruta === "/docs" || ruta === inicioDocs ? "bg-tinta-suave text-tinta" : "text-noche hover:bg-percha/40"}`}
       >
         <Icono nombre="libro" className="size-5" />
         {d.docs.titulo}
@@ -43,11 +52,11 @@ export function BarraDocs({ secciones, indice }: { secciones: SeccionBarra[]; in
           </p>
           <ul className="mt-1.5 space-y-0.5 border-l border-percha pl-2 ml-4">
             {s.guias.map((g) => {
-              const activa = ruta === `/docs/${g.slug}`;
+              const activa = ruta === g.href || ruta === `/docs/${g.slug}`;
               return (
                 <li key={g.slug}>
                   <Link
-                    href={`/docs/${g.slug}`}
+                    href={g.href}
                     onClick={() => setAbierta(false)}
                     aria-current={activa ? "page" : undefined}
                     className={`block rounded-lg px-2.5 py-1.5 text-[15px] transition ${

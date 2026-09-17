@@ -236,6 +236,36 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   rama `yapanel-build`.
 - **NO tocar:** no quitar `esbuild` de `devDependencies` aunque «nadie lo importe».
 
+### B14. El proxy de Next rompía el paquete de un solo archivo
+
+- **Cómo se veía:** al agregar `src/proxy.ts` (para las direcciones `/es` y `/en`),
+  `npm run cf:bundle` cortaba con «El empaquetado dejó módulos aparte (…resvg.wasm,
+  …yoga.wasm)».
+- **Causa real:** con cualquier `proxy`/middleware, OpenNext mete el motor de
+  middleware de Next, que trae el generador de imágenes con dos `.wasm`. wrangler
+  los deja como archivos aparte y YaDominios Cloud necesita UN solo `_worker.js`.
+- **Arreglo:** sin proxy. Las páginas con idioma en la dirección son rutas reales:
+  `src/app/[idioma]/page.tsx`, `[idioma]/docs/…` y `[idioma]/[pagina]` (privacidad,
+  términos, registro, con direcciones en inglés). Reutilizan las mismas pantallas
+  (`PaginaInicio`, `MarcoDocs`, `PortadaDocs`, `PaginaGuia`, `PaginaLegal`).
+- **Commit:** el de «feat: SEO bilingüe…» (ver `git log`).
+- **Cómo se comprueba:** `npm run cf:bundle` termina sin módulos aparte y
+  `npm run test:paquete` pasa `e2e/seo.spec.ts`.
+- **NO tocar:** no crear `src/proxy.ts` ni `middleware.ts`.
+
+### B15. El sitemap y robots apuntaban a sitios.dev
+
+- **Cómo se veía:** `https://tintorapos.com/sitemap.xml` listaba
+  `https://tintorapos.sitios.dev/…`. Google Search Console rechaza un sitemap con
+  direcciones de otro dominio.
+- **Causa real:** la dirección pública salía de la variable `APP_URL`.
+- **Arreglo:** `src/lib/sitio.ts` fija `URL_SITIO = "https://tintorapos.com"` para
+  todo lo público (sitemap, robots, canónicas, hreflang, datos estructurados,
+  llms.txt). `tintorapos.sitios.dev` responde con `X-Robots-Tag: noindex`
+  (`next.config.ts`). `APP_URL` queda solo para los enlaces que manda la app.
+- **Candado:** `tests/unit/seo.test.ts` (comprobado en rojo volviendo a sitios.dev)
+  y `scripts/humo-publicado.mjs`, que revisa el sitemap publicado.
+
 ---
 
 ## C. Candados de publicación

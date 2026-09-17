@@ -4,16 +4,21 @@ import { Logo } from "@/components/marca/logo";
 import { Pie } from "@/components/pie";
 import { SelectorIdioma } from "@/components/selector-idioma";
 import { Ticket } from "@/components/ui/ticket";
+import { diccionario, type Idioma } from "@/lib/i18n";
 import { obtenerTextos } from "@/lib/i18n/servidor";
+import { rutaPagina } from "@/lib/rutas-publicas";
 
 /** Marco de las pantallas de acceso: panel de marca a la izquierda (escritorio) y el formulario. */
-export async function MarcoAcceso({ children }: { children: ReactNode }) {
-  const { idioma, d } = await obtenerTextos();
+export async function MarcoAcceso({ children, idioma: fijo }: { children: ReactNode; idioma?: Idioma }) {
+  const { idioma, d } = fijo ? { idioma: fijo, d: diccionario(fijo) } : await obtenerTextos();
   return (
     <div className="flex min-h-dvh flex-col">
       <div className="grid flex-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
         <aside className="relative hidden overflow-hidden bg-tinta text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
-          <Link href="/" className="relative z-10 inline-flex w-fit rounded-2xl bg-papel px-3 py-2">
+          <Link
+            href={rutaPagina(idioma, "inicio")}
+            className="relative z-10 inline-flex w-fit rounded-2xl bg-papel px-3 py-2"
+          >
             <Logo />
           </Link>
           <div className="relative z-10 max-w-md">
@@ -32,7 +37,7 @@ export async function MarcoAcceso({ children }: { children: ReactNode }) {
         </aside>
         <main id="contenido" className="flex flex-col">
           <div className="flex items-center justify-between px-4 py-4 sm:px-8">
-            <Link href="/" className="lg:invisible">
+            <Link href={rutaPagina(idioma, "inicio")} className="lg:invisible">
               <Logo />
             </Link>
             <SelectorIdioma />

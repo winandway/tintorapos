@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const empujar = vi.fn();
-let rutaActual = "/docs/caja";
+let rutaActual = "/es/docs/caja";
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: empujar, refresh: vi.fn() }),
   usePathname: () => rutaActual,
@@ -13,17 +13,22 @@ import { GUIAS, guiasDeSeccion, indiceBuscador, SECCIONES } from "@/lib/docs";
 import { buscarGuias } from "@/lib/docs/buscar";
 import { diccionario } from "@/lib/i18n";
 import { ProveedorIdioma } from "@/lib/i18n/cliente";
+import { rutaGuia } from "@/lib/rutas-publicas";
 
 function montarBarra() {
   const secciones: SeccionBarra[] = SECCIONES.map((s) => ({
     clave: s.clave,
     titulo: s.es,
     icono: s.icono,
-    guias: guiasDeSeccion(s.clave).map((g) => ({ slug: g.slug, titulo: g.es.titulo })),
+    guias: guiasDeSeccion(s.clave).map((g) => ({
+      slug: g.slug,
+      titulo: g.es.titulo,
+      href: rutaGuia("es", g.slug),
+    })),
   }));
   return render(
     <ProveedorIdioma idioma="es" d={diccionario("es")}>
-      <BarraDocs secciones={secciones} indice={indiceBuscador("es")} />
+      <BarraDocs secciones={secciones} indice={indiceBuscador("es")} inicioDocs="/es/docs" />
     </ProveedorIdioma>,
   );
 }
@@ -74,13 +79,14 @@ describe("Docs: buscador", () => {
 describe("Docs: barra lateral", () => {
   beforeEach(() => {
     empujar.mockClear();
-    rutaActual = "/docs/caja";
+    rutaActual = "/es/docs/caja";
   });
 
   it("marca la guía activa", () => {
     montarBarra();
     const activos = screen.getAllByRole("link", { current: "page" });
-    expect(activos.every((a) => a.getAttribute("href") === "/docs/caja")).toBe(true);
+    expect(activos.length).toBeGreaterThan(0);
+    expect(activos.every((a) => a.getAttribute("href") === "/es/docs/caja")).toBe(true);
   });
 
   it("⌘K abre UNA sola ventana aunque haya botón de escritorio y de celular (comprobado en rojo)", () => {
@@ -94,7 +100,7 @@ describe("Docs: barra lateral", () => {
     fireEvent.change(entrada, { target: { value: "dos pasos" } });
     expect(screen.getAllByRole("option").length).toBeGreaterThan(0);
     fireEvent.keyDown(entrada, { key: "Enter" });
-    expect(empujar).toHaveBeenCalledWith("/docs/dos-pasos");
+    expect(empujar).toHaveBeenCalledWith("/es/docs/dos-pasos");
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 

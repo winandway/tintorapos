@@ -14,7 +14,15 @@ const nextConfig: NextConfig = {
   // YaDominios Cloud no ofrece el servicio de imágenes: se sirven tal cual.
   images: { unoptimized: true },
   async headers() {
-    return [{ source: "/:path*", headers: cabecerasSeguridad(desarrollo) }];
+    return [
+      { source: "/:path*", headers: cabecerasSeguridad(desarrollo) },
+      // La dirección técnica de la plataforma no se indexa: Google solo ve tintorapos.com.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "(?<sub>.*)\\.sitios\\.dev" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      },
+    ];
   },
 };
 

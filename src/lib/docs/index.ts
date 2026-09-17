@@ -1,4 +1,5 @@
 import type { Idioma } from "@/lib/i18n";
+import { rutaGuia } from "@/lib/rutas-publicas";
 import { GUIAS_CLIENTES, GUIAS_SEGURIDAD } from "./guias-clientes";
 import { GUIAS_EMPEZAR } from "./guias-empezar";
 import { GUIAS_MOSTRADOR } from "./guias-mostrador";
@@ -46,6 +47,8 @@ export function textoPlano(bloques: Bloque[]): string {
 
 export interface EntradaBuscador {
   slug: string;
+  /** Dirección pública de la guía en el idioma del índice. */
+  href: string;
   titulo: string;
   resumen: string;
   seccion: string;
@@ -56,6 +59,7 @@ export interface EntradaBuscador {
 export function indiceBuscador(idioma: Idioma): EntradaBuscador[] {
   return GUIAS.map((g) => ({
     slug: g.slug,
+    href: rutaGuia(idioma, g.slug),
     titulo: g[idioma].titulo,
     resumen: g[idioma].resumen,
     seccion: SECCIONES.find((s) => s.clave === g.seccion)?.[idioma] ?? "",

@@ -1,8 +1,8 @@
-import { GUIAS, SECCIONES } from "@/lib/docs";
 import { CONTENIDO_INICIO } from "@/lib/contenido/inicio";
-import { URL_SITIO } from "@/lib/sitio";
+import { GUIAS, SECCIONES } from "@/lib/docs";
+import { urlAbsoluta } from "@/lib/seo";
 
-/** Índice para asistentes de IA (llmstxt.org): qué es Tintora POS y dónde está cada guía de Docs. */
+/** Índice para asistentes de IA (llmstxt.org): qué es Tintora POS y dónde está cada guía, en inglés y en español. */
 export function GET() {
   const es = CONTENIDO_INICIO.es;
   const en = CONTENIDO_INICIO.en;
@@ -12,21 +12,25 @@ export function GET() {
     `> ${en.meta.descripcion}`,
     `> ${es.meta.descripcion}`,
     "",
-    "Tintora POS is a cloud point of sale for dry cleaners and laundries in the United States and Latin America. The interface, customer texts and Docs are available in English and Spanish (the site follows the visitor's language).",
+    "Tintora POS is cloud point-of-sale software for dry cleaners, laundries and laundromats worldwide, available in English and Spanish. It covers order intake with QR garment tags, production tracking by scanning, pickup and payment recording, cash drawer with blind close, customer text notifications, reports, daily encrypted backups and an offline mode for store tablets.",
     "",
     "## Site",
     "",
-    `- [Home](${URL_SITIO}/): features, security, offline mode and FAQ`,
-    `- [Start free trial](${URL_SITIO}/registro): 14 days, no credit card`,
-    `- [Docs](${URL_SITIO}/docs): step-by-step guides`,
-    `- [Privacy Policy](${URL_SITIO}/privacidad)`,
-    `- [Terms of Service](${URL_SITIO}/terminos)`,
+    `- [Home (English)](${urlAbsoluta("", "en")}): features, security, offline mode and FAQ`,
+    `- [Inicio (español)](${urlAbsoluta("", "es")})`,
+    `- [Start free trial](${urlAbsoluta("/registro", "en")}): 14 days, no credit card`,
+    `- [Docs (English)](${urlAbsoluta("/docs", "en")}) · [Docs (español)](${urlAbsoluta("/docs", "es")})`,
+    `- [Privacy Policy](${urlAbsoluta("/privacidad", "en")}) · [Política de privacidad](${urlAbsoluta("/privacidad", "es")})`,
+    `- [Terms of Service](${urlAbsoluta("/terminos", "en")}) · [Términos](${urlAbsoluta("/terminos", "es")})`,
     "",
   ];
   for (const s of SECCIONES) {
     lineas.push(`## Docs: ${s.en} / ${s.es}`, "");
     for (const g of GUIAS.filter((x) => x.seccion === s.clave)) {
-      lineas.push(`- [${g.en.titulo} / ${g.es.titulo}](${URL_SITIO}/docs/${g.slug}): ${g.en.resumen}`);
+      const interna = `/docs/${g.slug}`;
+      lineas.push(
+        `- [${g.en.titulo}](${urlAbsoluta(interna, "en")}) · [${g.es.titulo}](${urlAbsoluta(interna, "es")}): ${g.en.resumen}`,
+      );
     }
     lineas.push("");
   }

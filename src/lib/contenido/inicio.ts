@@ -52,9 +52,9 @@ export interface ContenidoInicio {
 
 const es: ContenidoInicio = {
   meta: {
-    titulo: "Tintora POS: punto de venta para tintorerías y lavanderías",
+    titulo: "Software para tintorerías y lavanderías | Tintora POS",
     descripcion:
-      "Recibe, etiqueta con QR, procesa, avisa por SMS y cobra desde la tablet del mostrador. Funciona sin internet. En español e inglés. Prueba 14 días gratis.",
+      "Punto de venta en la nube para tintorerías y lavanderías: etiquetas con QR por prenda, avisos por SMS, caja y reportes. Funciona sin internet. Prueba 14 días gratis.",
   },
   nav: { funciones: "Funciones", seguridad: "Seguridad", preguntas: "Preguntas" },
   hero: {
@@ -313,9 +313,9 @@ const es: ContenidoInicio = {
 
 const en: ContenidoInicio = {
   meta: {
-    titulo: "Tintora POS: point of sale for dry cleaners and laundries",
+    titulo: "Dry Cleaning & Laundry POS Software | Tintora POS",
     descripcion:
-      "Check in orders, print QR garment tags, track production, text customers and take payment from the counter tablet. Works offline. English and Spanish. 14-day free trial.",
+      "Cloud point of sale for dry cleaners and laundries: QR garment tags, text notifications, cash drawer and reports. Works offline, in English and Spanish. 14-day free trial.",
   },
   nav: { funciones: "Features", seguridad: "Security", preguntas: "FAQ" },
   hero: {

@@ -12,7 +12,7 @@ export function Bloques({ bloques, idioma }: { bloques: Bloque[]; idioma: Idioma
           case "p":
             return (
               <p key={i} className="mt-4">
-                <TextoRico texto={b.texto} />
+                <TextoRico texto={b.texto} idioma={idioma} />
               </p>
             );
           case "h2":
@@ -30,7 +30,7 @@ export function Bloques({ bloques, idioma }: { bloques: Bloque[]; idioma: Idioma
                       {j + 1}
                     </span>
                     <span>
-                      <TextoRico texto={it} />
+                      <TextoRico texto={it} idioma={idioma} />
                     </span>
                   </li>
                 ))}
@@ -41,7 +41,7 @@ export function Bloques({ bloques, idioma }: { bloques: Bloque[]; idioma: Idioma
               <ul key={i} className="mt-4 list-disc space-y-2 pl-6 marker:text-tinta">
                 {b.items.map((it, j) => (
                   <li key={j}>
-                    <TextoRico texto={it} />
+                    <TextoRico texto={it} idioma={idioma} />
                   </li>
                 ))}
               </ul>
@@ -60,7 +60,7 @@ export function Bloques({ bloques, idioma }: { bloques: Bloque[]; idioma: Idioma
                   {b.tono === "importante" ? d.importante : d.consejo}
                 </p>
                 <p className="mt-1 text-[16px]">
-                  <TextoRico texto={b.texto} />
+                  <TextoRico texto={b.texto} idioma={idioma} />
                 </p>
               </aside>
             );

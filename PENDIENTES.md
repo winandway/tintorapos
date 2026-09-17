@@ -6,34 +6,28 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 
 ## Esperando por Richard (👤)
 
-1. 👤 **Conectar el repositorio en el panel de `tintorapos`:** repositorio
-   `https://github.com/winandway/tintorapos` y rama `yapanel-build`, y tocar
-   «Publicar sitio». La rama ya la deja lista la Action.
-   **Destranca:** el sitio en vivo en `https://tintorapos.sitios.dev`.
-2. 👤 **Pegar las variables de entorno** en el panel (tarjeta del sitio →
-   Variables de entorno): `APP_SECRET`, `APP_URL`, `RELOJ_SECRETO`, `BACKUP_KEY`
-   y `YADOMINIOS_TOKEN`. Los valores se entregan en el chat, nunca en el repo.
-   **Destranca:** que la app arranque (sin `APP_SECRET` no abre).
+1. 👤 **Enviar el sitemap en Google Search Console** (propiedad `tintorapos.com` →
+   Sitemaps): `https://tintorapos.com/sitemap.xml`.
+   **Destranca:** que Google descubra las 69 páginas en español e inglés.
+2. 👤 **Cambiar la variable `APP_URL`** del sitio a `https://tintorapos.com`.
+   **Destranca:** que los enlaces de los SMS y correos usen el dominio propio.
 3. 👤 **Cron Trigger en tu cuenta de Cloudflare** que llame cada 5 minutos a
-   `https://tintorapos.sitios.dev/datos/reloj` con el secreto (recurso nuevo:
-   lo creo yo con tu sí).
-   **Destranca:** avisos automáticos, recordatorios y respaldo diario; el canario en verde.
-4. 👤 **Confirmar la compra de `tintorapos.com`.** El panel lo muestra conectado,
-   pero el 17 sep 2026 el registro .com respondía que no existe y no tenía DNS.
-   Después: «Activar correos de mi dominio» en Mis dominios.
-   **Destranca:** correos (recuperar contraseña, avisos por correo) y la dirección definitiva.
+   `https://tintorapos.com/datos/reloj` con el secreto (lo creo yo con tu sí).
+   **Destranca:** avisos automáticos, recordatorios, respaldo diario y el canario en verde.
+4. 👤 **«Activar correos de mi dominio»** en Mis dominios → `tintorapos.com`, y
+   variable `EMAIL_FROM`.
+   **Destranca:** correos de recuperación de contraseña y avisos por correo.
 5. 👤 **Correo de soporte** para privacidad y términos (variable `SUPPORT_EMAIL`),
-   y **revisión legal** de los dos borradores: qué empresa opera el servicio y el
-   estado cuya ley aplica.
+   y **revisión legal** de los dos borradores.
    **Destranca:** poder lanzar al público.
-6. 👤 **Precio de los planes** (Básico / Pro / Cadena), si los SMS van incluidos
-   y **qué pasa cuando termina la prueba gratis** (hoy solo muestra un aviso).
+6. 👤 **Precio de los planes**, si los SMS van incluidos y **qué pasa cuando termina
+   la prueba gratis**.
    **Destranca:** página de precios y suscripción (Fase 2).
 7. 👤 **Procesador de pagos:** Stripe (recomendado) o Square.
    **Destranca:** cobrar con tarjeta dentro del sistema (Fase 2).
 8. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU.
    **Destranca:** avisos por SMS reales.
-9. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare) para el sitio publicado.
+9. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
    **Destranca:** protección de entrar, registrarse y recuperar contraseña.
 
 ## Fila de la IA (🤖), en orden
@@ -72,4 +66,8 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
   subido; la Action deja la rama `yapanel-build`.
 - ✅ 2026-09-17 · Correo saliente cambiado a la API de YaDominios
   («Correos desde tu dominio»), con su prueba de formato comprobada en rojo.
+- ✅ 2026-09-17 · Richard conectó el repositorio, pegó las variables y conectó
+  `tintorapos.com`: sitio en vivo. Dominio verificado en Google Search Console.
+- ✅ 2026-09-17 · SEO bilingüe: dominio canónico, direcciones `/es` y `/en` con
+  hreflang, sitemap bilingüe, datos estructurados, `noindex` en sitios.dev e IndexNow.
 

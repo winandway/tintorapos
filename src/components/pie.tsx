@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { diccionario, type Idioma } from "@/lib/i18n";
+import { rutaPagina } from "@/lib/rutas-publicas";
 import { ANIO_ACTUAL, DOMINIO_SITIO } from "@/lib/sitio";
 
 /** Pie con el crédito obligatorio de Windoce LLC. */
@@ -21,13 +22,13 @@ export function Pie({ idioma, compacto = false }: { idioma: Idioma; compacto?: b
         </p>
         {!compacto && (
           <nav className="flex gap-5">
-            <Link href="/docs" className="hover:text-tinta">
+            <Link href={rutaPagina(idioma, "docs")} className="hover:text-tinta">
               {d.docs}
             </Link>
-            <Link href="/privacidad" className="hover:text-tinta">
+            <Link href={rutaPagina(idioma, "privacidad")} className="hover:text-tinta">
               {d.privacidad}
             </Link>
-            <Link href="/terminos" className="hover:text-tinta">
+            <Link href={rutaPagina(idioma, "terminos")} className="hover:text-tinta">
               {d.terminos}
             </Link>
           </nav>
