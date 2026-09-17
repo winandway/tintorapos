@@ -266,6 +266,26 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
 - **Candado:** `tests/unit/seo.test.ts` (comprobado en rojo volviendo a sitios.dev)
   y `scripts/humo-publicado.mjs`, que revisa el sitemap publicado.
 
+### B16. La prueba en producción tocaba botones antes de que la página respondiera
+
+- **Cómo se veía:** `E2E_URL=https://tintorapos.com npx playwright test
+  e2e/flujo-completo.spec.ts` se quedaba en «Empezar» de la verificación en dos
+  pasos hasta agotar el tiempo. En local pasaba. En la consola salía la política de
+  seguridad bloqueando `static.cloudflareinsights.com`.
+- **Causa real (dos):** (1) en producción la página llega antes que su JavaScript;
+  el clic caía en un botón todavía sin vida y se perdía. (2) La plataforma inyecta
+  la medición anónima de visitas de Cloudflare y la cabecera CSP la bloqueaba.
+- **Arreglo:** `hidratada(page)` en `e2e/ayuda.ts` espera a que React tome la página
+  antes de tocar nada (se usa después de cada `goto`/recarga del flujo).
+  `src/lib/cabeceras-seguridad.ts` permite `https://static.cloudflareinsights.com`
+  (script) y `https://cloudflareinsights.com` (envío); la política de privacidad lo
+  declara en español e inglés. `NOMBRES` usa nombres «Soporte …» cuando la prueba
+  corre contra un sitio publicado.
+- **Candado:** `tests/unit/cabeceras-seguridad.test.ts` (la medición permitida y
+  nada más) y `e2e/seo.spec.ts` (cero errores de consola).
+- **NO tocar:** no quitar `hidratada` del flujo; no abrir la CSP a otros dominios
+  «para que no moleste».
+
 ---
 
 ## C. Candados de publicación

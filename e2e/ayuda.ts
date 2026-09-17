@@ -26,23 +26,61 @@ export function correoDePrueba(): string {
   return `e2e-${Date.now()}-${randomInt(1000, 9999)}@ejemplo.com`;
 }
 
+/**
+ * Espera a que React tome la página. Antes de eso los botones no responden: en el sitio
+ * publicado (JavaScript por la red) un clic temprano se pierde, como le pasaría a una persona.
+ */
+export async function hidratada(page: Page) {
+  await page.waitForLoadState("domcontentloaded");
+  await page.waitForFunction(() => Object.keys(document.body).some((k) => k.startsWith("__react")), null, {
+    timeout: 60_000,
+  });
+}
+
 /** Espera a que la página cargue sin el indicador de «Cargando…». */
 export async function listo(page: Page) {
-  await page.waitForLoadState("domcontentloaded");
+  await hidratada(page);
   await expect(page.getByText("Cargando…").first()).toBeHidden({ timeout: 60_000 });
 }
 
+/**
+ * Nombres de los datos de prueba. Contra el sitio publicado (E2E_URL) son cuentas nuestras
+ * y llevan «Soporte» (regla de la casa: el cliente distingue de un vistazo quién es quién).
+ */
+export const EN_PRODUCCION = Boolean(
+  process.env.E2E_URL && !/localhost|127\.0\.0\.1/.test(process.env.E2E_URL),
+);
+export const NOMBRES = EN_PRODUCCION
+  ? {
+      negocio: "Soporte Tintora POS (verificación)",
+      dueno: "Soporte Windoce",
+      cajero: "Soporte Cajero",
+      gerente: "Soporte Gerente",
+      tablet: "Soporte tablet",
+      cliente: "Soporte Cliente",
+    }
+  : {
+      negocio: "Tintorería de prueba E2E",
+      dueno: "Dueña de prueba",
+      cajero: "Cajero E2E",
+      gerente: "Gerente E2E",
+      tablet: "Tablet E2E",
+      cliente: "Cliente E2E",
+    };
+
 /** Crea una tintorería nueva y activa los dos pasos del dueño. Deja la sesión abierta en /app. */
-export async function crearCuenta(page: Page, negocio = "Tintorería de prueba E2E") {
+export async function crearCuenta(page: Page, negocio = NOMBRES.negocio) {
   const correo = correoDePrueba();
   await page.goto("/registro");
+  await hidratada(page);
   await page.getByLabel(es.acceso.negocio).fill(negocio);
-  await page.getByLabel(es.acceso.tuNombre).fill("Dueña de prueba");
+  await page.getByLabel(es.acceso.tuNombre).fill(NOMBRES.dueno);
   await page.getByLabel(es.acceso.correo).fill(correo);
   await page.getByLabel(es.acceso.clave, { exact: true }).fill(`Clave-segura-${Date.now()}`);
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: es.acceso.crearCuenta }).click();
   await expect(page).toHaveURL(/\/entrar\/activar-dos-pasos/, { timeout: 60_000 });
+  await hidratada(page);
   await page.getByRole("button", { name: es.acceso.empezar }).click();
   const secreto = (await page.getByTestId("secreto-totp").textContent()) ?? "";
   expect(secreto.replace(/\s/g, "")).toMatch(/^[A-Z2-7]{16,}$/);
@@ -52,5 +90,6 @@ export async function crearCuenta(page: Page, negocio = "Tintorería de prueba E
   await page.getByRole("checkbox", { name: es.acceso.yaGuarde }).check();
   await page.getByRole("button", { name: es.acceso.irAlPanel }).click();
   await expect(page).toHaveURL(/\/app$/, { timeout: 60_000 });
+  await hidratada(page);
   return { correo };
 }

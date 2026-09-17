@@ -32,15 +32,10 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 
 ## Fila de la IA (🤖), en orden
 
-1. 🤖 **Comprobar la publicación** (espera 👤1 y 👤2): humo post-publicación
-   (`node scripts/humo-publicado.mjs https://tintorapos.sitios.dev`), tablas creadas
-   (consulta de solo lectura con el token), canario con detalle, variable
-   `SITIO_URL` del repo para el humo automático, y la prueba de pagos en producción
-   de `VERIFICAR-PAGOS.md` con una tintorería «Soporte».
-2. 🤖 **Fase 2 — Tarjeta y crecimiento** (espera 👤6 y 👤7): Stripe Terminal,
+1. 🤖 **Fase 2 — Tarjeta y crecimiento** (espera 👤6 y 👤7): Stripe Terminal,
    portal con pago, Connect, Billing, multi-sucursal, WhatsApp, impresión directa,
    firma del cliente al recoger.
-3. 🤖 **Fase 3 — Lo que vende caro**: rutas de reparto, planes recurrentes,
+2. 🤖 **Fase 3 — Lo que vende caro** (va después de la Fase 2: los planes recurrentes cobran con tarjeta): rutas de reparto, planes recurrentes,
    inventario, exportación contable, panel de cadena.
 
 ## Para la sesión de Laboratorio AI (no se hace aquí)
@@ -70,4 +65,9 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
   `tintorapos.com`: sitio en vivo. Dominio verificado en Google Search Console.
 - ✅ 2026-09-17 · SEO bilingüe: dominio canónico, direcciones `/es` y `/en` con
   hreflang, sitemap bilingüe, datos estructurados, `noindex` en sitios.dev e IndexNow.
-
+- ✅ 2026-09-17 · Publicación comprobada: humo en vivo, 23 tablas en la base, humo e
+  IndexNow automáticos después de cada publicación.
+- ✅ 2026-09-17 · **Registro de cobros probado en producción** con la tintorería
+  «Soporte Tintora POS (verificación)»: efectivo, tarjeta propia, otro, orden sin
+  conexión, anular con PIN del gerente, cierre de caja a ciegas y reportes
+  (`VERIFICAR-PAGOS.md`).

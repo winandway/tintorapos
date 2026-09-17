@@ -12,8 +12,9 @@ Bilingüe español/inglés. Marca: **Tintora POS**. Dueño: Richard (Windoce LLC
 **Estado (17 sep 2026):** Fase 0 y Fase 1 **publicadas en vivo en
 `https://tintorapos.com`** (YaDominios Cloud). Dominio verificado en Google Search
 Console. SEO bilingüe con direcciones `/es` y `/en`. Falta el reloj externo (Cron) y
-los servicios opcionales (ver `PENDIENTES.md`). **No hay procesador de pagos** (ver
-`VERIFICAR-PAGOS.md`).
+los servicios opcionales (ver `PENDIENTES.md`). **No hay procesador de pagos**: el
+registro de cobros (efectivo, tarjeta propia, otro, sin conexión, anular con PIN, caja
+y reportes) quedó probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
 
 ## Documentos que mandan
 
