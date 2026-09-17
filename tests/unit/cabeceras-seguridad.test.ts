@@ -28,4 +28,9 @@ describe("cabeceras de seguridad (candado)", () => {
     expect(politicaContenido(true)).toContain("unsafe-eval");
     expect(politicaContenido(true)).not.toContain("upgrade-insecure-requests");
   });
+  it("deja pasar solo la medición de visitas sin cookies que inyecta la plataforma", () => {
+    const csp = politicaContenido(false);
+    expect(csp).toMatch(/script-src [^;]*https:\/\/static\.cloudflareinsights\.com/);
+    expect(csp).toMatch(/connect-src [^;]*https:\/\/cloudflareinsights\.com/);
+  });
 });

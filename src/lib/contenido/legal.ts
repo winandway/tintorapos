@@ -81,7 +81,7 @@ const privacidadEs: DocumentoLegal = {
     {
       titulo: "Cookies",
       parrafos: [
-        "Usamos solo cookies necesarias: la sesión, el dispositivo registrado, la protección contra solicitudes falsificadas y el idioma que eliges. No usamos cookies de publicidad ni de seguimiento.",
+        "Usamos solo cookies necesarias: la sesión, el dispositivo registrado, la protección contra solicitudes falsificadas y el idioma que eliges. No usamos cookies de publicidad ni de seguimiento. Para saber cuántas visitas recibe el sitio usamos una medición anónima de Cloudflare que no usa cookies.",
       ],
     },
     {
@@ -189,7 +189,7 @@ const privacidadEn: DocumentoLegal = {
     {
       titulo: "Cookies",
       parrafos: [
-        "We only use essential cookies: your session, the registered device, protection against forged requests and the language you choose. We don’t use advertising or tracking cookies.",
+        "We only use essential cookies: your session, the registered device, protection against forged requests and the language you choose. We don’t use advertising or tracking cookies. To count site visits, we use Cloudflare’s anonymous, cookie-free analytics.",
       ],
     },
     {

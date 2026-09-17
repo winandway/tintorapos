@@ -9,17 +9,29 @@ export interface Cabecera {
 }
 
 const TURNSTILE = "https://challenges.cloudflare.com";
+/**
+ * Medición de visitas de Cloudflare (Web Analytics, sin cookies) que la plataforma
+ * inyecta en cada página. Sin esto la política la bloquea y ensucia la consola.
+ */
+const ANALITICA_SCRIPT = "https://static.cloudflareinsights.com";
+const ANALITICA_ENVIO = "https://cloudflareinsights.com";
 
 export function politicaContenido(desarrollo: boolean): string {
   const directivas: Record<string, string[]> = {
     "default-src": ["'self'"],
     // Next.js inyecta scripts en línea para hidratar; sin nonce hace falta 'unsafe-inline'.
     // 'unsafe-eval' solo en desarrollo (recarga en caliente).
-    "script-src": ["'self'", "'unsafe-inline'", TURNSTILE, ...(desarrollo ? ["'unsafe-eval'"] : [])],
+    "script-src": [
+      "'self'",
+      "'unsafe-inline'",
+      TURNSTILE,
+      ANALITICA_SCRIPT,
+      ...(desarrollo ? ["'unsafe-eval'"] : []),
+    ],
     "style-src": ["'self'", "'unsafe-inline'"],
     "img-src": ["'self'", "data:", "blob:"],
     "font-src": ["'self'", "data:"],
-    "connect-src": ["'self'", ...(desarrollo ? ["ws:", "wss:"] : [])],
+    "connect-src": ["'self'", ANALITICA_ENVIO, ...(desarrollo ? ["ws:", "wss:"] : [])],
     "frame-src": [TURNSTILE],
     "worker-src": ["'self'", "blob:"],
     "manifest-src": ["'self'"],
