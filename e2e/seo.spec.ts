@@ -1,8 +1,13 @@
 import { expect, test } from "@playwright/test";
 
 test("cada idioma tiene su dirección, su lang, su canónica y sus hreflang", async ({ page }) => {
+  const errores: string[] = [];
+  page.on("console", (m) => {
+    if (m.type() === "error") errores.push(m.text());
+  });
   await page.goto("/en");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.locator('head meta[http-equiv="content-language"]')).toHaveAttribute("content", "en");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://tintorapos.com/en");
   await expect(page.locator('link[rel="alternate"][hreflang="es"]')).toHaveAttribute(
     "href",
@@ -24,6 +29,7 @@ test("cada idioma tiene su dirección, su lang, su canónica y sus hreflang", as
   );
   // Los enlaces de la barra lateral se quedan en el mismo idioma.
   await expect(page.locator('a[href="/es/docs/caja"]').first()).toBeAttached();
+  expect(errores, "errores de consola en las páginas con idioma").toEqual([]);
 });
 
 test("el slug del otro idioma redirige a la dirección correcta", async ({ page }) => {

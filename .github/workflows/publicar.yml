@@ -21,6 +21,8 @@ concurrency:
 
 jobs:
   empaquetar:
+    outputs:
+      build_id: ${{ steps.version.outputs.build_id }}
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -36,6 +38,9 @@ jobs:
       - run: npm ci
       - name: Compilar y empaquetar (comprueba versiones y topes)
         run: node scripts/empaquetar-worker.mjs
+      - name: Identificador de la compilación
+        id: version
+        run: echo "build_id=$(cat out-deploy/BUILD_ID)" >> "$GITHUB_OUTPUT"
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -54,8 +59,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Esperar a que la plataforma republique
-        run: sleep 120
+      - name: Esperar a que la plataforma publique ESTA versión
+        # YaDominios tarda unos minutos en tomar la rama: se espera hasta ver el mismo BUILD_ID en vivo.
+        env:
+          BUILD_ID: ${{ needs.empaquetar.outputs.build_id }}
+        run: |
+          for i in $(seq 1 60); do
+            vivo=$(curl -s -m 15 "${{ vars.SITIO_URL }}/BUILD_ID" || true)
+            if [ "$vivo" = "$BUILD_ID" ]; then echo "Publicada: $vivo"; exit 0; fi
+            sleep 30
+          done
+          echo "::error::A los 30 minutos sigue en vivo «$vivo» y no «$BUILD_ID». Revisar el Registro de errores del sitio."
+          exit 1
       - name: Humo post-publicación
         run: node scripts/humo-publicado.mjs "${{ vars.SITIO_URL }}"
       - name: Avisar a los buscadores (IndexNow)

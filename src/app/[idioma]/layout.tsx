@@ -20,7 +20,9 @@ export default async function LayoutIdioma({
   if (!esIdioma(idioma)) notFound();
   return (
     <ProveedorIdioma idioma={idioma} d={diccionario(idioma)}>
-      {/* El lang del contenido es el de la dirección, aunque la cookie diga otro. */}
+      {/* El lang del contenido es el de la dirección, aunque la cookie diga otro. React 19 sube
+          el meta al <head>: los buscadores leen el idioma sin ejecutar JavaScript. */}
+      <meta httpEquiv="content-language" content={idioma} />
       <script
         dangerouslySetInnerHTML={{ __html: `document.documentElement.lang=${JSON.stringify(idioma)}` }}
       />
