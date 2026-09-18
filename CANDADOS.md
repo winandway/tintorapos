@@ -400,17 +400,23 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   `email.sending.error.email.sender_not_configured`: el dominio no tenía activado
   «Correos desde tu dominio» (sin SPF ni DKIM en el DNS). La recuperación de
   contraseña ignoraba el resultado: nadie se habría enterado.
-- **Causa real:** el canario solo miraba las variables, y el envío trataba ese 502
-  como pasajero (lo reintentaba sin fin).
+- **Causa real (dos):** (1) del lado de la plataforma, el dominio no estaba dado de
+  alta en Email Sending aunque los registros de correo ya estaban en el DNS; lo
+  arregló YaDominios el 18 sep 2026 a las 16:26 UTC (selector DKIM `cf-bounce`,
+  return-path `cf-bounce.tintorapos.com`, DMARC `p=reject`). (2) De nuestro lado,
+  el canario solo miraba las variables, y el envío trataba ese 502 como pasajero
+  (lo reintentaba sin fin).
 - **Arreglo:** `src/server/correo.ts` reconoce los errores de configuración
   (`sender_not_configured`, `token_*`, `from_ajeno`, `plan_sin_correo`), no los
   reintenta y anota el resultado de cada envío en `sistema.correo_ultimo` (sin
   destinatario ni contenido). `revisarSalud` pone el correo en rojo si el último
   envío falló por configuración, y en verde cuando vuelve a salir uno bien.
 - **Cómo se prueba a mano sin mandarle nada a nadie:** un envío a una dirección de
-  `example.com` (dominio reservado, rebota siempre y no cuenta en la cuota). Si
-  responde `502 rebote_permanente`, el remitente está bien; si responde
-  `sender_not_configured`, falta activar el dominio.
+  `example.com` (dominio reservado: nunca le llega a nadie). Con el dominio bien
+  responde **200** `success: true` con la dirección en `en_cola` (cuenta 1 correo
+  del día y el rebote aparece después en el panel); con el dominio sin dar de alta
+  responde `502 … sender_not_configured`. Comprobado las dos caras: 17 sep 2026
+  (502) y 18 sep 2026 16:31 UTC (200, `message_id` de @tintorapos.com).
 - **Candados:** `tests/integracion/correo.test.ts` (la respuesta real del
   proveedor) y `tests/integracion/salud.test.ts` (comprobado en rojo apagando la
   regla). Las cuentas de prueba usan `@example.com`.

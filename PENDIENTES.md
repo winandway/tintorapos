@@ -14,12 +14,7 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 3. 👤 **Cron Trigger en tu cuenta de Cloudflare** que llame cada 5 minutos a
    `https://tintorapos.com/datos/reloj` con el secreto (lo creo yo con tu sí).
    **Destranca:** avisos automáticos, recordatorios, respaldo diario y el canario en verde.
-4. 👤 **«Activar correos de mi dominio»** en el panel → Mis dominios → `tintorapos.com`
-   (un botón; el plan Galaxia trae 300 correos al día ya firmados). `EMAIL_FROM` =
-   `avisos@tintorapos.com` ✅ ya puesta (17 sep). Falta el botón: el 17 sep el
-   proveedor respondía `sender_not_configured` y el DNS no tenía SPF ni DKIM.
-   **Destranca:** recuperación de contraseña, avisos por correo al cliente y el
-   recibo por correo. Los SMS quedan para después (👤8).
+4. ✅ **Correo del dominio activo** (18 sep 2026, lo terminó YaDominios; `EMAIL_FROM` = `avisos@tintorapos.com`). Falta ver uno llegar a una bandeja real con la recuperación de contraseña.
 5. 👤 **Correo de soporte** para privacidad y términos (variable `SUPPORT_EMAIL`),
    y **revisión legal** de los dos borradores.
    **Destranca:** poder lanzar al público.
@@ -87,3 +82,6 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 - ✅ 2026-09-17 · Sitio listo para agentes de IA: servidor MCP público (`/mcp`),
   catálogo de API con OpenAPI, tarjetas MCP y A2A, habilidades con huella,
   manifiesto ARD, Markdown por negociación, cabeceras Link y señales de contenido.
+- ✅ 2026-09-18 · Correo saliente funcionando: el proveedor acepta `avisos@tintorapos.com`
+  (prueba 16:31 UTC, 200 con `message_id`); canario del correo en verde y ahora
+  basado en el último envío real (B22).
