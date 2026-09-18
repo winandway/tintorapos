@@ -31,7 +31,7 @@ jobs:
         with:
           # El commit exacto que pasó la verificación, no el último de main.
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -56,7 +56,7 @@ jobs:
     if: ${{ vars.SITIO_URL != '' }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Esperar a que la plataforma publique ESTA versión
