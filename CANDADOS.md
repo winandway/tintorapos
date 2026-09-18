@@ -393,6 +393,29 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
 - **NO tocar:** no volver a poner las pruebas de pantallas en paralelo en CI para
   ganar minutos: el precio es una compuerta que miente.
 
+### B22. El canario decía «correo ok» y el proveedor rechazaba todo
+
+- **Cómo se veía:** el 17 sep 2026, con `EMAIL_FROM` ya puesto, `/datos/salud`
+  marcaba `correo: ok`, pero la API respondía **502** `proveedor` con
+  `email.sending.error.email.sender_not_configured`: el dominio no tenía activado
+  «Correos desde tu dominio» (sin SPF ni DKIM en el DNS). La recuperación de
+  contraseña ignoraba el resultado: nadie se habría enterado.
+- **Causa real:** el canario solo miraba las variables, y el envío trataba ese 502
+  como pasajero (lo reintentaba sin fin).
+- **Arreglo:** `src/server/correo.ts` reconoce los errores de configuración
+  (`sender_not_configured`, `token_*`, `from_ajeno`, `plan_sin_correo`), no los
+  reintenta y anota el resultado de cada envío en `sistema.correo_ultimo` (sin
+  destinatario ni contenido). `revisarSalud` pone el correo en rojo si el último
+  envío falló por configuración, y en verde cuando vuelve a salir uno bien.
+- **Cómo se prueba a mano sin mandarle nada a nadie:** un envío a una dirección de
+  `example.com` (dominio reservado, rebota siempre y no cuenta en la cuota). Si
+  responde `502 rebote_permanente`, el remitente está bien; si responde
+  `sender_not_configured`, falta activar el dominio.
+- **Candados:** `tests/integracion/correo.test.ts` (la respuesta real del
+  proveedor) y `tests/integracion/salud.test.ts` (comprobado en rojo apagando la
+  regla). Las cuentas de prueba usan `@example.com`.
+- **NO tocar:** no volver a decidir el estado del correo solo por las variables.
+
 ---
 
 ## C. Candados de publicación

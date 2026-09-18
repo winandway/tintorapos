@@ -1,7 +1,7 @@
 import type { Variables } from "@/env";
 import { faltantesProduccion } from "@/env";
 import { twilioConfigurado } from "@/server/avisos/twilio";
-import { correoConfigurado } from "@/server/correo";
+import { CLAVE_ULTIMO_CORREO, correoConfigurado } from "@/server/correo";
 import { leerSistema } from "@/server/sistema";
 
 export type EstadoPieza = "ok" | "error" | "no_configurado";
@@ -52,7 +52,7 @@ export async function revisarSalud(env: CloudflareEnv, vars: Variables, ahora = 
     ? { estado: "error", detalle: `faltan: ${faltan.join(", ")}` }
     : { estado: "ok" };
   piezas.correo = correoConfigurado(vars)
-    ? { estado: "ok" }
+    ? await estadoCorreo(env.DB)
     : {
         estado: "no_configurado",
         detalle: "YADOMINIOS_TOKEN y EMAIL_FROM (dominio propio con «Correos desde tu dominio» activado)",
@@ -110,6 +110,28 @@ export async function revisarSalud(env: CloudflareEnv, vars: Variables, ahora = 
   }
   const estado = Object.values(piezas).some((p) => p.estado === "error") ? "error" : "ok";
   return { estado, piezas, revisadoEn: ahora };
+}
+
+/**
+ * Tener las variables no basta: el último envío real dice si el proveedor acepta
+ * el remitente. Un error de configuración (dominio sin activar, token cambiado)
+ * pone el correo en rojo; un rebote de un cliente, no.
+ */
+async function estadoCorreo(db: D1Database): Promise<{ estado: EstadoPieza; detalle?: string }> {
+  const ultimo = await leerSistema(db, CLAVE_ULTIMO_CORREO).catch(() => null);
+  if (!ultimo) return { estado: "ok", detalle: "configurado; todavía no se ha enviado ningún correo" };
+  const v = JSON.parse(ultimo.valor) as { ok: boolean; error?: string; configuracion?: boolean };
+  if (v.ok) return { estado: "ok" };
+  if (v.configuracion)
+    return {
+      estado: "error",
+      detalle:
+        `el proveedor rechaza el remitente (¿«Activar correos de mi dominio»?): ${v.error ?? ""}`.slice(
+          0,
+          300,
+        ),
+    };
+  return { estado: "ok", detalle: `el último envío falló: ${v.error ?? ""}`.slice(0, 300) };
 }
 
 /**

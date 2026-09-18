@@ -160,11 +160,15 @@ export async function procesarCola(
     } else if (!correoConfigurado(vars)) {
       resultado = { ok: false, error: "no_configurado", reintentar: false };
     } else {
-      const c = await enviarCorreo(vars, {
-        para: a.destino,
-        asunto: a.asunto ?? "Tintora POS",
-        texto: a.cuerpo,
-      });
+      const c = await enviarCorreo(
+        vars,
+        {
+          para: a.destino,
+          asunto: a.asunto ?? "Tintora POS",
+          texto: a.cuerpo,
+        },
+        db,
+      );
       resultado =
         c.estado === "enviado"
           ? { ok: true }

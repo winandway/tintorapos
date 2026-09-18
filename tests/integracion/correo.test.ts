@@ -1,7 +1,12 @@
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Variables } from "@/env";
-import { correoConfigurado, enviarCorreo, URL_CORREO_YADOMINIOS } from "@/server/correo";
+import {
+  correoConfigurado,
+  enviarCorreo,
+  esErrorDeConfiguracion,
+  URL_CORREO_YADOMINIOS,
+} from "@/server/correo";
 import { enviados, servidorMsw, TOKEN_CORREO_PRUEBA } from "../ayuda/msw";
 
 const base = {
@@ -45,6 +50,7 @@ describe("correo por la API de YaDominios Cloud (candado)", () => {
       estado: "fallido",
       error: "401 token_invalido",
       reintentar: false,
+      configuracion: true,
     });
     expect(await enviarCorreo(base, { ...correo, para: "rebota@ejemplo.com" })).toMatchObject({
       estado: "fallido",
@@ -59,6 +65,7 @@ describe("correo por la API de YaDominios Cloud (candado)", () => {
       estado: "fallido",
       error: "502 proveedor",
       reintentar: true,
+      configuracion: false,
     });
     servidorMsw.use(http.post(URL_CORREO_YADOMINIOS, () => HttpResponse.error()));
     expect(await enviarCorreo(base, correo)).toMatchObject({ estado: "fallido", reintentar: true });
@@ -71,5 +78,25 @@ describe("correo por la API de YaDominios Cloud (candado)", () => {
       ),
     );
     expect(await enviarCorreo(base, correo)).toMatchObject({ estado: "fallido", reintentar: false });
+  });
+
+  it("dominio sin activar: 502 sender_not_configured NO se reintenta y se marca como error de configuración", async () => {
+    // Respuesta real de la plataforma el 17 sep 2026, con EMAIL_FROM puesto pero el
+    // botón «Activar correos de mi dominio» sin completar.
+    servidorMsw.use(
+      http.post(URL_CORREO_YADOMINIOS, () =>
+        HttpResponse.json(
+          {
+            error: "El proveedor de correo rechazó el envío: email.sending.error.email.sender_not_configured",
+            codigo: "proveedor",
+          },
+          { status: 502 },
+        ),
+      ),
+    );
+    const r = await enviarCorreo(base, correo);
+    expect(r).toMatchObject({ estado: "fallido", reintentar: false, configuracion: true });
+    expect(r.estado === "fallido" && r.error).toContain("sender_not_configured");
+    expect(esErrorDeConfiguracion("502 proveedor")).toBe(false);
   });
 });

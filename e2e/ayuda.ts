@@ -22,8 +22,12 @@ export function ipDePrueba(): string {
   return `10.${randomInt(1, 254)}.${randomInt(1, 254)}.${randomInt(1, 254)}`;
 }
 
+/**
+ * example.com está reservado (RFC 2606): nunca le llega un correo a nadie. Con el
+ * correo del dominio activo, una prueba en producción no puede escribirle a un tercero.
+ */
 export function correoDePrueba(): string {
-  return `e2e-${Date.now()}-${randomInt(1000, 9999)}@ejemplo.com`;
+  return `e2e-${Date.now()}-${randomInt(1000, 9999)}@example.com`;
 }
 
 /**

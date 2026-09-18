@@ -15,8 +15,9 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
    `https://tintorapos.com/datos/reloj` con el secreto (lo creo yo con tu sí).
    **Destranca:** avisos automáticos, recordatorios, respaldo diario y el canario en verde.
 4. 👤 **«Activar correos de mi dominio»** en el panel → Mis dominios → `tintorapos.com`
-   (un botón; el plan Galaxia trae 300 correos al día ya firmados). Después, la
-   variable `EMAIL_FROM` = `avisos@tintorapos.com`.
+   (un botón; el plan Galaxia trae 300 correos al día ya firmados). `EMAIL_FROM` =
+   `avisos@tintorapos.com` ✅ ya puesta (17 sep). Falta el botón: el 17 sep el
+   proveedor respondía `sender_not_configured` y el DNS no tenía SPF ni DKIM.
    **Destranca:** recuperación de contraseña, avisos por correo al cliente y el
    recibo por correo. Los SMS quedan para después (👤8).
 5. 👤 **Correo de soporte** para privacidad y términos (variable `SUPPORT_EMAIL`),

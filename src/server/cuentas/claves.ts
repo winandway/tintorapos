@@ -76,11 +76,15 @@ export async function solicitarRecuperacion(
   ]);
   const d = diccionario(idioma).correos;
   const enlace = `${vars.APP_URL}/entrar/restablecer?token=${encodeURIComponent(token)}`;
-  await enviarCorreo(vars, {
-    para: correo,
-    asunto: d.recuperarAsunto,
-    texto: fmt(d.recuperarTexto, { nombre: u.nombre, enlace }),
-  });
+  await enviarCorreo(
+    vars,
+    {
+      para: correo,
+      asunto: d.recuperarAsunto,
+      texto: fmt(d.recuperarTexto, { nombre: u.nombre, enlace }),
+    },
+    db,
+  );
 }
 
 export async function restablecerClave(db: D1Database, token: string, nueva: string, ahora = Date.now()) {

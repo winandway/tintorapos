@@ -5,12 +5,15 @@ vi.mock("@/server/entorno", () => import("../ayuda/mock-entorno"));
 import { GET as salud } from "@/app/datos/salud/route";
 import { variablesDe } from "@/server/entorno";
 import { correrReloj } from "@/server/reloj";
+import { CLAVE_ULTIMO_CORREO, enviarCorreo, URL_CORREO_YADOMINIOS } from "@/server/correo";
 import { revisarSalud, type Salud } from "@/server/salud";
 import { guardarSistema } from "@/server/sistema";
 import { crearEntorno, type EntornoPrueba } from "../ayuda/entorno";
 import { usarEntorno } from "../ayuda/mock-entorno";
 import { Navegador } from "../ayuda/cliente-http";
 import { crearTintoreria } from "../ayuda/fabrica";
+import { servidorMsw, TOKEN_CORREO_PRUEBA } from "../ayuda/msw";
+import { http, HttpResponse } from "msw";
 
 describe("canario /datos/salud (candado de piezas)", () => {
   let e: EntornoPrueba;
@@ -85,5 +88,37 @@ describe("canario /datos/salud (candado de piezas)", () => {
     await e.env.DB.batch(lote);
     r = await revisarSalud(e.env, vars);
     expect(r.piezas.avisos?.estado).toBe("error");
+  });
+
+  it("correo con variables pero el dominio sin activar: el canario lo pone en rojo, no dice «ok» (comprobado en rojo)", async () => {
+    const vars = {
+      ...variablesDe(e.env),
+      YADOMINIOS_TOKEN: TOKEN_CORREO_PRUEBA,
+      EMAIL_FROM: "avisos@tintorapos.com",
+    };
+    await e.env.DB.prepare("delete from sistema where clave = ?").bind(CLAVE_ULTIMO_CORREO).run();
+    // Nunca se envió nada: configurado, sin juzgar todavía.
+    expect((await revisarSalud(e.env, vars)).piezas.correo?.estado).toBe("ok");
+
+    servidorMsw.use(
+      http.post(URL_CORREO_YADOMINIOS, () =>
+        HttpResponse.json(
+          {
+            error: "El proveedor de correo rechazó el envío: email.sending.error.email.sender_not_configured",
+            codigo: "proveedor",
+          },
+          { status: 502 },
+        ),
+      ),
+    );
+    await enviarCorreo(vars, { para: "cliente@ejemplo.com", asunto: "x", texto: "x" }, e.env.DB);
+    const mal = await revisarSalud(e.env, vars);
+    expect(mal.piezas.correo?.estado).toBe("error");
+    expect(mal.piezas.correo?.detalle).toContain("sender_not_configured");
+
+    // Cuando el proveedor vuelve a aceptar, se pone verde solo.
+    servidorMsw.resetHandlers();
+    await enviarCorreo(vars, { para: "cliente@ejemplo.com", asunto: "x", texto: "x" }, e.env.DB);
+    expect((await revisarSalud(e.env, vars)).piezas.correo).toEqual({ estado: "ok" });
   });
 });
