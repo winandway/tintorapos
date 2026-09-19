@@ -3,6 +3,8 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { Icono } from "@/components/marca/iconos-sitio";
 import { Pie } from "@/components/pie";
+import { Captura } from "@/components/sitio/captura";
+import { CarruselFlujo } from "@/components/sitio/carrusel-flujo";
 import { EncabezadoSitio } from "@/components/sitio/encabezado-sitio";
 import { HerramientasAgente } from "@/components/sitio/herramientas-agente";
 import { clasesBoton } from "@/components/ui/boton";
@@ -191,6 +193,11 @@ export async function PaginaInicio({ idioma }: { idioma: Idioma }) {
             </figure>
           </div>
 
+          {/* La pantalla real del mostrador: lo primero que quiere ver quien entra. */}
+          <div className="mx-auto max-w-6xl px-4 pb-10 sm:pb-14">
+            <Captura clave="mostrador" idioma={idioma} prioridad />
+          </div>
+
           <figure className="mx-auto max-w-6xl px-4 pb-16 sm:pb-20">
             <div className="relative pt-2">
               <div
@@ -268,18 +275,17 @@ export async function PaginaInicio({ idioma }: { idioma: Idioma }) {
         </Seccion>
 
         <Seccion id="como-funciona" titulo={c.flujo.titulo} texto={c.flujo.texto}>
-          <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {c.flujo.pasos.map((p, i) => (
-              <li
-                key={p.titulo}
-                className="relative rounded-[var(--radius-ticket)] bg-superficie p-5 ring-1 ring-percha/60"
-              >
-                <Ticket numero={i + 1} dia={i + 1} tamano="chico" />
-                <h3 className="titulo-ancho mt-4 text-xl">{p.titulo}</h3>
-                <p className="mt-2 text-[15px] text-gris">{p.texto}</p>
-              </li>
-            ))}
-          </ol>
+          <CarruselFlujo
+            idioma={idioma}
+            etiquetaAnterior={d.anterior}
+            etiquetaSiguiente={d.siguiente}
+            pasos={c.flujo.pasos.map((p, i) => ({
+              ...p,
+              captura:
+                (["mostrador", "etiquetas", "produccion", "clienteCelular", "entrega"] as const)[i] ??
+                "mostrador",
+            }))}
+          />
         </Seccion>
 
         <Seccion id="funciones" titulo={c.funciones.titulo} className="bg-superficie">
@@ -296,6 +302,11 @@ export async function PaginaInicio({ idioma }: { idioma: Idioma }) {
               </li>
             ))}
           </ul>
+          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <Captura clave="ordenes" idioma={idioma} />
+            <Captura clave="caja" idioma={idioma} />
+            <Captura clave="reportes" idioma={idioma} />
+          </div>
         </Seccion>
 
         <section className="bg-tinta text-white">
@@ -310,26 +321,31 @@ export async function PaginaInicio({ idioma }: { idioma: Idioma }) {
               <p className="mt-5 text-lg text-white/85">{c.sinConexion.texto}</p>
               <p className="mt-4 text-sm text-white/65">{c.sinConexion.nota}</p>
             </div>
-            <ol className="relative mx-auto flex w-full max-w-sm flex-col gap-5" aria-hidden="true">
-              <span className="absolute top-6 bottom-6 left-6 border-l-2 border-dashed border-white/30" />
-              {c.sinConexion.estados.map((e, i) => (
-                <li
-                  key={e}
-                  className={`relative flex items-center gap-3 rounded-full py-3 pr-5 pl-3 font-semibold shadow-ticket ${
-                    i === 0
-                      ? "bg-alerta-suave text-alerta"
-                      : i === 1
-                        ? "bg-white text-tinta"
-                        : "bg-ok-suave text-ok"
-                  }`}
-                >
-                  <span
-                    className={`size-6 rounded-full ${i === 0 ? "bg-alerta" : i === 1 ? "bg-tinta" : "bg-ok"} ring-4 ring-white/60`}
-                  />
-                  {e}
-                </li>
-              ))}
-            </ol>
+            <div className="space-y-8">
+              <div className="[&_figcaption]:text-white/70">
+                <Captura clave="mostradorTablet" idioma={idioma} />
+              </div>
+              <ol className="relative mx-auto flex w-full max-w-sm flex-col gap-5" aria-hidden="true">
+                <span className="absolute top-6 bottom-6 left-6 border-l-2 border-dashed border-white/30" />
+                {c.sinConexion.estados.map((e, i) => (
+                  <li
+                    key={e}
+                    className={`relative flex items-center gap-3 rounded-full py-3 pr-5 pl-3 font-semibold shadow-ticket ${
+                      i === 0
+                        ? "bg-alerta-suave text-alerta"
+                        : i === 1
+                          ? "bg-white text-tinta"
+                          : "bg-ok-suave text-ok"
+                    }`}
+                  >
+                    <span
+                      className={`size-6 rounded-full ${i === 0 ? "bg-alerta" : i === 1 ? "bg-tinta" : "bg-ok"} ring-4 ring-white/60`}
+                    />
+                    {e}
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
         </section>
 
@@ -343,6 +359,10 @@ export async function PaginaInicio({ idioma }: { idioma: Idioma }) {
               </li>
             ))}
           </ul>
+          <div className="mt-12 grid gap-8 sm:grid-cols-[minmax(0,3fr)_minmax(0,4fr)] sm:items-center">
+            <Captura clave="recibo" idioma={idioma} />
+            <Captura clave="produccionCelular" idioma={idioma} />
+          </div>
         </Seccion>
 
         <Seccion titulo={c.empezar.titulo} className="bg-superficie">

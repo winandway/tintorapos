@@ -1,58 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Aviso } from "@/components/ui/aviso";
 import { Boton } from "@/components/ui/boton";
-import { Casilla, CampoSelector, CampoTexto } from "@/components/ui/campo";
+import { Casilla, CampoTexto } from "@/components/ui/campo";
+import { CampoBuscador } from "@/components/ui/campo-buscador";
 import { CampoClave } from "@/components/ui/campo-clave";
 import { Turnstile } from "@/components/ui/turnstile";
 import { pedir } from "@/lib/api";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { recargarEn } from "@/lib/navegacion";
+import { listaMonedas, listaPaises, monedaDePais } from "@/lib/paises";
 import { rutaPagina } from "@/lib/rutas-publicas";
-
-const PAISES: { codigo: string; es: string; en: string; moneda: string }[] = [
-  { codigo: "US", es: "Estados Unidos", en: "United States", moneda: "USD" },
-  { codigo: "PR", es: "Puerto Rico", en: "Puerto Rico", moneda: "USD" },
-  { codigo: "CA", es: "Canadá", en: "Canada", moneda: "CAD" },
-  { codigo: "MX", es: "México", en: "Mexico", moneda: "MXN" },
-  { codigo: "CO", es: "Colombia", en: "Colombia", moneda: "COP" },
-  { codigo: "PE", es: "Perú", en: "Peru", moneda: "PEN" },
-  { codigo: "CL", es: "Chile", en: "Chile", moneda: "CLP" },
-  { codigo: "AR", es: "Argentina", en: "Argentina", moneda: "ARS" },
-  { codigo: "DO", es: "República Dominicana", en: "Dominican Republic", moneda: "DOP" },
-  { codigo: "GT", es: "Guatemala", en: "Guatemala", moneda: "GTQ" },
-  { codigo: "HN", es: "Honduras", en: "Honduras", moneda: "HNL" },
-  { codigo: "CR", es: "Costa Rica", en: "Costa Rica", moneda: "CRC" },
-  { codigo: "PA", es: "Panamá", en: "Panama", moneda: "USD" },
-  { codigo: "SV", es: "El Salvador", en: "El Salvador", moneda: "USD" },
-  { codigo: "EC", es: "Ecuador", en: "Ecuador", moneda: "USD" },
-  { codigo: "BO", es: "Bolivia", en: "Bolivia", moneda: "BOB" },
-  { codigo: "PY", es: "Paraguay", en: "Paraguay", moneda: "PYG" },
-  { codigo: "UY", es: "Uruguay", en: "Uruguay", moneda: "UYU" },
-  { codigo: "ES", es: "España", en: "Spain", moneda: "EUR" },
-];
-
-const MONEDAS = [
-  "USD",
-  "CAD",
-  "MXN",
-  "COP",
-  "PEN",
-  "CLP",
-  "ARS",
-  "DOP",
-  "GTQ",
-  "HNL",
-  "CRC",
-  "PAB",
-  "BOB",
-  "PYG",
-  "UYU",
-  "EUR",
-];
 
 export function FormRegistro({ siteKey }: { siteKey: string | null }) {
   const { d, idioma } = useIdioma();
@@ -68,6 +29,9 @@ export function FormRegistro({ siteKey }: { siteKey: string | null }) {
     aceptaTerminos: false,
   });
   const [zonas, setZonas] = useState<string[]>(["America/New_York"]);
+  // Todos los países y todas las monedas, con el nombre en el idioma de la persona.
+  const paises = useMemo(() => listaPaises(idioma), [idioma]);
+  const monedas = useMemo(() => listaMonedas(idioma), [idioma]);
   const [pase, setPase] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [campos, setCampos] = useState<Record<string, string>>({});
@@ -88,7 +52,7 @@ export function FormRegistro({ siteKey }: { siteKey: string | null }) {
     const valor = e.target.type === "checkbox" ? (e.target as HTMLInputElement).checked : e.target.value;
     setV((x) => {
       const nuevo = { ...x, [k]: valor };
-      if (k === "pais") nuevo.moneda = PAISES.find((p) => p.codigo === valor)?.moneda ?? x.moneda;
+      if (k === "pais") nuevo.moneda = monedaDePais(String(valor));
       return nuevo;
     });
   };
@@ -161,25 +125,31 @@ export function FormRegistro({ siteKey }: { siteKey: string | null }) {
         onChange={cambiar("telefono")}
         error={textoCampo(d, campos.telefono)}
       />
-      <div className="grid grid-cols-2 gap-3">
-        <CampoSelector
+      <div className="grid gap-3 sm:grid-cols-2">
+        <CampoBuscador
           etiqueta={d.acceso.pais}
-          value={v.pais}
-          onChange={cambiar("pais")}
-          opciones={PAISES.map((p) => ({ valor: p.codigo, texto: idioma === "en" ? p.en : p.es }))}
+          valor={v.pais}
+          alElegir={(codigo) => setV((x) => ({ ...x, pais: codigo, moneda: monedaDePais(codigo) }))}
+          opciones={paises.map((p) => ({
+            valor: p.codigo,
+            texto: p.nombre,
+            icono: p.bandera,
+            detalle: p.moneda,
+            busca: p.codigo,
+          }))}
         />
-        <CampoSelector
+        <CampoBuscador
           etiqueta={d.acceso.moneda}
-          value={v.moneda}
-          onChange={cambiar("moneda")}
-          opciones={MONEDAS.map((m) => ({ valor: m, texto: m }))}
+          valor={v.moneda}
+          alElegir={(m) => setV((x) => ({ ...x, moneda: m }))}
+          opciones={monedas.map((m) => ({ valor: m.codigo, texto: m.codigo, detalle: m.nombre }))}
           error={textoCampo(d, campos.moneda)}
         />
       </div>
-      <CampoSelector
+      <CampoBuscador
         etiqueta={d.acceso.zona}
-        value={v.zonaHoraria}
-        onChange={cambiar("zonaHoraria")}
+        valor={v.zonaHoraria}
+        alElegir={(z) => setV((x) => ({ ...x, zonaHoraria: z }))}
         opciones={zonas.map((z) => ({ valor: z, texto: z.replace(/_/g, " ") }))}
         error={textoCampo(d, campos.zonaHoraria)}
       />

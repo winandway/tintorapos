@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Aviso, useAvisar } from "@/components/ui/aviso";
 import { Boton } from "@/components/ui/boton";
 import { CampoSelector, CampoTexto } from "@/components/ui/campo";
+import { CampoBuscador } from "@/components/ui/campo-buscador";
 import { Tarjeta, TituloSeccion } from "@/components/ui/encabezado";
 import { pedir } from "@/lib/api";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { useIdioma } from "@/lib/i18n/cliente";
+import { listaMonedas, listaPaises, monedaDePais } from "@/lib/paises";
 
 interface Tienda {
   nombre: string;
@@ -31,46 +33,6 @@ interface Tienda {
   bloqueoInactividadMin: number;
 }
 
-const MONEDAS = [
-  "USD",
-  "CAD",
-  "MXN",
-  "COP",
-  "PEN",
-  "CLP",
-  "ARS",
-  "DOP",
-  "GTQ",
-  "HNL",
-  "CRC",
-  "PAB",
-  "BOB",
-  "PYG",
-  "UYU",
-  "EUR",
-];
-const PAISES = [
-  "US",
-  "PR",
-  "CA",
-  "MX",
-  "CO",
-  "PE",
-  "CL",
-  "AR",
-  "DO",
-  "GT",
-  "HN",
-  "CR",
-  "PA",
-  "SV",
-  "EC",
-  "BO",
-  "PY",
-  "UY",
-  "ES",
-];
-
 const bpsATexto = (bps: number) => String(bps / 100);
 const textoABps = (t: string) => {
   const n = Number(t.replace(",", "."));
@@ -86,6 +48,9 @@ export function FormTienda() {
   const [error, setError] = useState<string | null>(null);
   const [campos, setCampos] = useState<Record<string, string>>({});
   const [guardando, setGuardando] = useState(false);
+  // Todos los países y monedas del mundo, con el nombre en el idioma de la tienda.
+  const paises = useMemo(() => listaPaises(idioma), [idioma]);
+  const monedas = useMemo(() => listaMonedas(idioma), [idioma]);
 
   useEffect(() => {
     pedir<{ tienda: Tienda }>("/datos/ajustes/tienda")
@@ -107,9 +72,9 @@ export function FormTienda() {
 
   const texto = (k: keyof Tienda) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setT({ ...t, [k]: e.target.value });
+  const cambiar = (cambios: Partial<Tienda>) => setT((x) => (x ? { ...x, ...cambios } : x));
   const numero = (k: keyof Tienda) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setT({ ...t, [k]: e.target.value === "" ? Number.NaN : Number(e.target.value) });
-  const nombrePais = (c: string) => new Intl.DisplayNames([idioma], { type: "region" }).of(c) ?? c;
 
   async function guardar(e: React.FormEvent) {
     e.preventDefault();
@@ -200,22 +165,29 @@ export function FormTienda() {
       <Tarjeta>
         <TituloSeccion>{dt.region}</TituloSeccion>
         <div className="grid gap-4 sm:grid-cols-2">
-          <CampoSelector
+          <CampoBuscador
             etiqueta={d.acceso.pais}
-            value={t.pais}
-            onChange={texto("pais")}
-            opciones={PAISES.map((p) => ({ valor: p, texto: nombrePais(p) }))}
+            valor={t.pais}
+            alElegir={(codigo) => cambiar({ pais: codigo, moneda: monedaDePais(codigo) })}
+            opciones={paises.map((p) => ({
+              valor: p.codigo,
+              texto: p.nombre,
+              icono: p.bandera,
+              detalle: p.moneda,
+              busca: p.codigo,
+            }))}
           />
-          <CampoSelector
+          <CampoBuscador
             etiqueta={d.acceso.moneda}
-            value={t.moneda}
-            onChange={texto("moneda")}
-            opciones={MONEDAS.map((m) => ({ valor: m, texto: m }))}
+            valor={t.moneda}
+            alElegir={(m) => cambiar({ moneda: m })}
+            opciones={monedas.map((m) => ({ valor: m.codigo, texto: m.codigo, detalle: m.nombre }))}
+            error={c("moneda")}
           />
-          <CampoSelector
+          <CampoBuscador
             etiqueta={d.acceso.zona}
-            value={t.zonaHoraria}
-            onChange={texto("zonaHoraria")}
+            valor={t.zonaHoraria}
+            alElegir={(z) => cambiar({ zonaHoraria: z })}
             opciones={zonas.map((z) => ({ valor: z, texto: z.replace(/_/g, " ") }))}
             error={c("zonaHoraria")}
           />

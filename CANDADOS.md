@@ -422,6 +422,41 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   regla). Las cuentas de prueba usan `@example.com`.
 - **NO tocar:** no volver a decidir el estado del correo solo por las variables.
 
+### B23. El formulario de registro solo tenía 18 países
+
+- **Cómo se veía:** en «Probar gratis», el desplegable de país iba de Estados
+  Unidos a España y **no estaban Venezuela, Rumania ni casi ningún otro país**.
+  Un dueño de tintorería de esos países no podía ni registrarse. La moneda
+  también era una lista corta y el servidor rechazaba cualquier otra
+  (`z.enum(MONEDAS)` con 16).
+- **Arreglo:** `src/lib/paises.ts` tiene los ~200 códigos ISO con su moneda; el
+  NOMBRE lo pone el sistema en el idioma de la persona (`Intl.DisplayNames`), así
+  no hay listas de nombres que mantener. Las monedas salen de
+  `Intl.supportedValuesOf("currency")`. En el servidor, `esquemaMoneda` acepta
+  cualquier ISO 4217 que el sistema sepa formatear y `esquemaPais` cualquier país
+  de la lista. Los tres campos largos (país, moneda, zona horaria) usan
+  `CampoBuscador`: se escribe y filtra, con banderita y la moneda al lado.
+- **Candados:** `tests/unit/paises.test.ts` (más de 190 países, Venezuela y
+  Rumania por nombre en los dos idiomas, VES y RON, y que `ZZ` no cuele).
+- **NO tocar:** no volver a escribir listas de países a mano ni a fijar monedas
+  con `z.enum`. Y `paisValido` NO se resuelve preguntándole a `Intl`: para `ZZ`
+  responde «Región desconocida» y lo daría por bueno.
+
+### B24. La página de venta no enseñaba el producto
+
+- **Qué faltaba:** la landing contaba el sistema con texto y dibujos, pero no
+  había una sola pantalla real; quien entraba no sabía cómo se ve por dentro.
+- **Cómo está hecho:** `scripts/capturas.mjs` toma las capturas de la tintorería
+  de trabajo LOCAL (`npm run demo:local`, que siembra un día de órdenes, pagos y
+  caja abierta) con Playwright en 2x, y se pasan a webp a la mitad. Viven en
+  `public/capturas/` y se describen una sola vez en
+  `src/lib/contenido/capturas.ts` (texto alternativo y pie en los dos idiomas).
+  El componente `Captura` les pone el marco (computadora, tablet, celular o
+  papel) y `CarruselFlujo` enlaza cada paso de «Una orden, de principio a fin»
+  con su pantalla.
+- **NO tocar:** las capturas NUNCA salen de datos de un cliente real; se
+  regeneran con el sembrado local. Si cambia una pantalla, se vuelven a tomar.
+
 ---
 
 ## C. Candados de publicación

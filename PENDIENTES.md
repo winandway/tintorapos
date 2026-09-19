@@ -6,36 +6,33 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 
 ## Esperando por Richard (👤)
 
-1. 👤 **Enviar el sitemap en Google Search Console** (propiedad `tintorapos.com` →
-   Sitemaps): `https://tintorapos.com/sitemap.xml`.
-   **Destranca:** que Google descubra las 63 direcciones en español, inglés y x-default.
-2. 👤 **Cambiar la variable `APP_URL`** del sitio a `https://tintorapos.com`.
-   **Destranca:** que los enlaces de los SMS y correos usen el dominio propio.
-3. 👤 **Cron Trigger en tu cuenta de Cloudflare** que llame cada 5 minutos a
+1. 👤 **Cron Trigger en tu cuenta de Cloudflare** que llame cada 5 minutos a
    `https://tintorapos.com/datos/reloj` con el secreto (lo creo yo con tu sí).
    **Destranca:** avisos automáticos, recordatorios, respaldo diario y el canario en verde.
-4. ✅ **Correo del dominio activo** (18 sep 2026, lo terminó YaDominios; `EMAIL_FROM` = `avisos@tintorapos.com`). Falta ver uno llegar a una bandeja real con la recuperación de contraseña.
-5. 👤 **Correo de soporte** para privacidad y términos (variable `SUPPORT_EMAIL`),
+2. 👤 **Correo de soporte** para privacidad y términos (variable `SUPPORT_EMAIL`),
    y **revisión legal** de los dos borradores.
    **Destranca:** poder lanzar al público.
-6. 👤 **Precio de los planes**, si los SMS van incluidos y **qué pasa cuando termina
+3. 👤 **Precio de los planes**, si los SMS van incluidos y **qué pasa cuando termina
    la prueba gratis**.
    **Destranca:** página de precios y suscripción (Fase 2).
-7. 👤 **Procesador de pagos:** Stripe (recomendado) o Square.
-   **Destranca:** cobrar con tarjeta dentro del sistema (Fase 2).
-8. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU.
+4. 👤 **Stripe: dar el «sí» para conectarlo** (Richard ya tiene cuentas de Stripe).
+   Hace falta decidir qué se cobra primero: la suscripción de las tintorerías
+   (Billing) o el cobro con tarjeta en el mostrador (Terminal/Checkout).
+   **Destranca:** Fase 2. PROHIBIDO anunciar cobros con tarjeta antes de probarlo.
+5. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU. **Va al final**: primero
+   los avisos por correo, y los SMS cuando todo lo demás esté funcionando.
    **Destranca:** avisos por SMS reales.
-9. 👤 **Registros DNS para agentes (DNS-AID)** en el panel de YaDominios →
+6. 👤 **Registros DNS para agentes (DNS-AID)** en el panel de YaDominios →
    Mis dominios → `tintorapos.com` → DNS: un TXT `_catalog._agents` con
    `url=https://tintorapos.com/.well-known/ai-catalog.json` y, si el panel ofrece
    el tipo SVCB/HTTPS, `_index._agents`.
    **Destranca:** la última casilla de descubrimiento por DNS del informe de agentes.
-10. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
+7. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
    **Destranca:** protección de entrar, registrarse y recuperar contraseña.
 
 ## Fila de la IA (🤖), en orden
 
-1. 🤖 **Fase 2 — Tarjeta y crecimiento** (espera 👤6 y 👤7): Stripe Terminal,
+1. 🤖 **Fase 2 — Tarjeta y crecimiento** (espera 👤3 y 👤4): Stripe Terminal,
    portal con pago, Connect, Billing, multi-sucursal, WhatsApp, impresión directa,
    firma del cliente al recoger.
 2. 🤖 **Fase 3 — Lo que vende caro** (va después de la Fase 2: los planes recurrentes cobran con tarjeta): rutas de reparto, planes recurrentes,
@@ -85,3 +82,10 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 - ✅ 2026-09-18 · Correo saliente funcionando: el proveedor acepta `avisos@tintorapos.com`
   (prueba 16:31 UTC, 200 con `message_id`); canario del correo en verde y ahora
   basado en el último envío real (B22).
+- ✅ 2026-09-18 · Correo del dominio activo (`avisos@tintorapos.com`, 300 al día).
+  Falta ver uno llegar a una bandeja real con la recuperación de contraseña.
+- ✅ 2026-09-18 · Richard envió el sitemap en Search Console y puso `APP_URL`.
+- ✅ 2026-09-19 · Formulario de registro con TODOS los países y monedas del mundo,
+  con buscador (faltaban Venezuela, Rumania y casi todo el mundo).
+- ✅ 2026-09-19 · Capturas reales del sistema en la página de venta, con carrusel
+  del flujo de una orden.

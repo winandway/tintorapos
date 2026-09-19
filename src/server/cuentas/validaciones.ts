@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { zonaValida } from "@/lib/fechas";
+import { monedaValida, paisValido } from "@/lib/paises";
 import { claveAceptable } from "@/server/auth/claves";
 import { ErrorApp } from "@/server/errores";
 
@@ -9,26 +10,14 @@ export const esquemaNombre = z.string().trim().min(1).max(80);
 
 export const esquemaZona = z.string().max(64).refine(zonaValida, "zona");
 
-export const MONEDAS = [
-  "USD",
-  "MXN",
-  "COP",
-  "PEN",
-  "CLP",
-  "ARS",
-  "DOP",
-  "GTQ",
-  "HNL",
-  "CRC",
-  "PAB",
-  "BOB",
-  "PYG",
-  "UYU",
-  "EUR",
-  "CAD",
-] as const;
+/**
+ * Cualquier moneda del mundo, mientras el sistema sepa formatearla (ISO 4217).
+ * Antes eran 16 fijas y una tintorería de Venezuela o de Rumania no podía
+ * registrarse: ver `src/lib/paises.ts`.
+ */
+export const esquemaMoneda = z.string().trim().toUpperCase().refine(monedaValida, "moneda");
 
-export const esquemaMoneda = z.enum(MONEDAS);
+export const esquemaPais = z.string().trim().toUpperCase().refine(paisValido, "pais");
 
 /** Lanza el error de contraseña débil con su código exacto. */
 export function exigirClave(clave: string, correo?: string): void {

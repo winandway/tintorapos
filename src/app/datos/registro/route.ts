@@ -8,6 +8,7 @@ import {
   esquemaCorreo,
   esquemaMoneda,
   esquemaNombre,
+  esquemaPais,
   esquemaZona,
   exigirClave,
   exigirNombreSoporte,
@@ -22,11 +23,7 @@ const cuerpo = z.object({
   clave: z.string().min(1).max(200),
   zonaHoraria: esquemaZona,
   idioma: z.string().refine(esIdioma),
-  pais: z
-    .string()
-    .trim()
-    .toUpperCase()
-    .regex(/^[A-Z]{2}$/),
+  pais: esquemaPais,
   moneda: esquemaMoneda,
   telefono: z.string().trim().max(30).optional(),
   aceptaTerminos: z.literal(true, "acepta_terminos"),

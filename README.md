@@ -60,6 +60,15 @@ SOLO en la base local: nunca toca la base publicada.
 | `npm run cf:bundle` | Compila y arma `out-deploy/` con el `_worker.js` (corta si pasa de 10 MB en gzip) |
 | `npm run test:paquete` | Levanta ese `_worker.js` con wrangler y le corre todas las pruebas de punta a punta |
 
+## Capturas de la página de venta
+
+```bash
+cd "/Users/windocellc/Software-Tintora POS" && npm run demo:local && node scripts/capturas.mjs http://localhost:3000 <tp_sesion>
+```
+
+Salen en 2x; se pasan a webp a la mitad (ver el encabezado de `scripts/capturas.mjs`)
+y se describen en `src/lib/contenido/capturas.ts`.
+
 ## Para agentes de IA
 
 | Dirección | Qué es |
