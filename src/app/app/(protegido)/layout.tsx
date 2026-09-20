@@ -3,6 +3,7 @@ import { MarcoApp } from "@/components/app/marco-app";
 import { estadoVerificacion } from "@/server/cuentas/verificacion";
 import { obtenerContexto } from "@/server/entorno";
 import { permisosEfectivos } from "@/server/permisos";
+import { PLAN_DEMO } from "@/server/demo";
 import { diasDePrueba, exigirSesion } from "@/server/pagina";
 
 export default async function LayoutProtegido({ children }: { children: ReactNode }) {
@@ -23,6 +24,7 @@ export default async function LayoutProtegido({ children }: { children: ReactNod
         diasPrueba: diasDePrueba(sesion.tintoreria),
         bloqueoMin: dispositivo ? dispositivo.bloqueoInactividadMin : null,
         correoPorVerificar: verificacion.verificado ? null : (verificacion.correo ?? sesion.usuario.correo),
+        esDemo: sesion.tintoreria.plan === PLAN_DEMO,
       }}
     >
       {children}

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { Icono } from "@/components/marca/iconos-sitio";
 import { Pie } from "@/components/pie";
+import { BotonDemo } from "@/components/sitio/boton-demo";
 import { Captura } from "@/components/sitio/captura";
 import { CarruselFlujo } from "@/components/sitio/carrusel-flujo";
 import { EncabezadoSitio } from "@/components/sitio/encabezado-sitio";
@@ -65,6 +66,7 @@ function Seccion({
 export async function PaginaInicio({ idioma }: { idioma: Idioma }) {
   const c = CONTENIDO_INICIO[idioma];
   const d = diccionario(idioma).comun;
+  const dd = diccionario(idioma).demo;
   const haySesion = (await cookies()).has(COOKIE_SESION);
   const urlPagina = urlAbsoluta("", idioma);
   const datosEstructurados = {
@@ -154,6 +156,7 @@ export async function PaginaInicio({ idioma }: { idioma: Idioma }) {
                 <Link href={rutaPagina(idioma, "registro")} className={clasesBoton("primario", "grande")}>
                   {c.hero.cta}
                 </Link>
+                <BotonDemo variante="secundario" />
                 <a href="#como-funciona" className={clasesBoton("secundario", "grande")}>
                   {c.hero.ctaSecundario}
                 </a>
@@ -306,6 +309,36 @@ export async function PaginaInicio({ idioma }: { idioma: Idioma }) {
             <Captura clave="ordenes" idioma={idioma} />
             <Captura clave="caja" idioma={idioma} />
             <Captura clave="reportes" idioma={idioma} />
+          </div>
+        </Seccion>
+
+        {/* El demo: la gente quiere tocar el sistema antes de dar su correo. */}
+        <Seccion id="demo" titulo={dd.titulo} texto={dd.entrada} className="bg-papel">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-center">
+            <div>
+              <ul className="space-y-3 text-[17px]">
+                {dd.puntos.map((punto) => (
+                  <li key={punto} className="flex items-start gap-2.5">
+                    <svg viewBox="0 0 16 16" className="mt-1 size-4 shrink-0 text-ok" aria-hidden="true">
+                      <path
+                        d="m3.5 8.5 3 3 6-7"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    {punto}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8">
+                <BotonDemo />
+              </div>
+              <p className="mt-3 text-sm text-gris">{dd.nota}</p>
+            </div>
+            <Captura clave="panel" idioma={idioma} />
           </div>
         </Seccion>
 

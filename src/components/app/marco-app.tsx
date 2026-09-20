@@ -24,6 +24,8 @@ export interface InfoMarco {
   bloqueoMin: number | null;
   /** El correo que falta confirmar (null si ya está o si entró con PIN). */
   correoPorVerificar?: string | null;
+  /** Tintorería de demostración: se avisa arriba y se invita a abrir cuenta. */
+  esDemo?: boolean;
 }
 
 interface ItemNav {
@@ -239,6 +241,15 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
             </div>
           </div>
         </header>
+
+        {info.esDemo && (
+          <div className="flex flex-wrap items-center justify-center gap-2 bg-tinta px-4 py-2 text-center text-sm font-semibold text-white no-imprimir">
+            <span>{d.demo.barra}</span>
+            <Link href="/registro" className="underline underline-offset-2">
+              {d.demo.barraCuenta}
+            </Link>
+          </div>
+        )}
 
         {info.correoPorVerificar && <AvisoVerificarCorreo correo={info.correoPorVerificar} />}
 

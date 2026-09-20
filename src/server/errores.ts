@@ -26,6 +26,7 @@ export const CODIGOS_ERROR = [
   "codigo_incorrecto",
   "cuenta_suspendida",
   "prueba_terminada",
+  "demo_lleno",
   "estado_invalido",
   "monto_invalido",
   "pago_excede",

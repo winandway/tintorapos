@@ -2,6 +2,7 @@ import type { Variables } from "@/env";
 import { limpiarSesionesVencidas } from "@/server/auth/sesiones";
 import { procesarCola, programarRecordatorios } from "@/server/avisos";
 import { anonimizarClientesVencidos } from "@/server/clientes";
+import { limpiarDemos } from "@/server/demo";
 import { limpiarLimitesVencidos } from "@/server/limites";
 import { crearRespaldo, limpiarRespaldosViejos, tintoreriasPorRespaldar } from "@/server/respaldos";
 import { guardarSistema } from "@/server/sistema";
@@ -11,6 +12,7 @@ export interface ResultadoReloj {
   recordatorios: number;
   respaldos: { hechos: number; fallidos: string[] };
   respaldosBorrados: number;
+  demosBorrados: number;
   clientesAnonimizados: number;
   sesionesBorradas: number;
   limitesBorrados: number;
@@ -67,6 +69,7 @@ export async function correrReloj(
     recordatorios,
     respaldos,
     respaldosBorrados: await intentar("retención", () => limpiarRespaldosViejos(env, ahora), 0),
+    demosBorrados: await intentar("demos", () => limpiarDemos(env, ahora), 0),
     clientesAnonimizados: await intentar("papelera", () => anonimizarClientesVencidos(env.DB, ahora), 0),
     sesionesBorradas: await intentar("sesiones", () => limpiarSesionesVencidas(env.DB, ahora), 0),
     limitesBorrados: await intentar("límites", () => limpiarLimitesVencidos(env.DB, ahora), 0),

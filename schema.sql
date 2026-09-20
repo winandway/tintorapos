@@ -402,7 +402,13 @@ CREATE TRIGGER IF NOT EXISTS auditoria_sin_editar BEFORE UPDATE ON auditoria
 BEGIN
   SELECT RAISE(ABORT, 'La auditoria no se puede editar');
 END;
+-- La auditoría de una tintorería DE VERDAD no se borra nunca. La única excepción
+-- son las tintorerías de demostración (plan 'demo'), que se borran enteras a las
+-- 24 horas. Se vuelve a crear en cada publicación para que el candado no quede
+-- con la definición vieja.
+DROP TRIGGER IF EXISTS auditoria_sin_borrar;
 CREATE TRIGGER IF NOT EXISTS auditoria_sin_borrar BEFORE DELETE ON auditoria
+WHEN NOT EXISTS (SELECT 1 FROM tintorerias t WHERE t.id = OLD.tintoreria_id AND t.plan = 'demo')
 BEGIN
   SELECT RAISE(ABORT, 'La auditoria no se puede borrar');
 END;

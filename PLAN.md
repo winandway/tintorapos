@@ -16,7 +16,7 @@
 - [x] A4. Privacidad y términos completos (los dos idiomas), con contacto real.
 - [x] A5. Fin de la prueba gratis que de verdad bloquea + página de precios
       (importes los pone Richard).
-- [ ] A6. Demo pública con datos: cualquiera entra, prueba y toca todo; se
+- [x] A6. Demo pública con datos: cualquiera entra, prueba y toca todo; se
       limpia sola.
 
 ## Fase B — Contabilidad para tintorerías

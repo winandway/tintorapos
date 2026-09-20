@@ -18,7 +18,10 @@ describe("esquema de la base", () => {
     const { results } = await e.env.DB.prepare(
       "select name from sqlite_master where type = 'table' and name not like 'sqlite_%' and name not like '_cf_%'",
     ).all<{ name: string }>();
-    const sistema = new Set(["tintorerias", "limites", "sistema"]);
+    // Tablas que NO son de una tintorería: la ficha de cada una, los contadores
+    // de límites por IP, la memoria del sistema y el buzón del formulario
+    // público (mensajes de gente que todavía no es cliente de nadie).
+    const sistema = new Set(["tintorerias", "limites", "sistema", "mensajes_contacto"]);
     for (const { name } of results) {
       if (sistema.has(name)) continue;
       const cols = await e.env.DB.prepare(`pragma table_info(${name})`).all<{ name: string }>();

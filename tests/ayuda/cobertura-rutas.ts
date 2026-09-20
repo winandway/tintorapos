@@ -36,6 +36,9 @@ export const COBERTURA: Record<string, Cobertura> = {
     casos: () => [{ metodo: "POST", cuerpo: { actual: "no-es", nueva: "Otra-Clave-2026" } }],
   },
   "/datos/clave/recuperar": { publica: "solo recibe un correo y siempre responde lo mismo" },
+  "/datos/demo": {
+    publica: "crea una tintorería de demostración nueva; no recibe identificadores de otra",
+  },
   "/datos/contacto": {
     publica: "formulario público: solo nombre, correo y mensaje; no recibe identificadores",
   },

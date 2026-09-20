@@ -2,6 +2,7 @@ import { nuevoId } from "@/lib/codigos";
 import { formatoFecha } from "@/lib/i18n";
 import type { Variables } from "@/env";
 import { correoConfigurado, enviarCorreo } from "@/server/correo";
+import { PLAN_DEMO } from "@/server/demo";
 import { componerAviso, configuracionAvisos, type TipoAviso } from "./plantillas";
 import { enviarSms } from "./twilio";
 
@@ -26,7 +27,7 @@ export async function encolarAvisos(
   const f = await db
     .prepare(
       `select o.numero, o.codigo_publico, o.fecha_promesa, c.id as cliente_id, c.nombre, c.telefono, c.correo, c.idioma,
-         c.acepta_sms, c.sms_baja_en, c.acepta_correo, t.nombre as tienda, t.plantillas, t.zona_horaria, t.pais
+         c.acepta_sms, c.sms_baja_en, c.acepta_correo, t.nombre as tienda, t.plantillas, t.zona_horaria, t.pais, t.plan
        from ordenes o
        join clientes c on c.id = o.cliente_id and c.tintoreria_id = o.tintoreria_id
        join tintorerias t on t.id = o.tintoreria_id
@@ -49,8 +50,11 @@ export async function encolarAvisos(
       plantillas: string;
       zona_horaria: string;
       pais: string;
+      plan: string;
     }>();
   if (!f) return [];
+  // Candado del demo: una tintorería de demostración no le escribe a nadie.
+  if (f.plan === PLAN_DEMO) return [];
   const conf = configuracionAvisos(f.plantillas)[d.tipo];
   if (!conf.activo) return [];
   const cuerpo = componerAviso(conf[f.idioma], {
@@ -221,7 +225,7 @@ export async function programarRecordatorios(
     .prepare(
       `select o.id, o.tintoreria_id from ordenes o join tintorerias t on t.id = o.tintoreria_id
        /* sistema: recordatorios de todas las tintorerías */
-       where o.estado = 'lista' and t.estado = 'activa' and o.recordatorios_enviados < t.max_recordatorios
+       where o.estado = 'lista' and t.estado = 'activa' and t.plan <> 'demo' and o.recordatorios_enviados < t.max_recordatorios
          and o.lista_en <= ? - t.dias_recordatorio * 86400000
          and (o.ultimo_recordatorio_en is null or o.ultimo_recordatorio_en <= ? - t.dias_recordatorio * 86400000)
        limit 200`,

@@ -183,7 +183,7 @@ export async function tintoreriasPorRespaldar(
   const { results } = await db
     .prepare(
       `select t.id from tintorerias t /* sistema: respaldos pendientes */
-       where t.estado = 'activa'
+       where t.estado = 'activa' and t.plan <> 'demo'
          and coalesce((select max(r.creado_en) from respaldos r where r.tintoreria_id = t.id), 0) < ?
        order by coalesce((select max(r.creado_en) from respaldos r where r.tintoreria_id = t.id), 0)
        limit ?`,
