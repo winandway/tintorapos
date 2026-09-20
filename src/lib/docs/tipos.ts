@@ -1,4 +1,5 @@
 import type { IconoSitio } from "@/components/marca/iconos-sitio";
+import type { ClaveCaptura } from "@/lib/contenido/capturas";
 
 /** Ilustraciones de las guías (se dibujan con los textos reales de la app). */
 export type NombreFigura =
@@ -13,7 +14,9 @@ export type Bloque =
   | { t: "pasos"; items: string[] }
   | { t: "lista"; items: string[] }
   | { t: "nota"; tono: "consejo" | "importante"; texto: string }
-  | { t: "figura"; figura: NombreFigura; pie: string };
+  | { t: "figura"; figura: NombreFigura; pie: string }
+  /** Una captura REAL del sistema (las mismas de la página de venta). */
+  | { t: "captura"; captura: ClaveCaptura; pie?: string };
 
 export interface TextoGuia {
   titulo: string;

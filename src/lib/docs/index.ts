@@ -1,6 +1,7 @@
 import type { Idioma } from "@/lib/i18n";
 import { rutaGuia } from "@/lib/rutas-publicas";
 import { GUIAS_CLIENTES, GUIAS_SEGURIDAD } from "./guias-clientes";
+import { GUIAS_CAMINO } from "./guias-camino";
 import { GUIAS_CONTABILIDAD } from "./guias-contabilidad";
 import { GUIAS_EMPEZAR } from "./guias-empezar";
 import { GUIAS_MOSTRADOR } from "./guias-mostrador";
@@ -22,6 +23,7 @@ export const SECCIONES: Seccion[] = [
 export const GUIAS: Guia[] = [
   ...GUIAS_EMPEZAR,
   ...GUIAS_MOSTRADOR,
+  ...GUIAS_CAMINO,
   ...GUIAS_OPERACION,
   ...GUIAS_CONTABILIDAD,
   ...GUIAS_CLIENTES,
@@ -43,6 +45,7 @@ export function textoPlano(bloques: Bloque[]): string {
     .map((b) => {
       if (b.t === "pasos" || b.t === "lista") return b.items.map(limpiar).join(" ");
       if (b.t === "figura") return limpiar(b.pie);
+      if (b.t === "captura") return b.pie ? limpiar(b.pie) : "";
       return limpiar(b.texto);
     })
     .join(" ");

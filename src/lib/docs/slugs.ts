@@ -12,6 +12,7 @@ export const SLUG_EN: Record<string, string> = {
   "entrega-y-cobro": "pickup-and-payment",
   "sin-conexion": "working-offline",
   produccion: "production-scanner",
+  "camino-de-una-prenda": "a-garments-journey",
   caja: "cash-register-closing",
   autorizaciones: "roles-and-manager-approval",
   reportes: "reports",

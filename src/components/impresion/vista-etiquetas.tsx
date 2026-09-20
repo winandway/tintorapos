@@ -13,12 +13,13 @@ import { diccionario, type Idioma } from "@/lib/i18n";
  * El tamaño de papel se manda con `@page`, que hay que escribir en el momento
  * (no se puede cambiar con una variable de CSS).
  */
-export const FORMATOS = ["rollo2x1", "rollo225", "hoja", "recibo80"] as const;
+export const FORMATOS = ["rollo2x1", "rollo225", "tag3x1", "hoja", "recibo80"] as const;
 export type FormatoEtiqueta = (typeof FORMATOS)[number];
 
 const PAPEL: Record<FormatoEtiqueta, string> = {
   rollo2x1: "size: 2in 1in; margin: 0;",
   rollo225: "size: 2.25in 1.25in; margin: 0;",
+  tag3x1: "size: 3in 1in; margin: 0;",
   hoja: "size: letter; margin: 0.5in 0.19in;",
   recibo80: "size: 80mm auto; margin: 0;",
 };

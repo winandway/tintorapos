@@ -34,6 +34,7 @@ export const impresion: Forma<typeof base> = {
   formatos: {
     rollo2x1: "Roll 2 × 1 inches",
     rollo225: "Roll 2¼ × 1¼ inches",
+    tag3x1: "Staple tag (3 × 1 inches)",
     hoja: "Letter sheet (30 labels)",
     recibo80: "Receipt roll (80 mm)",
   },

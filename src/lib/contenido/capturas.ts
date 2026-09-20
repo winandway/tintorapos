@@ -16,6 +16,34 @@ export interface Captura {
 }
 
 export const CAPTURAS = {
+  orden: {
+    archivo: "/capturas/orden.webp",
+    ancho: 1440,
+    alto: 900,
+    marco: "escritorio",
+    alt: {
+      es: "Detalle de una orden en Tintora POS: el cliente, las prendas con su estado y su etiqueta, el saldo y los botones para imprimir y cobrar.",
+      en: "Order detail in Tintora POS: the customer, each garment with its status and tag, the balance and the buttons to print and charge.",
+    },
+    pie: {
+      es: "La orden por dentro: cada prenda con su etiqueta y su estado.",
+      en: "Inside an order: every garment with its tag and its status.",
+    },
+  },
+  etiquetasPantalla: {
+    archivo: "/capturas/etiquetas-pantalla.webp",
+    ancho: 900,
+    alto: 420,
+    marco: "escritorio",
+    alt: {
+      es: "Pantalla de impresión de etiquetas con el selector de tamaño arriba: rollo, tag para grapar, hoja carta o rollo de recibos.",
+      en: "Tag printing screen with the size picker on top: roll, staple tag, letter sheet or receipt roll.",
+    },
+    pie: {
+      es: "Arriba se elige el tamaño; esa computadora lo recuerda.",
+      en: "You pick the size up top; that computer remembers it.",
+    },
+  },
   mostrador: {
     archivo: "/capturas/mostrador.webp",
     ancho: 1440,
@@ -33,7 +61,7 @@ export const CAPTURAS = {
   etiquetas: {
     archivo: "/capturas/etiquetas.webp",
     ancho: 900,
-    alto: 700,
+    alto: 340,
     marco: "papel",
     alt: {
       es: "Etiquetas de 2 × 1 pulgadas listas para imprimir, una por prenda, con el número de orden, el día, el cliente y su código QR.",

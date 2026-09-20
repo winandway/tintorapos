@@ -145,6 +145,11 @@ body {
   width: 2.25in;
   height: 1.25in;
 }
+/* Tag de papel para grapar a la prenda (el clásico de las tintorerías). */
+.hoja-etiquetas[data-formato="tag3x1"] .etiqueta {
+  width: 3in;
+  height: 1in;
+}
 .hoja-etiquetas[data-formato="recibo80"] .etiqueta {
   width: 72mm;
   height: 1in;

@@ -31,6 +31,7 @@ export const impresion = {
   formatos: {
     rollo2x1: "Rollo 2 × 1 pulgadas",
     rollo225: "Rollo 2¼ × 1¼ pulgadas",
+    tag3x1: "Tag para grapar (3 × 1 pulgadas)",
     hoja: "Hoja carta (30 etiquetas)",
     recibo80: "Rollo de recibos (80 mm)",
   },

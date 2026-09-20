@@ -30,6 +30,10 @@ async function tomar(nombre, { ancho = 1440, alto = 900, movil = false, antes })
   const p = await ctx.newPage();
   p.setDefaultTimeout(60000);
   await antes(p);
+  // El botoncito de desarrollo de Next no sale en las capturas del producto.
+  await p
+    .addStyleTag({ content: "nextjs-portal, #nextjs-portal { display: none !important; }" })
+    .catch(() => {});
   await p.waitForTimeout(700);
   await p.screenshot({ path: `${salida}/${nombre}.png` });
   await ctx.close();
@@ -97,7 +101,8 @@ const { ordenes } = await api.evaluate(async () => {
   const r = await fetch("/datos/ordenes?estado=abiertas", { headers: { accept: "application/json" } });
   return r.json();
 });
-const orden = ordenes[0];
+// La de más prendas: las capturas de etiquetas se ven vacías con una sola pieza.
+const orden = [...ordenes].sort((a, b) => (b.piezas ?? 0) - (a.piezas ?? 0))[0];
 const { orden: detalle } = await api.evaluate(async (id) => {
   const r = await fetch(`/datos/ordenes/${id}`, { headers: { accept: "application/json" } });
   return r.json();
@@ -112,7 +117,16 @@ await tomar("cliente-celular", {
 });
 await tomar("etiquetas", {
   ancho: 900,
-  alto: 700,
+  alto: 340,
+  antes: async (p) => {
+    await ir(`/app/ordenes/${orden.id}/imprimir?tipo=etiquetas&vista=1`)(p);
+    // Solo el papel: la barra de la pantalla va en «etiquetas-pantalla».
+    await p.addStyleTag({ content: ".no-imprimir { display: none !important; }" });
+  },
+});
+await tomar("etiquetas-pantalla", {
+  ancho: 900,
+  alto: 420,
   antes: ir(`/app/ordenes/${orden.id}/imprimir?tipo=etiquetas&vista=1`),
 });
 await tomar("recibo", {

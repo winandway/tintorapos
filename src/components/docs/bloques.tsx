@@ -1,5 +1,6 @@
 import type { Bloque } from "@/lib/docs";
 import { diccionario, type Idioma } from "@/lib/i18n";
+import { Captura } from "@/components/sitio/captura";
 import { Figura } from "./figuras";
 import { TextoRico } from "./texto-rico";
 
@@ -66,6 +67,13 @@ export function Bloques({ bloques, idioma }: { bloques: Bloque[]; idioma: Idioma
             );
           case "figura":
             return <Figura key={i} nombre={b.figura} pie={b.pie} idioma={idioma} />;
+          case "captura":
+            return (
+              <figure key={i} className="mt-6">
+                <Captura clave={b.captura} idioma={idioma} conPie={false} />
+                {b.pie && <figcaption className="mt-2 text-center text-[14px] text-gris">{b.pie}</figcaption>}
+              </figure>
+            );
         }
       })}
     </div>
