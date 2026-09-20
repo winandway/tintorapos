@@ -6,37 +6,47 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 
 ## Esperando por Richard (👤)
 
-1. 👤 **Cron Trigger en tu cuenta de Cloudflare** que llame cada 5 minutos a
-   `https://tintorapos.com/datos/reloj` con el secreto (lo creo yo con tu sí).
-   **Destranca:** avisos automáticos, recordatorios, respaldo diario y el canario en verde.
-2. 👤 **Correo de soporte** para privacidad y términos (variable `SUPPORT_EMAIL`),
-   y **revisión legal** de los dos borradores.
-   **Destranca:** poder lanzar al público.
-3. 👤 **Precio de los planes**, si los SMS van incluidos y **qué pasa cuando termina
-   la prueba gratis**.
-   **Destranca:** página de precios y suscripción (Fase 2).
-4. 👤 **Stripe: dar el «sí» para conectarlo** (Richard ya tiene cuentas de Stripe).
+1. 👤 **Correo de soporte**: variable `SUPPORT_EMAIL` en el panel de YaDominios
+   Cloud (una dirección donde tú leas: los mensajes del formulario de contacto
+   ya se guardan en la base, pero sin esa variable no te llegan al buzón).
+   **Destranca:** que te enteres cuando alguien escriba desde la página.
+2. 👤 **Prueba de registro real**: abre `https://tintorapos.com/registro`, crea
+   una cuenta con un correo tuyo y dime si te llegó el correo de bienvenida y si
+   el enlace de confirmación funcionó. Crear cuentas y escribir contraseñas es
+   lo único que no hago yo.
+   **Destranca:** poder decir «el registro está probado en vivo» sin adivinar.
+3. 👤 **Precio de los planes** (la página `/precios` ya está en vivo y dice
+   «escríbenos» en vez de un número inventado), si los SMS van incluidos y **qué
+   pasa cuando termina la prueba gratis** (hoy: se puede mirar y exportar todo,
+   pero no seguir trabajando).
+   **Destranca:** poner los importes y cobrar.
+4. 👤 **Revisión legal** de privacidad y términos (los dos están completos y en
+   vivo, en español e inglés, con la empresa y los encargados nombrados).
+   **Destranca:** tranquilidad al lanzar al público.
+5. 👤 **Stripe: dar el «sí» para conectarlo** (Richard ya tiene cuentas de Stripe).
    Hace falta decidir qué se cobra primero: la suscripción de las tintorerías
    (Billing) o el cobro con tarjeta en el mostrador (Terminal/Checkout).
    **Destranca:** Fase 2. PROHIBIDO anunciar cobros con tarjeta antes de probarlo.
-5. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU. **Va al final**: primero
+6. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU. **Va al final**: primero
    los avisos por correo, y los SMS cuando todo lo demás esté funcionando.
    **Destranca:** avisos por SMS reales.
-6. 👤 **Registros DNS para agentes (DNS-AID)** en el panel de YaDominios →
+7. 👤 **Registros DNS para agentes (DNS-AID)** en el panel de YaDominios →
    Mis dominios → `tintorapos.com` → DNS: un TXT `_catalog._agents` con
    `url=https://tintorapos.com/.well-known/ai-catalog.json` y, si el panel ofrece
    el tipo SVCB/HTTPS, `_index._agents`.
    **Destranca:** la última casilla de descubrimiento por DNS del informe de agentes.
-7. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
+8. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
    **Destranca:** protección de entrar, registrarse y recuperar contraseña.
 
 ## Fila de la IA (🤖), en orden
 
-1. 🤖 **Fase 2 — Tarjeta y crecimiento** (espera 👤3 y 👤4): Stripe Terminal,
+1. 🤖 **Fase 2 — Tarjeta y crecimiento** (espera 👤3 y 👤5): Stripe Terminal,
    portal con pago, Connect, Billing, multi-sucursal, WhatsApp, impresión directa,
    firma del cliente al recoger.
-2. 🤖 **Fase 3 — Lo que vende caro** (va después de la Fase 2: los planes recurrentes cobran con tarjeta): rutas de reparto, planes recurrentes,
-   inventario, exportación contable, panel de cadena.
+2. 🤖 **Fase 3 — Lo que vende caro** (va después de la Fase 2: los planes
+   recurrentes cobran con tarjeta): rutas de reparto, planes recurrentes,
+   panel de cadena. (Inventario de insumos y exportación contable ya están
+   hechos, en Contabilidad.)
 
 ## Para la sesión de Laboratorio AI (no se hace aquí)
 
@@ -46,6 +56,23 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 - Búsqueda de marca «Tintora» en USPTO antes de comprar el dominio.
 
 ## Hecho (✅)
+
+- ✅ 2026-09-19 · **El reloj ya no depende de nadie**: lo mueve el tráfico del
+  sitio con candado de una sola corrida cada 5 minutos, así que los avisos, los
+  recordatorios y el respaldo diario funcionan sin el Cron externo. El canario
+  de producción dice `reloj: ok` y `respaldos: ok`.
+- ✅ 2026-09-19 · **Verificación de correo al registrarse**, página de contacto
+  con los mensajes guardados, privacidad y términos completos en los dos
+  idiomas, página de precios y fin de la prueba gratis que de verdad bloquea
+  (se puede mirar y exportar; no seguir trabajando).
+- ✅ 2026-09-19 · **Demo público en vivo**: cualquiera entra desde la portada sin
+  registrarse y cae en su propia tintorería con un día de trabajo cargado; no le
+  escribe a nadie y se borra sola a las 24 horas.
+- ✅ 2026-09-19 · **Contabilidad completa** (investigada primero en internet,
+  `docs/CONTABILIDAD-TINTORERIA.md`): ganancia, gastos por categoría del oficio,
+  compras a proveedores, insumos con aviso de reorden, proveedores, cuentas por
+  cobrar con antigüedad, impuestos y archivo para el contador. Con sus guías en
+  Docs.
 
 - ✅ 2026-09-16 · Estudio y propuesta del proyecto: `ESTUDIO-TINTORA-POS.md`.
 - ✅ 2026-09-16 · Búsqueda de código libre en GitHub: se parte de cero (estudio, punto 3.1).

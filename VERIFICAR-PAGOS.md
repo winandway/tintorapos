@@ -17,8 +17,13 @@
   🔴 **Solo en local:** entradas y salidas de caja, cajón sin venta y cierre con
   diferencia.
 - 🔴 **No hay suscripción ni cobro a las tintorerías** (Stripe Billing no existe
-  todavía). La prueba gratis de 14 días solo muestra un aviso: no bloquea nada al
-  terminar.
+  todavía). La prueba gratis de 14 días **ya bloquea de verdad al terminar**: se
+  puede mirar todo y exportarlo, pero no crear ni cobrar nada (402
+  `prueba_terminada`). Para seguir, la tienda escribe y se le activa a mano; no
+  hay forma de que pague dentro del sistema.
+- 🔴 **La contabilidad NO mueve dinero.** Los gastos, las compras y los abonos a
+  proveedores son **apuntes**: el dueño escribe lo que ya pagó por fuera. El
+  programa no le paga a nadie ni se conecta a ningún banco.
 - **No se le anuncia a ningún cliente que «cobra con tarjeta».** La página
   principal y Docs dicen explícitamente que no procesa tarjetas.
 
@@ -37,6 +42,9 @@
 | 🔴 **Stripe Terminal / Checkout / Connect** (cobrar tarjetas de verdad) | **NO CONSTRUIDO** | Fase 2. Espera que Richard elija procesador (PENDIENTES 👤) |
 | 🔴 **Suscripción de las tintorerías** (Stripe Billing) | **NO CONSTRUIDO** | Fase 2. Espera precios de los planes (PENDIENTES 👤) |
 | 🔴 **Webhooks de pago con firma** | **NO CONSTRUIDO** | Llega con Stripe |
+| **Fin de la prueba gratis** (mirar y exportar sí, trabajar no) | Probado en LOCAL | 19 sep 2026, `tests/integracion/ruta.test.ts`, comprobado en rojo (quitando el candado la prueba falla) |
+| **Contabilidad** (gastos, compras, abonos, ganancia, impuestos, por cobrar) | Probado en LOCAL y **visto en producción** | 19 sep 2026: `tests/integracion/contabilidad.test.ts` (7 casos, dos comprobados en rojo) y las pantallas abiertas en `https://tintorapos.com` con el demo. Son apuntes: no mueven dinero |
+| **Demo público** (no cobra, no manda correos, se borra a las 24 h) | ✅ **PROBADO EN PRODUCCIÓN** | 19 sep 2026: se abrió desde la portada de `tintorapos.com`, se entró al POS y a Contabilidad. Candados en `tests/integracion/demo.test.ts`, comprobados en rojo |
 
 ## Cómo se repite la prueba en producción
 

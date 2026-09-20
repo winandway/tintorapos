@@ -35,5 +35,5 @@
 ## Fase C — Publicar
 
 - [x] C1. `npm run verify`, punta a punta y paquete.
-- [ ] C2. Publicar y comprobar en producción (registro, correo, demo, reloj).
-- [ ] C3. Documentar en CANDADOS.md, PENDIENTES.md y las guías de Docs.
+- [x] C2. Publicar y comprobar en producción (registro, correo, demo, reloj).
+- [x] C3. Documentar en CANDADOS.md, PENDIENTES.md y las guías de Docs.

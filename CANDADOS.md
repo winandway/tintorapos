@@ -481,6 +481,68 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
 
 ---
 
+### B26. El demo público podía escribirle a clientes de verdad y quedarse para siempre
+
+- **Cómo se veía:** nada todavía — se atrapó al construirlo. Un demo abierto a
+  cualquiera que pasa por la página es una tintorería más dentro de la misma
+  base: encola avisos, gasta el cupo de correo del plan, se respalda todas las
+  noches y no se borra nunca.
+- **Arreglo:** plan `demo` en `tintorerias`. `encolarAvisos` devuelve lista
+  vacía si la tintorería es demo (no entra NADA a la cola, así que nada puede
+  salir), `tintoreriasPorRespaldar` y `programarRecordatorios` la saltan, y el
+  reloj llama a `limpiarDemos`, que borra la tintorería entera a las 24 horas
+  —fotos del almacén incluidas—. Sus clientes nacen sin correo ni teléfono.
+- **Detalle del borrado:** la auditoría es intocable por diseño (trigger
+  `auditoria_sin_borrar`). Ahora ese trigger tiene un `WHEN` que permite el
+  borrado SOLO cuando la tintorería dueña de esa fila existe y es plan `demo`.
+  La auditoría de una tintorería de verdad sigue sin poder borrarse ni editarse.
+  El `schema.sql` hace `DROP TRIGGER IF EXISTS` antes de crearlo, porque
+  `CREATE TRIGGER IF NOT EXISTS` no actualiza la definición vieja.
+- **Commit:** `0ba1cb5` (demo) y el que agrega la contabilidad al borrado.
+- **Candado:** `tests/integracion/demo.test.ts`, comprobado en rojo dos veces
+  (quitando el freno de avisos y quitando la limpieza del reloj).
+- **Qué NO tocar:** no quitar el `if (f.plan === PLAN_DEMO) return [];` de
+  `encolarAvisos` ni sacar `limpiarDemos` del reloj. Una tabla nueva con
+  `tintoreria_id` hay que agregarla a `TABLAS_DEMO` o el demo no se podrá
+  borrar (la prueba se pone en rojo).
+
+### B27. La contabilidad aceptaba el proveedor de OTRA tintorería
+
+- **Cómo se veía:** lo atrapó el candado de aislamiento al agregar las rutas de
+  contabilidad: la tintorería B podía guardar un gasto colgado del `proveedor_id`
+  de la tintorería A, y después el nombre de A aparecía en la pantalla de B.
+- **Causa real:** los identificadores que llegan del navegador (proveedor,
+  insumo, empleado) se guardaban tal cual, sin comprobar de quién son.
+- **Arreglo:** `exigirPropio()` en `src/server/contabilidad/index.ts`, usado en
+  gastos, insumos y compras. Si el id no es de esta tintorería, 404.
+- **Candado:** `tests/integracion/aislamiento.test.ts` con los casos de
+  contabilidad (usa los ids de A desde la sesión de B).
+- **Regla que deja:** ningún id que venga del cliente se guarda sin comprobar
+  que es de la tintorería de la sesión.
+
+### B28. La ganancia podía contar dos veces una compra
+
+- **Cómo se veía:** riesgo de diseño, atrapado al construirlo: si las compras a
+  proveedor y los gastos fueran dos sumas separadas, quien registre la compra y
+  además el gasto ve su ganancia hundida sin entender por qué.
+- **Arreglo:** una compra escribe TAMBIÉN su gasto (`gastos.compra_id`, con
+  índice único), y `ganancia()` suma SOLO la tabla `gastos`. El gasto que nació
+  de una compra no se edita ni se borra desde gastos: responde 409
+  `gasto_de_compra`.
+- **Candado:** `tests/integracion/contabilidad.test.ts`, comprobado en rojo
+  (duplicando a propósito la categoría «insumos» la prueba falla).
+- **Qué NO tocar:** no sumar `compras` dentro de `ganancia()`, y no quitar el
+  índice `idx_gastos_compra`.
+
+### B29. Las tablas nuevas no viajaban en el respaldo
+
+- **Cómo se veía:** el candado de respaldos (restaurar en una base limpia tiene
+  que dar la misma huella) se puso en rojo al agregar la contabilidad.
+- **Arreglo:** `TABLAS_RESPALDO` incluye proveedores, insumos, compras,
+  compra_lineas, gastos y movimientos_insumo.
+- **Regla que deja:** **toda tabla nueva con `tintoreria_id` se agrega a
+  `TABLAS_RESPALDO`** (y al escenario de aislamiento), o el respaldo miente.
+
 ## C. Candados de publicación
 
 ### C1. El paquete que se publica es el que se prueba

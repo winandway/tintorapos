@@ -9,12 +9,15 @@ Punto de venta y gestión en la nube para tintorerías y lavanderías, vendido
 como suscripción (SaaS) a dueños de negocio en EE.UU. y Latinoamérica.
 Bilingüe español/inglés. Marca: **Tintora POS**. Dueño: Richard (Windoce LLC).
 
-**Estado (17 sep 2026):** Fase 0 y Fase 1 **publicadas en vivo en
-`https://tintorapos.com`** (YaDominios Cloud). Dominio verificado en Google Search
-Console. SEO bilingüe con direcciones `/es` y `/en`. Falta el reloj externo (Cron) y
-los servicios opcionales (ver `PENDIENTES.md`). **No hay procesador de pagos**: el
-registro de cobros (efectivo, tarjeta propia, otro, sin conexión, anular con PIN, caja
-y reportes) quedó probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
+**Estado (19 sep 2026):** en vivo en `https://tintorapos.com` (YaDominios Cloud),
+bilingüe y con SEO. Además del POS: **demo público** sin registro que se borra solo a
+las 24 horas, **verificación de correo**, **contacto**, **precios** (sin importes hasta
+que Richard los ponga), **fin de la prueba gratis** que bloquea de verdad y
+**contabilidad completa** (ganancia, gastos, compras, insumos, proveedores, por cobrar,
+impuestos y archivo para el contador). **El reloj ya NO necesita Cron externo**: lo
+mueve el tráfico del sitio. **No hay procesador de pagos**: el registro de cobros
+(efectivo, tarjeta propia, otro, sin conexión, anular con PIN, caja y reportes) quedó
+probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
 
 ## Documentos que mandan
 
@@ -25,7 +28,8 @@ y reportes) quedó probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.m
 | `docs/CONTRATO-YADOMINIOS.md` | Cómo se publica en YaDominios Cloud, sin depender de red |
 | `CANDADOS.md` | Cada cosa que se rompió y cómo quedó fija. **Se lee antes de un rollback o de actualizar paquetes** |
 | `VERIFICAR-PAGOS.md` | Estado real de cada pieza de dinero: probado con fecha o NO probado (en rojo) |
-| `PLAN.md` | Los 52 pasos de la Fase 0 y la Fase 1, todos marcados |
+| `PLAN.md` | Los pasos del trabajo en curso, marcados a medida que se hacen |
+| `docs/CONTABILIDAD-TINTORERIA.md` | Qué lleva la contabilidad del oficio y por qué el menú es el que es |
 | `README.md` | Cómo se corre, se prueba y se publica |
 
 ## Perímetro (lista cerrada; lo que no está aquí no existe para la IA)
@@ -42,9 +46,9 @@ y reportes) quedó probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.m
   `verify` pasó en verde.
 - **Correo saliente:** API de YaDominios (`src/server/correo.ts`), no la binding
   `env.EMAIL`. Guía: `https://yadominios.com/docs/correos-desde-tu-dominio`.
-- **Cuenta de Cloudflare de Richard:** solo para UN Cron Trigger (el reloj
-  externo que llama a `/datos/reloj`). **Todavía no creado.** Nada más se toca
-  en esa cuenta.
+- **Cuenta de Cloudflare de Richard:** no se toca. El reloj externo ya no hace
+  falta: `latirReloj()` lo mueve con el tráfico del sitio (`src/server/reloj/interno.ts`).
+  `/datos/reloj` sigue existiendo por si algún día se quiere un reloj de afuera.
 - **Servicios externos previstos:** Stripe, Twilio, WhatsApp Business (Meta).
   Ninguno conectado todavía; cada uno se conecta con autorización explícita.
 - Nada de Supabase, Vercel, Netlify ni otras plataformas.
@@ -62,9 +66,16 @@ y reportes) quedó probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.m
 - Archivos (fotos, respaldos): `env.BUCKET`, servidos por `/media/...` con
   comprobación de sesión.
 - **Rutas del backend con prefijo `/datos`. PROHIBIDO `/api/`.**
-- Sin cron en la plataforma: el reloj es externo y llama a `/datos/reloj` con
-  un secreto del panel. Sin KV, sin colas, sin Durable Objects: la cola de
-  avisos es una tabla.
+- Sin cron en la plataforma: **el reloj lo mueve el propio tráfico** (turno
+  atómico en `sistema` + `waitUntil` desde el layout raíz). `/datos/reloj` con
+  secreto sigue disponible para un reloj externo. Sin KV, sin colas, sin Durable
+  Objects: la cola de avisos es una tabla.
+- Contabilidad: **una compra a proveedor escribe TAMBIÉN su gasto**
+  (`gastos.compra_id` único) y la ganancia se calcula SOLO de `gastos`. Toda
+  tabla nueva con `tintoreria_id` se agrega a `TABLAS_RESPALDO`, a `TABLAS_DEMO`
+  y al escenario de aislamiento, o las pruebas se ponen en rojo.
+- Demo público: plan `demo`, no manda avisos, no se respalda y el reloj lo borra
+  entero a las 24 horas.
 - Pagos: Stripe (Terminal, Checkout, Connect, Billing). Webhooks con firma
   verificada. Nunca se guarda una tarjeta.
 - Idioma: bilingüe ES/EN con selector arriba; todo texto público en dos
