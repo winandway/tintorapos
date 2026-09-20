@@ -42,6 +42,16 @@ export function clienteVacio(idioma: "es" | "en", inicial: Partial<DatosFormClie
   };
 }
 
+/**
+ * Los avisos van por correo: en cuanto el cliente da su dirección, la palomita
+ * se marca sola (y se puede quitar). Antes había que acordarse de marcarla, y
+ * el aviso de «tu ropa está lista» no salía nunca.
+ */
+export function aceptaCorreoAlEscribir(anterior: string, nuevo: string, actual: boolean): boolean {
+  if (nuevo.trim() === "") return false;
+  return anterior.trim() === "" ? true : actual;
+}
+
 /** Crear o editar un cliente. Si el teléfono ya existe, ofrece usar ese cliente. */
 export function ModalCliente({
   abierto,
@@ -182,7 +192,17 @@ export function ModalCliente({
           autoComplete="off"
           placeholder={d.acceso.correoPlaceholder}
           value={v.correo}
-          onChange={(e) => set("correo", e.target.value)}
+          onChange={(e) => {
+            // Los avisos van por correo: en cuanto el cliente da su dirección,
+            // la palomita se marca sola (se puede quitar). Antes había que
+            // acordarse, y el aviso de «tu ropa está lista» no salía nunca.
+            const correo = e.target.value;
+            setV({
+              ...v,
+              correo,
+              aceptaCorreo: aceptaCorreoAlEscribir(v.correo, correo, v.aceptaCorreo),
+            });
+          }}
           error={textoCampo(d, campos.correo)}
           opcional={d.comun.opcional}
         />
