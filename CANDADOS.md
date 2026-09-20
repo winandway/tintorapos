@@ -634,6 +634,38 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   suya y está bien.
 - **Dónde:** `src/components/selector-idioma.tsx`.
 
+### B35. Una etiqueta sola imprimía una hoja en blanco de más
+
+- **Cómo se veía:** Richard mandó a imprimir las etiquetas de una orden de una
+  sola prenda y el diálogo decía **«2 páginas»**: la etiqueta y una hoja vacía.
+  Con un rollo de etiquetas, esa hoja vacía es una etiqueta desperdiciada por
+  cada orden.
+- **Causa real:** cada etiqueta llevaba `break-after-page` pegado en su clase,
+  también la última.
+- **Arreglo:** el corte de página lo pone ahora el CSS de impresión
+  (`.hoja-etiquetas .etiqueta { break-after: page }`) y **la última no lo
+  lleva** (`:last-child { break-after: auto }`). En el formato de hoja carta no
+  hay cortes: las etiquetas se acomodan en rejilla.
+- **Candado:** `e2e/flujo-completo.spec.ts` comprueba que ninguna etiqueta
+  lleve `break-after-page` en su clase. Comprobado en rojo (devolviéndolo, la
+  prueba falla).
+
+### B36. Con qué impresora se imprime cada cosa
+
+- **La pregunta que lo destapó:** *«la etiqueta se imprime con la misma
+  impresora del ticket?»*. No: el **recibo** va en la térmica de 80 mm y la
+  **etiqueta** en la de etiquetas adhesivas.
+- **Lo que se agregó:** un selector de tamaño arriba de la pantalla de
+  etiquetas (`src/components/impresion/vista-etiquetas.tsx`) con cuatro
+  formatos —rollo 2 × 1, rollo 2¼ × 1¼, hoja carta de 30 etiquetas y rollo de
+  recibos de 80 mm—, que **se recuerda en esa computadora**, escribe el `@page`
+  correcto y explica en una línea qué impresora usa cada documento. Quien no
+  tenga etiquetera imprime en hojas adhesivas con su impresora normal.
+- **Ojo:** el tamaño del papel (`@page size`) no se puede cambiar con una
+  variable de CSS; hay que escribir la regla en el momento. Por eso el `<style>`
+  vive en el componente de cliente y no en el servidor.
+- **Documentado en:** la guía «Impresoras de recibos y etiquetas» de Docs.
+
 ## C. Candados de publicación
 
 ### C1. El paquete que se publica es el que se prueba

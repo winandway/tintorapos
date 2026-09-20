@@ -133,6 +133,21 @@ test("un día completo en la tintorería", async ({ page, context }) => {
     await page.goto(`/app/ordenes/${ordenId}/imprimir?tipo=etiquetas&vista=1`);
     await hidratada(page);
     await expect(page.getByTestId("etiqueta")).toHaveCount(3);
+    // CANDADO: ninguna etiqueta puede llevar el corte de página pegado en su
+    // clase; el corte lo pone el CSS de impresión y la última NO lo lleva (si
+    // no, una etiqueta sola imprime una hoja en blanco de más).
+    const clases = await page.getByTestId("etiqueta").first().getAttribute("class");
+    expect(clases).not.toContain("break-after-page");
+    // Y el tamaño del papel se puede cambiar: rollo, hoja carta o recibo.
+    const selector = page.getByLabel(es.impresion.formato);
+    await expect(selector).toBeVisible();
+    await selector.selectOption("hoja");
+    await expect(page.locator(".hoja-etiquetas")).toHaveAttribute("data-formato", "hoja");
+    await page.reload();
+    await hidratada(page);
+    // Se recuerda en esta computadora.
+    await expect(page.locator(".hoja-etiquetas")).toHaveAttribute("data-formato", "hoja");
+    await page.getByLabel(es.impresion.formato).selectOption("rollo2x1");
     await page.goto(`/app/ordenes/${ordenId}/imprimir?tipo=recibo&vista=1`);
     const recibo = page.getByTestId("recibo");
     await expect(recibo).toBeVisible();

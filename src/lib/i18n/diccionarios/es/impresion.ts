@@ -26,4 +26,15 @@ export const impresion = {
   autorizar: "Autorizar e imprimir",
   metodos: { efectivo: "Efectivo", tarjeta_externa: "Tarjeta", otro: "Otro" },
   lb: "lb",
+  formato: "Tamaño de la etiqueta",
+  formatoAyuda: "Se recuerda en esta computadora.",
+  formatos: {
+    rollo2x1: "Rollo 2 × 1 pulgadas",
+    rollo225: "Rollo 2¼ × 1¼ pulgadas",
+    hoja: "Hoja carta (30 etiquetas)",
+    recibo80: "Rollo de recibos (80 mm)",
+  },
+  queImpresora: "Las etiquetas van en la impresora de etiquetas; el recibo, en la de recibos de 80 mm.",
+  sinEtiquetera:
+    "¿No tienes impresora de etiquetas? Elige «Hoja carta» e imprime en la impresora normal con hojas de etiquetas adhesivas.",
 };

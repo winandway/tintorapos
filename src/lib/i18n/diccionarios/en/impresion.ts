@@ -29,4 +29,15 @@ export const impresion: Forma<typeof base> = {
   autorizar: "Approve and print",
   metodos: { efectivo: "Cash", tarjeta_externa: "Card", otro: "Other" },
   lb: "lb",
+  formato: "Label size",
+  formatoAyuda: "Remembered on this computer.",
+  formatos: {
+    rollo2x1: "Roll 2 × 1 inches",
+    rollo225: "Roll 2¼ × 1¼ inches",
+    hoja: "Letter sheet (30 labels)",
+    recibo80: "Receipt roll (80 mm)",
+  },
+  queImpresora: "Labels go to the label printer; the receipt goes to the 80 mm receipt printer.",
+  sinEtiquetera:
+    "No label printer? Pick “Letter sheet” and print on a regular printer with adhesive label sheets.",
 };

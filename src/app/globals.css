@@ -123,3 +123,57 @@ body {
   transform-origin: 50% 0;
   animation: balanceo 1.4s cubic-bezier(0.3, 0.7, 0.3, 1) both;
 }
+
+/* ---------------------------------------------------------------------------
+   Etiquetas de prenda. Cada formato manda su tamaño y su acomodo; el tamaño
+   del papel (@page) lo escribe `VistaEtiquetas` al elegirlo. Hasta el 20 de
+   septiembre de 2026 toda etiqueta llevaba corte de página, así que una sola
+   etiqueta imprimía una hoja en blanco de más.
+--------------------------------------------------------------------------- */
+.hoja-etiquetas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+}
+.hoja-etiquetas .etiqueta {
+  width: 2in;
+  height: 1in;
+}
+.hoja-etiquetas[data-formato="rollo225"] .etiqueta {
+  width: 2.25in;
+  height: 1.25in;
+}
+.hoja-etiquetas[data-formato="recibo80"] .etiqueta {
+  width: 72mm;
+  height: 1in;
+}
+/* Hoja carta con 30 etiquetas adhesivas (2,625 × 1 pulgadas, tipo Avery 5160). */
+.hoja-etiquetas[data-formato="hoja"] {
+  display: grid;
+  grid-template-columns: repeat(3, 2.625in);
+  column-gap: 0.14in;
+  row-gap: 0;
+  justify-content: center;
+}
+.hoja-etiquetas[data-formato="hoja"] .etiqueta {
+  width: 2.625in;
+  height: 1in;
+}
+
+@media print {
+  .hoja-etiquetas {
+    gap: 0;
+  }
+  /* Una etiqueta por página en los rollos, y NUNCA una página en blanco al final. */
+  .hoja-etiquetas .etiqueta {
+    break-after: page;
+  }
+  .hoja-etiquetas .etiqueta:last-child {
+    break-after: auto;
+  }
+  .hoja-etiquetas[data-formato="hoja"] .etiqueta {
+    break-after: auto;
+  }
+}

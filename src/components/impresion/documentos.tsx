@@ -198,12 +198,14 @@ export function Etiquetas({
 }) {
   const d = diccionario(idioma);
   return (
-    <div className="flex flex-col items-center gap-2 bg-white print:gap-0">
+    <>
       {etiquetas.map(({ prenda, i, n, qr }) => (
         <section
           key={prenda.id}
           data-testid="etiqueta"
-          className="flex h-[1in] w-[2in] break-after-page items-center gap-[0.06in] overflow-hidden bg-white p-[0.06in] text-black ring-1 ring-percha print:ring-0"
+          // El tamaño y el corte de página los pone `.hoja-etiquetas` según el
+          // formato elegido (rollo, hoja carta o rollo de recibos).
+          className="etiqueta flex items-center gap-[0.06in] overflow-hidden bg-white p-[0.06in] text-black ring-1 ring-percha print:ring-0"
         >
           <div
             className="w-[0.82in] shrink-0 [&_svg]:h-auto [&_svg]:w-full"
@@ -228,6 +230,6 @@ export function Etiquetas({
           </div>
         </section>
       ))}
-    </div>
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { renderSVG } from "uqr";
 import { Recibo, Etiquetas } from "@/components/impresion/documentos";
 import { BarraImpresion, ReciboBloqueado } from "@/components/impresion/barra";
+import { VistaEtiquetas } from "@/components/impresion/vista-etiquetas";
 import { diccionario } from "@/lib/i18n";
 import { obtenerTextos } from "@/lib/i18n/servidor";
 import { ErrorApp } from "@/server/errores";
@@ -45,16 +46,14 @@ export default async function PaginaImprimir({
         qr: renderSVG(`${vars.APP_URL}/e/${p.codigoEtiqueta}`, { border: 0, ecc: "M", pixelSize: 4 }),
       }));
     return (
-      <>
-        <style>{`@page { size: 2in 1in; margin: 0; } body { background: #fff; }`}</style>
-        <BarraImpresion idioma={idiomaPersonal} automatico={!vista} />
+      <VistaEtiquetas idioma={idiomaPersonal} automatico={!vista}>
         <Etiquetas
           orden={orden}
           etiquetas={etiquetas}
           idioma={orden.cliente.idioma}
           zona={tienda.zonaHoraria}
         />
-      </>
+      </VistaEtiquetas>
     );
   }
 

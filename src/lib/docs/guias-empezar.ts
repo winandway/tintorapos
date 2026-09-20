@@ -324,6 +324,33 @@ export const GUIAS_EMPEZAR: Guia[] = [
           ],
         },
         { t: "figura", figura: "etiquetas", pie: "El recibo del cliente y la etiqueta de cada prenda." },
+        { t: "h2", texto: "¿Una impresora o dos?" },
+        {
+          t: "p",
+          texto:
+            "**Dos**, y son distintas. El **recibo** sale en la térmica de recibos (rollo de 80 mm, papel sin pegamento). La **etiqueta** va en una impresora de etiquetas adhesivas (rollo de 2 × 1 pulgadas), que es la que se pega a la prenda. Forzar la etiqueta en la de recibos funciona, pero sale en papel sin pegamento: no se queda en la ropa.",
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "¿Todavía no tienes etiquetera? En la pantalla de etiquetas elige **Hoja carta (30 etiquetas)** e imprime en tu impresora normal con hojas de etiquetas adhesivas de 2⅝ × 1 pulgadas (las de tipo Avery 5160). Salen 30 por hoja.",
+        },
+        { t: "h2", texto: "El tamaño de la etiqueta" },
+        {
+          t: "p",
+          texto:
+            "Arriba de la pantalla de etiquetas hay un selector con cuatro tamaños. Se elige una vez y **esa computadora lo recuerda**:",
+        },
+        {
+          t: "lista",
+          items: [
+            "**Rollo 2 × 1 pulgadas**: el más común en tintorerías. Una etiqueta por etiqueta del rollo.",
+            "**Rollo 2¼ × 1¼ pulgadas**: si tu rollo es un poco más grande.",
+            "**Hoja carta (30 etiquetas)**: para impresora normal con hojas adhesivas.",
+            "**Rollo de recibos (80 mm)**: sale por la misma impresora del recibo, para salir del paso.",
+          ],
+        },
         { t: "h2", texto: "Configurar la impresión" },
         {
           t: "pasos",
@@ -381,6 +408,33 @@ export const GUIAS_EMPEZAR: Guia[] = [
           ],
         },
         { t: "figura", figura: "etiquetas", pie: "The customer receipt and a tag for each garment." },
+        { t: "h2", texto: "One printer or two?" },
+        {
+          t: "p",
+          texto:
+            "**Two**, and they're different. The **receipt** comes out of the thermal receipt printer (80 mm roll, plain paper). The **tag** needs an adhesive label printer (2 × 1 inch roll) — that's the one that sticks to the garment. You can force a tag through the receipt printer, but it prints on paper with no adhesive: it won't stay on the clothes.",
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "No label printer yet? On the tags screen pick **Letter sheet (30 labels)** and print on your regular printer with 2⅝ × 1 inch adhesive label sheets (Avery 5160 style). You get 30 per sheet.",
+        },
+        { t: "h2", texto: "Tag size" },
+        {
+          t: "p",
+          texto:
+            "At the top of the tags screen there's a size picker with four options. You choose once and **that computer remembers it**:",
+        },
+        {
+          t: "lista",
+          items: [
+            "**Roll 2 × 1 inches**: the most common in dry cleaners. One tag per label on the roll.",
+            "**Roll 2¼ × 1¼ inches**: if your roll is a bit bigger.",
+            "**Letter sheet (30 labels)**: for a regular printer with adhesive sheets.",
+            "**Receipt roll (80 mm)**: comes out of the same receipt printer, to get by for now.",
+          ],
+        },
         { t: "h2", texto: "Set up printing" },
         {
           t: "pasos",
