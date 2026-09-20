@@ -18,7 +18,7 @@
       demos vivos, y el botón para activar el plan de quien pague.
 - [x] D5. Candados y pruebas de D3 y D4 (comprobados en rojo).
 - [x] D6. `npm run verify`, punta a punta, paquete, publicar y comprobar en vivo.
-- [ ] D7. Documentar (CANDADOS, PENDIENTES, Docs) y dejar el prompt de DNS para
+- [x] D7. Documentar (CANDADOS, PENDIENTES, Docs) y dejar el prompt de DNS para
       la sesión de YaDominios Cloud.
 
 ## Esperando por Richard (va en el reporte)
