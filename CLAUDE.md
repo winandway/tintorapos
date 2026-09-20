@@ -9,13 +9,15 @@ Punto de venta y gestión en la nube para tintorerías y lavanderías, vendido
 como suscripción (SaaS) a dueños de negocio en EE.UU. y Latinoamérica.
 Bilingüe español/inglés. Marca: **Tintora POS**. Dueño: Richard (Windoce LLC).
 
-**Estado (19 sep 2026):** en vivo en `https://tintorapos.com` (YaDominios Cloud),
+**Estado (20 sep 2026):** en vivo en `https://tintorapos.com` (YaDominios Cloud),
 bilingüe y con SEO. Además del POS: **demo público** sin registro que se borra solo a
 las 24 horas, **verificación de correo**, **contacto**, **precios** (sin importes hasta
 que Richard los ponga), **fin de la prueba gratis** que bloquea de verdad y
 **contabilidad completa** (ganancia, gastos, compras, insumos, proveedores, por cobrar,
-impuestos y archivo para el contador). **El reloj ya NO necesita Cron externo**: lo
-mueve el tráfico del sitio. **No hay procesador de pagos**: el registro de cobros
+impuestos y archivo para el contador), **billetes de soporte** que se responden desde el
+**panel de Windoce** (`/app/admin`: cuentas, uso, dinero y activar el plan de quien
+paga). Precio: **120 USD al año por tienda**, un solo plan. **El reloj ya NO necesita
+Cron externo**: lo mueve el tráfico del sitio. **No hay procesador de pagos**: el registro de cobros
 (efectivo, tarjeta propia, otro, sin conexión, anular con PIN, caja y reportes) quedó
 probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
 
@@ -49,6 +51,9 @@ probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
 - **Cuenta de Cloudflare de Richard:** no se toca. El reloj externo ya no hace
   falta: `latirReloj()` lo mueve con el tráfico del sitio (`src/server/reloj/interno.ts`).
   `/datos/reloj` sigue existiendo por si algún día se quiere un reloj de afuera.
+- **Correo de soporte y panel de Windoce:** `SUPPORT_EMAIL` y `CORREOS_ADMIN`
+  (por defecto `go@windoce.com`, en `src/lib/soporte.ts`). Solo esos correos
+  entran a `/app/admin`.
 - **Servicios externos previstos:** Stripe, Twilio, WhatsApp Business (Meta).
   Ninguno conectado todavía; cada uno se conecta con autorización explícita.
 - Nada de Supabase, Vercel, Netlify ni otras plataformas.
@@ -76,6 +81,10 @@ probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
   y al escenario de aislamiento, o las pruebas se ponen en rojo.
 - Demo público: plan `demo`, no manda avisos, no se respalda y el reloj lo borra
   entero a las 24 horas.
+- Dos pasos: el secreto se CONSERVA mientras no esté activo (si no, quien recarga
+  la página queda fuera para siempre) y la ventana de activación es de ±2 min.
+- Panel de Windoce: rutas `/datos/admin/*` con `exigirAdmin()`; cada consulta
+  global lleva su marca `/* global: ... */`.
 - Pagos: Stripe (Terminal, Checkout, Connect, Billing). Webhooks con firma
   verificada. Nunca se guarda una tarjeta.
 - Idioma: bilingüe ES/EN con selector arriba; todo texto público en dos

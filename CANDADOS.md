@@ -543,6 +543,61 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
 - **Regla que deja:** **toda tabla nueva con `tintoreria_id` se agrega a
   `TABLAS_RESPALDO`** (y al escenario de aislamiento), o el respaldo miente.
 
+### B30. Activar la verificación en dos pasos era imposible si la página daba una vuelta
+
+- **Cómo se veía:** el 19 de septiembre de 2026 Richard escaneó el QR, la
+  pantalla dio un vaivén y desde ahí, con cualquier código de su app, la
+  respuesta era **«El código no es correcto o ya se usó»**. Bloqueaba a TODO
+  dueño nuevo: el segundo paso es obligatorio para el rol `dueno`, así que
+  nadie podía terminar de registrarse. Un sitio que no deja entrar no vende.
+- **Causa real:** `iniciarDosPasos` generaba un secreto NUEVO en cada llamada y
+  lo guardaba. Quien recargaba, volvía atrás o repetía el paso se quedaba con
+  una app autenticadora atada a un secreto que ya no existía en la base. Se
+  sumaba una ventana de tolerancia de ±30 s: con el reloj del celular corrido
+  un par de minutos, tampoco entraba nunca, y el mensaje culpaba al código.
+- **Arreglo (`src/server/auth/dos-pasos.ts`, `src/server/auth/totp.ts`):**
+  1. Mientras los dos pasos no estén activos se **conserva** el secreto ya
+     generado; hay un botón «Generar un código nuevo» para empezar de cero.
+  2. La ventana de **activación** pasa a ±4 pasos (±2 min). La de entrar todos
+     los días sigue en ±1 paso (±30 s), que es lo seguro.
+  3. `desfaseDeReloj()` busca el código en ±20 minutos SOLO para explicarlo: si
+     aparece, el error es `reloj_desfasado` con los minutos, no
+     `codigo_incorrecto`. Nunca deja pasar por esa vía.
+- **Candado:** `tests/integracion/dos-pasos.test.ts`, comprobado en rojo
+  (devolviendo el secreto nuevo en cada visita, la primera prueba falla).
+- **Comprobado en pantalla:** se abrió la pantalla, se leyó la clave, se recargó
+  la página y la clave era la misma; con el código de esa clave se activó.
+- **Qué NO tocar:** no volver a generar el secreto sin `regenerar: true`, y no
+  bajar `VENTANA_ACTIVAR`.
+
+### B31. El panel de Windoce ve TODAS las tintorerías
+
+- **Qué es:** `/app/admin` y `/datos/admin/*` son la única parte del sistema que
+  mira todas las cuentas a la vez (cuántas hay, cuántas prueban, cuántas pagan,
+  uso, dinero y billetes de soporte), y donde se activa el plan de quien paga.
+- **Candado:** `exigirAdmin()` en cada ruta —sesión de cuenta, segundo paso
+  pasado y correo dentro de `CORREOS_ADMIN` (por defecto `go@windoce.com`)— más
+  los casos del panel en la prueba de aislamiento, donde la dueña de una
+  tintorería cualquiera recibe 403 en las seis rutas.
+- **Prueba:** `tests/integracion/admin.test.ts`, comprobado en rojo (quitando la
+  comprobación del correo, la prueba de la puerta falla).
+- **Qué NO tocar:** cada consulta global lleva su marca `/* global: ... */`; sin
+  ella la prueba estática de SQL se pone en rojo, y con razón.
+
+### B32. Los mensajes de la gente se responden, no se acumulan
+
+- **Cómo estaba:** el formulario de contacto guardaba el mensaje y, si había
+  buzón, mandaba un correo. No había forma de responder desde el sistema ni de
+  saber qué estaba contestado.
+- **Ahora:** cada mensaje abre un **billete** (`tickets` + `ticket_mensajes`),
+  llega el aviso a `go@windoce.com` con el número, y la respuesta se escribe en
+  el panel: se guarda y sale por correo al cliente **en su idioma**. Si el
+  correo falla, la respuesta queda guardada y el error se ve en pantalla — nunca
+  en silencio.
+- **Candado:** `tests/integracion/admin.test.ts` (circuito completo: se abre el
+  billete, llega el aviso, se responde, sale el correo al cliente y el billete
+  queda «respondido»).
+
 ## C. Candados de publicación
 
 ### C1. El paquete que se publica es el que se prueba

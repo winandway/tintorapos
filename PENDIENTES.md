@@ -6,41 +6,27 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 
 ## Esperando por Richard (👤)
 
-1. 👤 **Correo de soporte**: variable `SUPPORT_EMAIL` en el panel de YaDominios
-   Cloud (una dirección donde tú leas: los mensajes del formulario de contacto
-   ya se guardan en la base, pero sin esa variable no te llegan al buzón).
-   **Destranca:** que te enteres cuando alguien escriba desde la página.
+1. 👤 **La clave secreta de Stripe** para cobrar los 120 USD al año dentro del
+   sistema (`STRIPE_SECRET_KEY`, y la de webhook `STRIPE_WEBHOOK_SECRET`).
+   **Destranca:** que una tintorería pague sola desde la app y se le active el
+   plan sin que tú toques nada. Hoy: cuando alguien pague por fuera, lo activas
+   con un toque en el panel de Windoce.
 2. 👤 **Prueba de registro real**: abre `https://tintorapos.com/registro`, crea
-   una cuenta con un correo tuyo y dime si te llegó el correo de bienvenida y si
-   el enlace de confirmación funcionó. Crear cuentas y escribir contraseñas es
-   lo único que no hago yo.
-   **Destranca:** poder decir «el registro está probado en vivo» sin adivinar.
-3. 👤 **Precio de los planes** (la página `/precios` ya está en vivo y dice
-   «escríbenos» en vez de un número inventado), si los SMS van incluidos y **qué
-   pasa cuando termina la prueba gratis** (hoy: se puede mirar y exportar todo,
-   pero no seguir trabajando).
-   **Destranca:** poner los importes y cobrar.
-4. 👤 **Revisión legal** de privacidad y términos (los dos están completos y en
-   vivo, en español e inglés, con la empresa y los encargados nombrados).
-   **Destranca:** tranquilidad al lanzar al público.
-5. 👤 **Stripe: dar el «sí» para conectarlo** (Richard ya tiene cuentas de Stripe).
-   Hace falta decidir qué se cobra primero: la suscripción de las tintorerías
-   (Billing) o el cobro con tarjeta en el mostrador (Terminal/Checkout).
-   **Destranca:** Fase 2. PROHIBIDO anunciar cobros con tarjeta antes de probarlo.
-6. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU. **Va al final**: primero
-   los avisos por correo, y los SMS cuando todo lo demás esté funcionando.
-   **Destranca:** avisos por SMS reales.
-7. 👤 **Registros DNS para agentes (DNS-AID)** en el panel de YaDominios →
-   Mis dominios → `tintorapos.com` → DNS: un TXT `_catalog._agents` con
-   `url=https://tintorapos.com/.well-known/ai-catalog.json` y, si el panel ofrece
-   el tipo SVCB/HTTPS, `_index._agents`.
-   **Destranca:** la última casilla de descubrimiento por DNS del informe de agentes.
-8. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
+   tu cuenta con `go@windoce.com` y avísame si llegó el correo y si el segundo
+   paso te dejó entrar. Crear cuentas y escribir contraseñas es lo único que no
+   hago yo. **Destranca:** tu panel de Windoce (entra con ese correo) y poder
+   decir «el registro está probado en vivo».
+3. 👤 **Registros DNS para agentes (DNS-AID)**: hay que pegárselo a la sesión de
+   YaDominios Cloud con el prompt que te pasé. **Destranca:** la última casilla
+   de descubrimiento del informe de agentes.
+4. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
    **Destranca:** protección de entrar, registrarse y recuperar contraseña.
+5. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU. **Va al final**: los
+   avisos van por correo. **Destranca:** avisos por SMS reales.
 
 ## Fila de la IA (🤖), en orden
 
-1. 🤖 **Fase 2 — Tarjeta y crecimiento** (espera 👤3 y 👤5): Stripe Terminal,
+1. 🤖 **Fase 2 — Tarjeta y crecimiento** (espera 👤1): Stripe Terminal,
    portal con pago, Connect, Billing, multi-sucursal, WhatsApp, impresión directa,
    firma del cliente al recoger.
 2. 🤖 **Fase 3 — Lo que vende caro** (va después de la Fase 2: los planes
@@ -56,6 +42,11 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 - Búsqueda de marca «Tintora» en USPTO antes de comprar el dominio.
 
 ## Hecho (✅)
+
+- ✅ 2026-09-20 · **El segundo paso ya no deja a nadie afuera** (bloqueaba a todo
+  dueño nuevo), **precio de 120 USD al año** publicado, **billetes de soporte**
+  con aviso a `go@windoce.com` y respuesta por correo, y **panel de Windoce**
+  con las cifras del negocio y el botón para activar a quien pague.
 
 - ✅ 2026-09-19 · **El reloj ya no depende de nadie**: lo mueve el tráfico del
   sitio con candado de una sola corrida cada 5 minutos, así que los avisos, los
