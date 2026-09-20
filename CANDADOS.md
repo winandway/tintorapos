@@ -666,6 +666,31 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   vive en el componente de cliente y no en el servidor.
 - **Documentado en:** la guía «Impresoras de recibos y etiquetas» de Docs.
 
+### B37. La captura del recibo enseñaba la pantalla del gerente
+
+- **Cómo se veía:** en la guía nueva, donde debía salir el recibo del cliente,
+  salía «Reimprimir el recibo necesita la autorización de un gerente». La
+  captura se tomaba de una orden vieja, y reimprimir el recibo después de 15
+  minutos pide autorización (eso está bien y no se toca).
+- **Arreglo:** `scripts/capturas.mjs` le pone fecha de ahora a ESA orden en la
+  base LOCAL antes de la captura, esconde la barra de la pantalla y cambia el
+  `localhost` del pie por el dominio de verdad.
+- **Regla que deja:** una captura que se publica se MIRA antes de subirla. Esta
+  se publicó mal una vez porque se dio por buena sin abrirla.
+
+### B38. Cuándo cobra cada tienda
+
+- **Qué es:** unas tintorerías cobran al recibir la ropa y otras al entregarla.
+  Antes el mostrador siempre arrancaba en «paga al recoger».
+- **Ahora:** en Ajustes → Tu tienda hay un botón con las dos costumbres, y el
+  mostrador arranca como diga ese botón (en cada orden se puede cambiar igual).
+  Por defecto, lo tradicional: **al entregar**.
+- **Dónde vive:** tabla `preferencias_tienda` (clave/valor por tintorería),
+  porque el esquema se aplica en cada publicación y **no admite `ALTER TABLE`**.
+  Toda preferencia nueva de tienda va ahí.
+- **Candado:** `tests/integracion/ajustes.test.ts` («la tienda elige cuándo
+  cobra»), comprobado en rojo.
+
 ## C. Candados de publicación
 
 ### C1. El paquete que se publica es el que se prueba

@@ -620,3 +620,13 @@ INSERT INTO ticket_mensajes (id, ticket_id, de, cuerpo, autor, enviado_en, cread
 SELECT m.id || '-1', m.id, 'cliente', m.mensaje, m.nombre, m.enviado_en, m.creado_en
 FROM mensajes_contacto m
 WHERE NOT EXISTS (SELECT 1 FROM ticket_mensajes tm WHERE tm.id = m.id || '-1');
+
+-- Preferencias de cada tintorería que no viven en una columna suya (el schema
+-- se aplica en cada publicación y no admite ALTER TABLE). Clave y valor.
+CREATE TABLE IF NOT EXISTS preferencias_tienda (
+  tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
+  clave TEXT NOT NULL,
+  valor TEXT NOT NULL,
+  actualizado_en INTEGER NOT NULL,
+  PRIMARY KEY (tintoreria_id, clave)
+);

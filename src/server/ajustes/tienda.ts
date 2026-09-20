@@ -41,6 +41,12 @@ export const esquemaTienda = z.object({
   maxRecordatorios: z.number().int().min(0).max(10),
   diasAbandono: z.number().int().min(7).max(365),
   bloqueoInactividadMin: z.number().int().min(1).max(240),
+  /**
+   * Cuándo cobra la tienda. `entrega` es lo tradicional y lo que viene puesto:
+   * el cliente paga cuando recoge la ropa. `recepcion` es para las tiendas que
+   * cobran por adelantado en el mostrador.
+   */
+  politicaCobro: z.enum(["entrega", "recepcion"]).default("entrega"),
 });
 
 export type DatosTienda = z.infer<typeof esquemaTienda>;
@@ -67,6 +73,27 @@ interface FilaTienda {
   bloqueo_inactividad_min: number;
 }
 
+/** Preferencias que no tienen columna propia (ver `preferencias_tienda`). */
+export const CLAVE_POLITICA_COBRO = "politica_cobro";
+
+async function leerPreferencia(db: D1Database, tintoreriaId: string, clave: string): Promise<string | null> {
+  const f = await db
+    .prepare("select valor from preferencias_tienda where tintoreria_id = ? and clave = ?")
+    .bind(tintoreriaId, clave)
+    .first<{ valor: string }>();
+  return f?.valor ?? null;
+}
+
+/** Solo la política de cobro (la pantalla del mostrador no necesita el resto). */
+export async function politicaCobro(
+  db: D1Database,
+  tintoreriaId: string,
+): Promise<DatosTienda["politicaCobro"]> {
+  return (await leerPreferencia(db, tintoreriaId, CLAVE_POLITICA_COBRO)) === "recepcion"
+    ? "recepcion"
+    : "entrega";
+}
+
 export async function leerTienda(db: D1Database, tintoreriaId: string): Promise<DatosTienda> {
   const f = await db
     .prepare(
@@ -78,6 +105,7 @@ export async function leerTienda(db: D1Database, tintoreriaId: string): Promise<
     .bind(tintoreriaId)
     .first<FilaTienda>();
   if (!f) throw new Error("Tintorería inexistente");
+  const politica = await leerPreferencia(db, tintoreriaId, CLAVE_POLITICA_COBRO);
   return {
     nombre: f.nombre,
     telefono: f.telefono,
@@ -98,6 +126,7 @@ export async function leerTienda(db: D1Database, tintoreriaId: string): Promise<
     maxRecordatorios: f.max_recordatorios,
     diasAbandono: f.dias_abandono,
     bloqueoInactividadMin: f.bloqueo_inactividad_min,
+    politicaCobro: politica === "recepcion" ? "recepcion" : "entrega",
   };
 }
 
@@ -113,6 +142,14 @@ export async function guardarTienda(
   );
   if (!cambios.length) return;
   await db.batch([
+    // La política de cobro vive en `preferencias_tienda`: el schema se aplica en
+    // cada publicación y no se le pueden agregar columnas a `tintorerias`.
+    db
+      .prepare(
+        `insert into preferencias_tienda (tintoreria_id, clave, valor, actualizado_en) values (?, ?, ?, ?)
+         on conflict (tintoreria_id, clave) do update set valor = excluded.valor, actualizado_en = excluded.actualizado_en`,
+      )
+      .bind(s.tintoreria.id, CLAVE_POLITICA_COBRO, datos.politicaCobro, ahora),
     db
       .prepare(
         `update tintorerias set nombre = ?, telefono = ?, correo = ?, direccion = ?, ciudad = ?, estado_region = ?,

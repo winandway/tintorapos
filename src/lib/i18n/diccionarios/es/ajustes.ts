@@ -30,6 +30,16 @@ export const ajustes = {
     impuestoAyuda: "Las reglas cambian por estado y ciudad. Confírmalo con tu contador. Pon 0 si no aplica.",
     recargo: "Recargo por servicio urgente (%)",
     descuentoMax: "Descuento máximo sin autorización de gerente (%)",
+    cobro: "¿Cuándo cobras?",
+    cobroAyuda: "Esto decide cómo arranca la pantalla del mostrador. Siempre puedes cambiarlo en cada orden.",
+    politicaCobro: {
+      entrega: "Al entregar la ropa",
+      recepcion: "Al recibirla, en el mostrador",
+    },
+    politicaCobroAyuda: {
+      entrega: "Lo tradicional: el cliente paga cuando recoge. La orden nace con saldo pendiente.",
+      recepcion: "El cliente paga por adelantado. El mostrador pide el pago completo al crear la orden.",
+    },
     entregas: "Entregas y ropa sin recoger",
     diasEntrega: "Días hábiles para entregar",
     diasRecordatorio: "Recordar al cliente cada (días)",

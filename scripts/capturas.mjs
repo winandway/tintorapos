@@ -11,6 +11,7 @@
  */
 import { chromium } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 
 const [, , url, sesion, salida = "public/capturas"] = process.argv;
 await mkdir(salida, { recursive: true });
@@ -129,10 +130,36 @@ await tomar("etiquetas-pantalla", {
   alto: 420,
   antes: ir(`/app/ordenes/${orden.id}/imprimir?tipo=etiquetas&vista=1`),
 });
+// El recibo del cliente solo se reimprime sin autorización en sus primeros 15
+// minutos; si no, la captura sale con la pantalla del gerente. Se le pone fecha
+// de ahora a ESA orden en la base LOCAL de trabajo.
+execFileSync(
+  "npx",
+  [
+    "wrangler",
+    "d1",
+    "execute",
+    "DB",
+    "--local",
+    "--yes",
+    `--command=update ordenes set creada_en = ${Date.now()} where id = '${orden.id}'`,
+  ],
+  { stdio: ["ignore", "ignore", "inherit"] },
+);
+
 await tomar("recibo", {
   ancho: 700,
   alto: 900,
-  antes: ir(`/app/ordenes/${orden.id}/imprimir?tipo=recibo&vista=1`),
+  antes: async (p) => {
+    await ir(`/app/ordenes/${orden.id}/imprimir?tipo=recibo&vista=1`)(p);
+    await p.addStyleTag({ content: ".no-imprimir { display: none !important; }" });
+    // En la captura no se enseña un localhost: va el dominio de verdad.
+    await p.evaluate(() => {
+      for (const el of document.querySelectorAll("p, span, div"))
+        if (el.children.length === 0 && el.textContent?.includes("localhost:3000"))
+          el.textContent = el.textContent.replace(/https?:\/\/localhost:3000/g, "https://tintorapos.com");
+    });
+  },
 });
 await tomar("orden", { antes: ir(`/app/ordenes/${orden.id}`) });
 

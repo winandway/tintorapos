@@ -71,6 +71,46 @@ describe("ajustes: tienda, catálogo, precios y empleados", () => {
     expect(JSON.parse(aud.results[0]!.detalle)).toMatchObject({ impuestoAntes: 0, impuestoDespues: 825 });
   });
 
+  /**
+   * CANDADO: la tienda decide si cobra al recibir la ropa o al entregarla. Por
+   * defecto, lo tradicional (al entregar). La preferencia vive en su propia
+   * tabla porque el esquema se aplica en cada publicación y no admite columnas
+   * nuevas en `tintorerias`.
+   */
+  it("la tienda elige cuándo cobra, y por defecto cobra al entregar", async () => {
+    const r = await dueno.llamar<{ tienda: Record<string, unknown> }>(leerTienda);
+    expect(r.datos.tienda.politicaCobro).toBe("entrega");
+
+    const guardado = await dueno.llamar(guardarTienda, {
+      metodo: "PUT",
+      cuerpo: { ...r.datos.tienda, politicaCobro: "recepcion" },
+    });
+    expect(guardado.estado).toBe(200);
+    expect(
+      (await dueno.llamar<{ tienda: Record<string, unknown> }>(leerTienda)).datos.tienda.politicaCobro,
+    ).toBe("recepcion");
+
+    // Lo que no es ni «entrega» ni «recepcion» no entra.
+    const mal = await dueno.llamar<Err>(guardarTienda, {
+      metodo: "PUT",
+      cuerpo: { ...r.datos.tienda, politicaCobro: "cuando sea" },
+    });
+    expect(mal.estado).toBe(400);
+
+    // Y la de otra tintorería no se toca.
+    const otra = await e.env.DB.prepare(
+      "select count(*) as n from preferencias_tienda where tintoreria_id = ?",
+    )
+      .bind(esc.b.id)
+      .first<{ n: number }>();
+    expect(otra!.n).toBe(0);
+
+    await dueno.llamar(guardarTienda, {
+      metodo: "PUT",
+      cuerpo: { ...r.datos.tienda, politicaCobro: "entrega" },
+    });
+  });
+
   it("catálogo: crear, editar, desactivar y precios por pieza y por libra", async () => {
     const p = await dueno.llamar<{ id: string }>(crearPrenda, {
       cuerpo: { nombreEs: "Chaleco", nombreEn: "Vest" },

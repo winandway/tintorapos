@@ -29,6 +29,7 @@ interface Tienda {
   recargoUrgenteBps: number;
   descuentoMaxBps: number;
   diasEntrega: number;
+  politicaCobro: "entrega" | "recepcion";
   diasRecordatorio: number;
   maxRecordatorios: number;
   diasAbandono: number;
@@ -253,6 +254,34 @@ export function FormTienda() {
             error={c("descuentoMaxBps")}
             className="sm:col-span-2"
           />
+        </div>
+      </Tarjeta>
+      <Tarjeta>
+        <TituloSeccion>{dt.cobro}</TituloSeccion>
+        <p className="mb-3 text-[15px] text-gris">{dt.cobroAyuda}</p>
+        <div
+          className="flex flex-wrap gap-2"
+          role="radiogroup"
+          aria-label={dt.cobro}
+          data-testid="politica-cobro"
+        >
+          {(["entrega", "recepcion"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              role="radio"
+              aria-checked={t.politicaCobro === v}
+              onClick={() => setT({ ...t, politicaCobro: v })}
+              className={`rounded-2xl px-4 py-3 text-left text-[15px] font-semibold ring-1 ${t.politicaCobro === v ? "bg-tinta text-white ring-tinta" : "bg-superficie ring-percha hover:bg-tinta-suave"}`}
+            >
+              {dt.politicaCobro[v]}
+              <span
+                className={`block text-[13px] font-normal ${t.politicaCobro === v ? "text-white/80" : "text-gris"}`}
+              >
+                {dt.politicaCobroAyuda[v]}
+              </span>
+            </button>
+          ))}
         </div>
       </Tarjeta>
       <Tarjeta>

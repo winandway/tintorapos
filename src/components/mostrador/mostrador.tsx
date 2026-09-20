@@ -52,6 +52,8 @@ export interface DatosTienda {
   pais: string;
   diasEntrega: number;
   reglas: ReglasPrecio;
+  /** Cómo arranca el cobro: al entregar (lo tradicional) o al recibir la ropa. */
+  politicaCobro: "entrega" | "recepcion";
 }
 
 type ModoPago = "recoger" | "completo" | "abono";
@@ -81,7 +83,10 @@ export function Mostrador({
   const [buscaPrenda, setBuscaPrenda] = useState("");
   const [piezaElegida, setPiezaElegida] = useState<string | null>(null);
   const [fotos, setFotos] = useState<Map<string, Blob>>(new Map());
-  const [modoPago, setModoPago] = useState<ModoPago>("recoger");
+  // La tienda decide en Ajustes si cobra al recibir o al entregar; en cada
+  // orden se puede cambiar igual.
+  const modoInicial: ModoPago = tienda.politicaCobro === "recepcion" ? "completo" : "recoger";
+  const [modoPago, setModoPago] = useState<ModoPago>(modoInicial);
   const [metodo, setMetodo] = useState<Metodo>("efectivo");
   const [abono, setAbono] = useState("");
   const [recibido, setRecibido] = useState("");
@@ -287,7 +292,7 @@ export function Mostrador({
     despachar({ tipo: "vaciar" });
     setCliente(null);
     setFotos(new Map());
-    setModoPago("recoger");
+    setModoPago(modoInicial);
     setAbono("");
     setRecibido("");
     setReferencia("");

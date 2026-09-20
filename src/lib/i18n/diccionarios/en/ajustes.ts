@@ -30,6 +30,17 @@ export const ajustes: Forma<typeof base> = {
     impuestoAyuda: "Rules vary by state and city. Confirm with your accountant. Enter 0 if it doesn't apply.",
     recargo: "Rush service surcharge (%)",
     descuentoMax: "Max discount without manager approval (%)",
+    cobro: "When do you charge?",
+    cobroAyuda: "This decides how the counter screen starts. You can still change it on any order.",
+    politicaCobro: {
+      entrega: "At pickup",
+      recepcion: "At drop-off, on the counter",
+    },
+    politicaCobroAyuda: {
+      entrega: "The traditional way: the customer pays when they pick up. The order starts with a balance.",
+      recepcion:
+        "The customer pays up front. The counter asks for the full payment when the order is created.",
+    },
     entregas: "Pickups and unclaimed clothes",
     diasEntrega: "Business days to have orders ready",
     diasRecordatorio: "Remind the customer every (days)",

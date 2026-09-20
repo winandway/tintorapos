@@ -24,6 +24,7 @@ const TIENDA = {
   zona: "America/New_York",
   pais: "US",
   diasEntrega: 2,
+  politicaCobro: "entrega" as const,
   reglas: { impuestoBps: 0, recargoUrgenteBps: 5000, descuentoMaxBps: 1000 },
 };
 

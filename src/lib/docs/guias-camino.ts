@@ -26,7 +26,7 @@ export const GUIAS_CAMINO: Guia[] = [
         {
           t: "p",
           texto:
-            "En el mostrador cuentas las prendas, marcas el color, la marca y los daños que trae cada una (botón roto, mancha, descosido), y cobras o dejas el saldo pendiente.",
+            "En el mostrador cuentas las prendas y marcas el color, la marca y los daños que trae cada una (botón roto, mancha, descosido). Abajo del ticket eliges qué hacer con el dinero: **dejarlo para cuando recoja** (lo normal), **cobrar todo ahora** o **recibir un abono**. Más abajo te cuento cómo dejar puesta la costumbre de tu tienda.",
         },
         { t: "captura", captura: "mostrador", pie: "Cada prenda con su color, sus marcas y su precio." },
         {
@@ -34,7 +34,26 @@ export const GUIAS_CAMINO: Guia[] = [
           texto:
             "Al guardar salen **dos impresiones distintas**: el **recibo del cliente** (rollo de 80 mm) y **una etiqueta por prenda**. Mira [Impresoras de recibos y etiquetas](/docs/impresoras).",
         },
-        { t: "h2", texto: "Paso 2 · Se etiqueta cada prenda" },
+        { t: "h2", texto: "Paso 2 · El recibo del cliente" },
+        {
+          t: "p",
+          texto:
+            "El cliente se lleva su recibo. Lleva el **número de la orden**, las prendas con lo que anotaste, el **total**, lo que pagó, el **saldo** que queda y el **día de entrega**.",
+        },
+        { t: "captura", captura: "recibo", pie: "El recibo del cliente, con su código QR abajo." },
+        {
+          t: "p",
+          texto:
+            "Abajo va un **código QR**: el cliente lo escanea con la cámara de su celular y ve en qué va su ropa, sin llamar a la tienda. Es la misma dirección que le llega por correo cuando la orden queda lista.",
+        },
+        { t: "captura", captura: "clienteCelular", pie: "Lo que ve el cliente al escanear su recibo." },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "Si el cliente pierde el recibo no pasa nada: en **Entregar** lo buscas por su teléfono o su nombre. El recibo es una comodidad, no una llave.",
+        },
+        { t: "h2", texto: "Paso 3 · Se etiqueta cada prenda" },
         {
           t: "p",
           texto:
@@ -54,13 +73,13 @@ export const GUIAS_CAMINO: Guia[] = [
             "**Termosellada** (heat seal): una etiqueta de nylon que se pega con una planchita. Es la que usan las tintorerías grandes; aguanta todo y se puede dejar puesta varios servicios.",
           ],
         },
-        { t: "h2", texto: "Paso 3 · Clasificar y tratar manchas" },
+        { t: "h2", texto: "Paso 4 · Clasificar y tratar manchas" },
         {
           t: "p",
           texto:
             "Se separa por tipo de tela y color, y se tratan las manchas antes de lavar. Las marcas que pusiste en el mostrador le dicen al de planta qué revisar en cada pieza.",
         },
-        { t: "h2", texto: "Paso 4 · Lavado (aquí está la pregunta de siempre)" },
+        { t: "h2", texto: "Paso 5 · Lavado (aquí está la pregunta de siempre)" },
         {
           t: "p",
           texto:
@@ -80,13 +99,13 @@ export const GUIAS_CAMINO: Guia[] = [
             "**Secadora y plancha:** el calor es el enemigo del papel térmico barato. Con tag de tintorería o termosellable no pasa nada.",
           ],
         },
-        { t: "h2", texto: "Paso 5 · Planchado y acabado" },
+        { t: "h2", texto: "Paso 6 · Planchado y acabado" },
         {
           t: "p",
           texto:
             "La prenda se plancha con su etiqueta puesta. Si la etiqueta estorba para planchar esa parte, se corre al otro lado de la costura; no se quita.",
         },
-        { t: "h2", texto: "Paso 6 · Ensamblado: aquí el sistema te dice cuál es cuál" },
+        { t: "h2", texto: "Paso 7 · Ensamblado: aquí el sistema te dice cuál es cuál" },
         {
           t: "p",
           texto:
@@ -118,19 +137,38 @@ export const GUIAS_CAMINO: Guia[] = [
             "En el detalle de la orden ves **cada pieza con su etiqueta y su estado**, así que en cualquier momento sabes cuántas van y cuál falta.",
         },
         { t: "captura", captura: "orden", pie: "La orden por dentro: pieza por pieza." },
-        { t: "h2", texto: "Paso 7 · Al rack, con su ubicación" },
+        { t: "h2", texto: "Paso 8 · Al rack, con su ubicación" },
         {
           t: "p",
           texto:
             "Cuando la orden queda lista, escribe su **ubicación en el rack** (por ejemplo B-12). Al entregar, la pantalla se la dice al cajero y nadie camina de más buscando.",
         },
-        { t: "h2", texto: "Paso 8 · Entrega: aquí sí se quitan las etiquetas" },
+        { t: "h2", texto: "Paso 9 · Entrega y cobro: aquí sí se quitan las etiquetas" },
         {
           t: "p",
           texto:
-            "El cliente llega con su recibo (o solo dice su teléfono). Buscas, cobras el saldo y entregas. **Las etiquetas se retiran al empacar**, justo antes de meter la ropa en la funda.",
+            "El cliente llega con su recibo (o solo dice su teléfono). La pantalla te dice dónde está la orden en el rack y **cuánto falta por cobrar**. Cobras el saldo, entregas y la orden queda cerrada. **Las etiquetas se retiran al empacar**, justo antes de meter la ropa en la funda.",
         },
         { t: "captura", captura: "entrega", pie: "Entrega: cobra el saldo y cierra la orden." },
+        { t: "h2", texto: "¿Cuándo se cobra? Lo decides tú" },
+        {
+          t: "p",
+          texto:
+            "Hay dos costumbres y las dos son normales. En **Ajustes → Tu tienda** eliges la de tu negocio con un botón, y el mostrador arranca así todos los días:",
+        },
+        {
+          t: "lista",
+          items: [
+            "**Al entregar la ropa** (lo que viene puesto, y lo tradicional): la orden nace con su saldo pendiente y se cobra cuando el cliente recoge. El recibo sale con el saldo bien visible.",
+            "**Al recibirla, en el mostrador**: el cliente paga por adelantado. El mostrador pide el pago completo al crear la orden y el recibo sale pagado.",
+          ],
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "Elijas la que elijas, **en cada orden puedes cambiarla**: cobrar todo, dejarlo para el final o recibir un abono. Lo que el botón decide es cómo arranca la pantalla, para no repetir lo mismo cien veces al día.",
+        },
         { t: "h2", texto: "¿Y si se cae una etiqueta?" },
         {
           t: "pasos",
@@ -178,7 +216,7 @@ export const GUIAS_CAMINO: Guia[] = [
         {
           t: "p",
           texto:
-            "At the counter you count the garments, mark the color, the brand and whatever damage each one has (broken button, stain, loose seam), and take payment or leave a balance.",
+            "At the counter you count the garments and mark the color, the brand and whatever damage each one has (broken button, stain, loose seam). Under the ticket you choose what to do about the money: **leave it for pickup** (the usual), **charge it all now** or **take a deposit**. Further down I'll show you how to set your shop's habit once.",
         },
         { t: "captura", captura: "mostrador", pie: "Every garment with its color, its marks and its price." },
         {
@@ -186,7 +224,30 @@ export const GUIAS_CAMINO: Guia[] = [
           texto:
             "Saving prints **two different things**: the **customer receipt** (80 mm roll) and **one tag per garment**. See [Receipt and tag printers](/docs/impresoras).",
         },
-        { t: "h2", texto: "Step 2 · Tag every garment" },
+        { t: "h2", texto: "Step 2 · The customer receipt" },
+        {
+          t: "p",
+          texto:
+            "The customer takes their receipt. It carries the **order number**, the garments with everything you wrote down, the **total**, what they paid, the **balance** left and the **due date**.",
+        },
+        { t: "captura", captura: "recibo", pie: "The customer receipt, with its QR code at the bottom." },
+        {
+          t: "p",
+          texto:
+            "At the bottom there's a **QR code**: the customer scans it with their phone camera and sees how their clothes are doing, without calling the store. It's the same address they get by email when the order is ready.",
+        },
+        {
+          t: "captura",
+          captura: "clienteCelular",
+          pie: "What the customer sees when they scan the receipt.",
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "If the customer loses the receipt, no problem: in **Pickup** you find them by phone or name. The receipt is a convenience, not a key.",
+        },
+        { t: "h2", texto: "Step 3 · Tag every garment" },
         {
           t: "p",
           texto:
@@ -206,13 +267,13 @@ export const GUIAS_CAMINO: Guia[] = [
             "**Heat-sealed**: a nylon label pressed on with a small sealer. It's what big cleaners use; it survives everything and can stay on for several visits.",
           ],
         },
-        { t: "h2", texto: "Step 3 · Sort and treat stains" },
+        { t: "h2", texto: "Step 4 · Sort and treat stains" },
         {
           t: "p",
           texto:
             "Garments are split by fabric and color, and stains are treated before cleaning. The marks you entered at the counter tell the plant what to look at on each piece.",
         },
-        { t: "h2", texto: "Step 4 · Cleaning (the question everyone asks)" },
+        { t: "h2", texto: "Step 5 · Cleaning (the question everyone asks)" },
         {
           t: "p",
           texto:
@@ -232,13 +293,13 @@ export const GUIAS_CAMINO: Guia[] = [
             "**Dryer and press:** heat is the enemy of cheap thermal paper. With a proper tag or heat-seal, nothing happens.",
           ],
         },
-        { t: "h2", texto: "Step 5 · Pressing and finishing" },
+        { t: "h2", texto: "Step 6 · Pressing and finishing" },
         {
           t: "p",
           texto:
             "The garment is pressed with its tag on. If the tag is in the way, move it to the other side of the seam; don't take it off.",
         },
-        { t: "h2", texto: "Step 6 · Assembly: this is where the system tells you which is which" },
+        { t: "h2", texto: "Step 7 · Assembly: this is where the system tells you which is which" },
         {
           t: "p",
           texto:
@@ -270,19 +331,38 @@ export const GUIAS_CAMINO: Guia[] = [
             "The order detail shows **each piece with its tag and its status**, so at any moment you know how many are done and which one is missing.",
         },
         { t: "captura", captura: "orden", pie: "Inside the order: piece by piece." },
-        { t: "h2", texto: "Step 7 · Onto the rack, with its location" },
+        { t: "h2", texto: "Step 8 · Onto the rack, with its location" },
         {
           t: "p",
           texto:
             "When the order is ready, write its **rack location** (B-12, for example). At pickup the screen tells the cashier, and nobody walks around hunting for it.",
         },
-        { t: "h2", texto: "Step 8 · Pickup: now the tags come off" },
+        { t: "h2", texto: "Step 9 · Pickup and payment: now the tags come off" },
         {
           t: "p",
           texto:
-            "The customer shows up with their receipt (or just says their phone number). You search, collect the balance and hand it over. **Tags come off at bagging**, right before the clothes go into the garment bag.",
+            "The customer shows up with their receipt (or just says their phone number). The screen tells you where the order sits on the rack and **how much is still owed**. You collect the balance, hand it over and the order closes. **Tags come off at bagging**, right before the clothes go into the garment bag.",
         },
         { t: "captura", captura: "entrega", pie: "Pickup: collect the balance and close the order." },
+        { t: "h2", texto: "When do you charge? You decide" },
+        {
+          t: "p",
+          texto:
+            "There are two habits and both are normal. In **Settings → Your store** you pick your shop's with one button, and the counter starts that way every day:",
+        },
+        {
+          t: "lista",
+          items: [
+            "**At pickup** (what comes set, and the traditional way): the order starts with a balance and you charge when the customer picks up. The receipt shows the balance clearly.",
+            "**At drop-off, on the counter**: the customer pays up front. The counter asks for the full payment when the order is created and the receipt comes out paid.",
+          ],
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "Whichever you pick, **you can change it on any order**: charge it all, leave it for the end, or take a deposit. What the button decides is how the screen starts, so you don't repeat the same thing a hundred times a day.",
+        },
         { t: "h2", texto: "What if a tag falls off?" },
         {
           t: "pasos",

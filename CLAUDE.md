@@ -106,6 +106,9 @@ probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
   `mcp/server-card.json`, `agent-card.json` y `ai-catalog.json`. Las páginas
   públicas responden Markdown con `Accept: text/markdown` (reescritura a `/md`).
   **PROHIBIDO publicar metadatos de OAuth mientras no exista el servidor OAuth.**
+- Preferencias de tienda que no tienen columna: tabla `preferencias_tienda`
+  (clave/valor). El esquema se aplica en cada publicación y NO admite `ALTER
+  TABLE`.
 - **Ningún formulario pierde lo escrito:** todos usan `useBorrador`
   (`src/lib/use-borrador.ts`). Guarda solo mientras se escribe, lo devuelve al
   volver con la línea `AvisoBorrador`, se borra al guardar y al cerrar sesión, y
