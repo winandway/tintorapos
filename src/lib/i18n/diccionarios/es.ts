@@ -25,6 +25,7 @@ import { contacto } from "./es/contacto";
 import { precios } from "./es/precios";
 import { demo } from "./es/demo";
 import { contabilidad } from "./es/contabilidad";
+import { admin } from "./es/admin";
 
 export const es = {
   comun,
@@ -54,4 +55,5 @@ export const es = {
   precios,
   demo,
   contabilidad,
+  admin,
 };

@@ -8,6 +8,7 @@ export type NombreIcono =
   | "caja"
   | "reportes"
   | "contabilidad"
+  | "windoce"
   | "ajustes"
   | "mas";
 
@@ -21,6 +22,7 @@ const TRAZOS: Record<NombreIcono, string> = {
   clientes: "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 10a7 7 0 0 1 14 0m1-10a3 3 0 1 0 0-6m5 16a5 5 0 0 0-4-4.9",
   caja: "M3 9h18v11H3zM6 9V5h12v4m-9 5h6",
   reportes: "M4 20V10m6 10V4m6 16v-8m4 8H2",
+  windoce: "M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3Zm-2.5 9 2 2 4-4",
   contabilidad:
     "M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm2 4h8M8 11h2m4 0h2m-8 4h2m4 0h2",
   ajustes:

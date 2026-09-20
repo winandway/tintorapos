@@ -3,11 +3,12 @@ import { MarcoApp } from "@/components/app/marco-app";
 import { estadoVerificacion } from "@/server/cuentas/verificacion";
 import { obtenerContexto } from "@/server/entorno";
 import { permisosEfectivos } from "@/server/permisos";
+import { esAdmin } from "@/lib/soporte";
 import { PLAN_DEMO } from "@/server/demo";
 import { diasDePrueba, exigirSesion } from "@/server/pagina";
 
 export default async function LayoutProtegido({ children }: { children: ReactNode }) {
-  const { sesion, dispositivo } = await exigirSesion();
+  const { sesion, dispositivo, vars } = await exigirSesion();
   // Solo se le recuerda a quien entró con su correo (no en la tablet con PIN).
   const { env } = obtenerContexto();
   const verificacion =
@@ -25,6 +26,7 @@ export default async function LayoutProtegido({ children }: { children: ReactNod
         bloqueoMin: dispositivo ? dispositivo.bloqueoInactividadMin : null,
         correoPorVerificar: verificacion.verificado ? null : (verificacion.correo ?? sesion.usuario.correo),
         esDemo: sesion.tintoreria.plan === PLAN_DEMO,
+        esAdmin: esAdmin(vars, sesion.usuario.correo),
       }}
     >
       {children}

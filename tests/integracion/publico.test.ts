@@ -171,7 +171,7 @@ describe("página pública de la orden (datos mínimos)", () => {
     expect(vacio.error!.code).toBe(-32602);
   });
 
-  it("contacto: el mensaje se guarda siempre, aunque no haya buzón de soporte", async () => {
+  it("contacto: el mensaje abre un billete y no se pierde nunca", async () => {
     const { POST: contacto } = await import("@/app/datos/contacto/route");
     const enviar = async (cuerpo: object) =>
       contacto(
@@ -190,9 +190,17 @@ describe("página pública de la orden (datos mínimos)", () => {
     });
     expect(ok.status).toBe(200);
     const fila = await e.env.DB.prepare(
-      "select nombre, correo, mensaje, enviado_en from mensajes_contacto order by creado_en desc limit 1",
-    ).first<{ nombre: string; correo: string; mensaje: string; enviado_en: number | null }>();
-    expect(fila).toMatchObject({ nombre: "Dueña interesada", correo: "interesada@tintoreria.com" });
+      `select t.nombre, t.correo, t.numero, t.estado, m.cuerpo from tickets t
+         join ticket_mensajes m on m.ticket_id = t.id and m.de = 'cliente'
+       order by t.creado_en desc limit 1`,
+    ).first<{ nombre: string; correo: string; numero: number; estado: string; cuerpo: string }>();
+    expect(fila).toMatchObject({
+      nombre: "Dueña interesada",
+      correo: "interesada@tintoreria.com",
+      estado: "abierto",
+    });
+    expect(fila!.numero).toBeGreaterThan(1000);
+    expect(fila!.cuerpo).toContain("cuánto cuesta");
 
     // Lo corto o sin correo no entra.
     expect((await enviar({ nombre: "A", correo: "no-es-correo", mensaje: "hola" })).status).toBe(400);

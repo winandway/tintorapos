@@ -45,6 +45,8 @@ export const acceso: Forma<typeof base> = {
   activarPaso1:
     "Install an authenticator app on your phone: Google Authenticator, Microsoft Authenticator, or 1Password.",
   activarPaso2: "In the app, tap “Add” and scan this code.",
+  otroCodigo: "Generate a new code",
+  otroCodigoAyuda: "If the app no longer works, tap here and scan again.",
   activarManual: "Can't scan it? Type this key into the app:",
   activarPaso3: "Enter the 6-digit code the app shows.",
   empezar: "Get started",

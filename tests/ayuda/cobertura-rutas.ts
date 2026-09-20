@@ -409,6 +409,20 @@ export const COBERTURA: Record<string, Cobertura> = {
       { metodo: "DELETE", params: { id: e.a.ids.compraId ?? "" } },
     ],
   },
+  // El panel de Windoce: ninguna sesión de tintorería entra (403 para el dueño de B).
+  "/datos/admin/resumen": { casos: () => [{ metodo: "GET", esperado: [403] }] },
+  "/datos/admin/tintorerias": { casos: () => [{ metodo: "GET", esperado: [403] }] },
+  "/datos/admin/tintorerias/[id]": {
+    casos: (e) => [{ metodo: "PUT", params: { id: e.a.id }, cuerpo: { plan: "pagado" }, esperado: [403] }],
+  },
+  "/datos/admin/tickets": { casos: () => [{ metodo: "GET", esperado: [403] }] },
+  "/datos/admin/tickets/[id]": {
+    casos: (e) => [
+      { metodo: "GET", params: { id: e.a.id }, esperado: [403] },
+      { metodo: "POST", params: { id: e.a.id }, cuerpo: { mensaje: "hola" }, esperado: [403] },
+      { metodo: "PUT", params: { id: e.a.id }, cuerpo: { estado: "cerrado" }, esperado: [403] },
+    ],
+  },
   "/datos/salud": { publica: "canario sin datos de ninguna tintorería" },
   "/datos/empleados": {
     casos: () => [

@@ -74,8 +74,21 @@ export function pasoActual(ahoraMs: number): number {
   return Math.floor(ahoraMs / 1000 / PASO_SEG);
 }
 
+/** Pasos de tolerancia: 1 al entrar (±30 s) y 4 al activar (±2 min). */
+export const VENTANA_ENTRAR = 1;
+export const VENTANA_ACTIVAR = 4;
+/** Hasta dónde se busca SOLO para decirle a la persona que su reloj está mal. */
+export const VENTANA_DIAGNOSTICO = 40; // ±20 minutos
+
+/** Los pasos a probar, del más probable al menos, dentro de la ventana. */
+function pasosAProbar(actual: number, ventana: number): number[] {
+  const pasos = [actual];
+  for (let i = 1; i <= ventana; i++) pasos.push(actual - i, actual + i);
+  return pasos;
+}
+
 /**
- * Verifica un código aceptando un paso de desfase del reloj (±30 s).
+ * Verifica un código aceptando desfase de reloj dentro de `ventana` pasos.
  * Devuelve el paso usado, que se guarda para impedir usar el mismo código dos veces.
  */
 export async function verificarTotp(
@@ -83,13 +96,37 @@ export async function verificarTotp(
   codigo: string,
   ahoraMs: number,
   ultimoPasoUsado: number | null,
+  ventana = VENTANA_ENTRAR,
 ): Promise<number | null> {
   const limpio = codigo.replace(/\s/g, "");
   if (!/^\d{6}$/.test(limpio)) return null;
   const actual = pasoActual(ahoraMs);
-  for (const paso of [actual, actual - 1, actual + 1]) {
+  for (const paso of pasosAProbar(actual, ventana)) {
     if (ultimoPasoUsado !== null && paso <= ultimoPasoUsado) continue;
     if ((await codigoTotp(secretoBase32, paso)) === limpio) return paso;
+  }
+  return null;
+}
+
+/**
+ * El código es bueno, pero de otro minuto: el reloj del celular está corrido.
+ * Devuelve los MINUTOS de desfase (positivo = el celular va adelantado), o null
+ * si el código simplemente no es de este secreto.
+ *
+ * Solo se usa para explicárselo a la persona; nunca para dejarla pasar.
+ */
+export async function desfaseDeReloj(
+  secretoBase32: string,
+  codigo: string,
+  ahoraMs: number,
+): Promise<number | null> {
+  const limpio = codigo.replace(/\s/g, "");
+  if (!/^\d{6}$/.test(limpio)) return null;
+  const actual = pasoActual(ahoraMs);
+  for (const paso of pasosAProbar(actual, VENTANA_DIAGNOSTICO)) {
+    if ((await codigoTotp(secretoBase32, paso)) === limpio) {
+      return Math.round(((paso - actual) * PASO_SEG) / 60);
+    }
   }
   return null;
 }

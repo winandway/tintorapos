@@ -26,6 +26,8 @@ export interface InfoMarco {
   correoPorVerificar?: string | null;
   /** Tintorería de demostración: se avisa arriba y se invita a abrir cuenta. */
   esDemo?: boolean;
+  /** Panel de Windoce (solo para los correos de CORREOS_ADMIN). */
+  esAdmin?: boolean;
 }
 
 interface ItemNav {
@@ -35,6 +37,12 @@ interface ItemNav {
   permiso?: string | string[];
   principal?: boolean;
 }
+
+const ITEM_ADMIN: ItemNav = {
+  ruta: "/app/admin",
+  clave: "admin",
+  icono: "windoce",
+};
 
 const ITEMS: ItemNav[] = [
   { ruta: "/app", clave: "inicio", icono: "inicio", principal: true },
@@ -76,7 +84,7 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
    * es toda para atender. El menú sigue a un toque, en la hamburguesa.
    */
   const pantallaCompleta = ruta.startsWith("/app/mostrador");
-  const visibles = ITEMS.filter((i) => {
+  const visibles = [...ITEMS, ...(info.esAdmin ? [ITEM_ADMIN] : [])].filter((i) => {
     if (!i.permiso) return true;
     const lista = Array.isArray(i.permiso) ? i.permiso : [i.permiso];
     return lista.some((p) => info.permisos.includes(p));

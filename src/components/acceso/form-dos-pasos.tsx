@@ -21,15 +21,16 @@ export function FormActivarDosPasos() {
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
 
-  async function empezar() {
+  async function empezar(regenerar = false) {
     setOcupado(true);
     setError(null);
     try {
       setDatos(
         await pedir<{ secreto: string; qrSvg: string }>("/datos/sesion/dos-pasos/iniciar", {
-          metodo: "POST",
+          cuerpo: { regenerar },
         }),
       );
+      if (regenerar) setCodigo("");
     } catch (e) {
       setError(textoError(d, e));
     } finally {
@@ -128,6 +129,13 @@ export function FormActivarDosPasos() {
                 <p className="font-mono text-[15px] tracking-wider" data-testid="secreto-totp">
                   {datos.secreto}
                 </p>
+                <button
+                  type="button"
+                  onClick={() => void empezar(true)}
+                  className="text-[13px] font-semibold text-tinta underline underline-offset-2"
+                >
+                  {d.acceso.otroCodigo}
+                </button>
               </div>
             </li>
             <li className="flex gap-3">
@@ -151,7 +159,7 @@ export function FormActivarDosPasos() {
         )}
       </ol>
       {!datos && (
-        <Boton ancho tamano="grande" onClick={empezar} cargando={ocupado}>
+        <Boton ancho tamano="grande" onClick={() => void empezar()} cargando={ocupado}>
           {d.acceso.empezar}
         </Boton>
       )}

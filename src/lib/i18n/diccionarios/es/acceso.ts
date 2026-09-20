@@ -43,6 +43,8 @@ export const acceso = {
   activarPaso1:
     "Instala una app autenticadora en tu celular: Google Authenticator, Microsoft Authenticator o 1Password.",
   activarPaso2: "En la app, toca «Agregar» y escanea este código.",
+  otroCodigo: "Generar un código nuevo",
+  otroCodigoAyuda: "Si la app ya no te sirve, toca aquí y vuelve a escanear.",
   activarManual: "¿No puedes escanear? Escribe esta clave en la app:",
   activarPaso3: "Escribe el código de 6 números que muestra la app.",
   empezar: "Empezar",

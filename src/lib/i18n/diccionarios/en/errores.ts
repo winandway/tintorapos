@@ -23,6 +23,8 @@ export const errores: Record<CodigoError, string> = {
   correo_en_uso: "An account with that email already exists. Sign in or reset your password.",
   turnstile: "We couldn't confirm you're a person. Reload the page and try again.",
   codigo_incorrecto: "The code isn't correct or was already used.",
+  reloj_desfasado:
+    "Your code is good, but your phone's clock is off by {minutos} minutes. Set it to automatic (Settings → Date & time) and type the new code the app shows.",
   cuenta_suspendida: "This account is suspended. Please contact support.",
   prueba_terminada:
     "Your free trial has ended. You can still see and export everything of yours; to keep working, write to us and we'll turn your plan on.",

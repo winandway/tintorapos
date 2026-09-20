@@ -31,11 +31,13 @@ export const esquemaEnv = z.object({
   YADOMINIOS_TOKEN: opcional,
   /** Nombre del sitio en YaDominios Cloud. Por defecto «tintorapos». */
   YADOMINIOS_SITIO: opcional,
-  /** Correo de contacto que se publica en privacidad y términos. */
+  /** Correo de contacto que se publica en privacidad y términos, y al que llegan los billetes. */
   SUPPORT_EMAIL: opcional.refine(
     (v) => v === undefined || z.email().safeParse(v).success,
     "SUPPORT_EMAIL debe ser un correo",
   ),
+  /** Correos que entran al panel de Windoce, separados por coma. */
+  CORREOS_ADMIN: opcional,
 });
 
 export type Variables = z.infer<typeof esquemaEnv>;

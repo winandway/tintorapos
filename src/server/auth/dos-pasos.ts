@@ -3,9 +3,30 @@ import { sentenciaAuditoria } from "@/server/auditoria";
 import { ErrorApp } from "@/server/errores";
 import { cifrarTexto, descifrarTexto } from "./cifrado";
 import type { Sesion } from "./sesiones";
-import { hashRespaldo, nuevoSecretoTotp, nuevosCodigosRespaldo, uriOtpauth, verificarTotp } from "./totp";
+import {
+  desfaseDeReloj,
+  hashRespaldo,
+  nuevoSecretoTotp,
+  nuevosCodigosRespaldo,
+  uriOtpauth,
+  verificarTotp,
+  VENTANA_ACTIVAR,
+} from "./totp";
 
 const PROPOSITO = "totp";
+
+/**
+ * Cuando un código no entra, se mira si es bueno pero de otro minuto: eso es un
+ * reloj de celular corrido, y la persona tiene que saberlo. Decirle «el código
+ * no es correcto» cuando lo que está mal es la hora la deja dando vueltas para
+ * siempre (le pasó a un dueño de verdad el 19 de septiembre de 2026).
+ */
+async function fallarConDiagnostico(secreto: string, codigo: string, ahora: number): Promise<never> {
+  const minutos = await desfaseDeReloj(secreto, codigo, ahora);
+  if (minutos !== null && minutos !== 0)
+    throw new ErrorApp(400, "reloj_desfasado", { minutos: Math.abs(minutos) }, { codigo: "invalido" });
+  throw new ErrorApp(400, "codigo_incorrecto", {}, { codigo: "invalido" });
+}
 
 interface FilaTotp {
   correo: string | null;
@@ -26,15 +47,32 @@ async function filaTotp(db: D1Database, s: Sesion): Promise<FilaTotp> {
   return f;
 }
 
-/** Genera (o regenera mientras no esté activo) el secreto y devuelve el QR para la app autenticadora. */
-export async function iniciarDosPasos(db: D1Database, appSecret: string, s: Sesion) {
+/**
+ * Devuelve el QR para la app autenticadora.
+ *
+ * CANDADO: mientras los dos pasos no estén activos se CONSERVA el secreto que
+ * ya se generó. Antes se creaba uno nuevo en cada visita: quien escaneaba el
+ * código, recargaba la página y volvía, se quedaba con una app que generaba
+ * códigos de un secreto muerto y el sistema le decía «el código no es
+ * correcto» para siempre. Con `regenerar: true` se empieza de cero a propósito.
+ */
+export async function iniciarDosPasos(
+  db: D1Database,
+  appSecret: string,
+  s: Sesion,
+  opciones: { regenerar?: boolean } = {},
+) {
   const f = await filaTotp(db, s);
   if (f.totp_activo) throw new ErrorApp(409, "no_aplica");
-  const secreto = nuevoSecretoTotp();
-  await db
-    .prepare("update usuarios set totp_secreto = ?, actualizado_en = ? where id = ? and tintoreria_id = ?")
-    .bind(await cifrarTexto(appSecret, PROPOSITO, secreto), Date.now(), s.usuario.id, s.tintoreria.id)
-    .run();
+  const guardado = f.totp_secreto
+    ? await descifrarTexto(appSecret, PROPOSITO, f.totp_secreto).catch(() => null)
+    : null;
+  const secreto = !opciones.regenerar && guardado ? guardado : nuevoSecretoTotp();
+  if (secreto !== guardado)
+    await db
+      .prepare("update usuarios set totp_secreto = ?, actualizado_en = ? where id = ? and tintoreria_id = ?")
+      .bind(await cifrarTexto(appSecret, PROPOSITO, secreto), Date.now(), s.usuario.id, s.tintoreria.id)
+      .run();
   const uri = uriOtpauth(secreto, f.correo ?? s.usuario.nombre);
   return {
     secreto: secreto.match(/.{1,4}/g)?.join(" ") ?? secreto,
@@ -60,8 +98,9 @@ export async function activarDosPasos(
 ) {
   const f = await filaTotp(db, s);
   if (f.totp_activo) throw new ErrorApp(409, "no_aplica");
-  const paso = await verificarTotp(await secretoDe(appSecret, f), codigo, ahora, null);
-  if (paso === null) throw new ErrorApp(400, "codigo_incorrecto", {}, { codigo: "invalido" });
+  const secreto = await secretoDe(appSecret, f);
+  const paso = await verificarTotp(secreto, codigo, ahora, null, VENTANA_ACTIVAR);
+  if (paso === null) await fallarConDiagnostico(secreto, codigo, ahora);
   const codigos = nuevosCodigosRespaldo();
   const hashes = await Promise.all(codigos.map(hashRespaldo));
   await db.batch([
@@ -70,7 +109,7 @@ export async function activarDosPasos(
         `update usuarios set totp_activo = 1, totp_ultimo_paso = ?, codigos_respaldo = ?, actualizado_en = ?
          where id = ? and tintoreria_id = ?`,
       )
-      .bind(paso, JSON.stringify(hashes), ahora, s.usuario.id, s.tintoreria.id),
+      .bind(paso!, JSON.stringify(hashes), ahora, s.usuario.id, s.tintoreria.id),
     db
       .prepare("update sesiones set segundo_factor_ok = 1 where id_hash = ? and tintoreria_id = ?")
       .bind(s.idHash, s.tintoreria.id),
@@ -106,17 +145,13 @@ export async function verificarDosPasos(
     );
     metodo = "respaldo";
   } else {
-    const paso = await verificarTotp(
-      await secretoDe(appSecret, f),
-      entrada.codigo ?? "",
-      ahora,
-      f.totp_ultimo_paso,
-    );
-    if (paso === null) throw new ErrorApp(400, "codigo_incorrecto", {}, { codigo: "invalido" });
+    const secreto = await secretoDe(appSecret, f);
+    const paso = await verificarTotp(secreto, entrada.codigo ?? "", ahora, f.totp_ultimo_paso);
+    if (paso === null) await fallarConDiagnostico(secreto, entrada.codigo ?? "", ahora);
     sentencias.push(
       db
         .prepare("update usuarios set totp_ultimo_paso = ? where id = ? and tintoreria_id = ?")
-        .bind(paso, s.usuario.id, s.tintoreria.id),
+        .bind(paso!, s.usuario.id, s.tintoreria.id),
     );
     metodo = "app";
   }
@@ -150,8 +185,9 @@ export async function regenerarRespaldos(
 ) {
   const f = await filaTotp(db, s);
   if (!f.totp_activo) throw new ErrorApp(409, "no_aplica");
-  const paso = await verificarTotp(await secretoDe(appSecret, f), codigo, ahora, f.totp_ultimo_paso);
-  if (paso === null) throw new ErrorApp(400, "codigo_incorrecto", {}, { codigo: "invalido" });
+  const secretoActual = await secretoDe(appSecret, f);
+  const paso = await verificarTotp(secretoActual, codigo, ahora, f.totp_ultimo_paso);
+  if (paso === null) await fallarConDiagnostico(secretoActual, codigo, ahora);
   const codigos = nuevosCodigosRespaldo();
   await db.batch([
     db

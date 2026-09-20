@@ -10,6 +10,7 @@ export const app: Forma<typeof base> = {
     entrega: "Pick up",
     clientes: "Customers",
     caja: "Register",
+    admin: "Windoce Support",
     contabilidad: "Accounting",
     reportes: "Reports",
     ajustes: "Settings",

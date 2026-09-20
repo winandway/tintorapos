@@ -573,3 +573,50 @@ CREATE TABLE IF NOT EXISTS movimientos_insumo (
   creado_en INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_movimientos_insumo ON movimientos_insumo (tintoreria_id, insumo_id, creado_en);
+
+-- ---------------------------------------------------------------------------
+-- Billetes de soporte (tickets). NO son de una tintorería: los abre cualquiera
+-- desde el formulario público, y se responden desde el panel de Windoce.
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS tickets (
+  id TEXT PRIMARY KEY,
+  numero INTEGER NOT NULL,
+  nombre TEXT NOT NULL,
+  correo TEXT NOT NULL,
+  asunto TEXT,
+  idioma TEXT NOT NULL DEFAULT 'es',
+  tintoreria_id TEXT,
+  estado TEXT NOT NULL DEFAULT 'abierto' CHECK (estado IN ('abierto', 'respondido', 'cerrado')),
+  ip_hash TEXT,
+  creado_en INTEGER NOT NULL,
+  actualizado_en INTEGER NOT NULL,
+  ultima_respuesta_en INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_tickets_estado ON tickets (estado, creado_en);
+CREATE INDEX IF NOT EXISTS idx_tickets_correo ON tickets (correo);
+
+CREATE TABLE IF NOT EXISTS ticket_mensajes (
+  id TEXT PRIMARY KEY,
+  ticket_id TEXT NOT NULL REFERENCES tickets(id),
+  de TEXT NOT NULL CHECK (de IN ('cliente', 'soporte')),
+  cuerpo TEXT NOT NULL,
+  autor TEXT,
+  enviado_en INTEGER,
+  error TEXT,
+  creado_en INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_ticket_mensajes ON ticket_mensajes (ticket_id, creado_en);
+
+-- Los mensajes que entraron antes de los billetes no se pierden.
+INSERT INTO tickets (id, numero, nombre, correo, asunto, idioma, estado, ip_hash, creado_en, actualizado_en)
+SELECT m.id,
+       1000 + (SELECT COUNT(*) FROM mensajes_contacto x WHERE x.creado_en <= m.creado_en),
+       m.nombre, m.correo, m.asunto, m.idioma, 'abierto', m.ip_hash, m.creado_en, m.creado_en
+FROM mensajes_contacto m
+WHERE NOT EXISTS (SELECT 1 FROM tickets t WHERE t.id = m.id);
+
+INSERT INTO ticket_mensajes (id, ticket_id, de, cuerpo, autor, enviado_en, creado_en)
+SELECT m.id || '-1', m.id, 'cliente', m.mensaje, m.nombre, m.enviado_en, m.creado_en
+FROM mensajes_contacto m
+WHERE NOT EXISTS (SELECT 1 FROM ticket_mensajes tm WHERE tm.id = m.id || '-1');

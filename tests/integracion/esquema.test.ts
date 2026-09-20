@@ -21,7 +21,17 @@ describe("esquema de la base", () => {
     // Tablas que NO son de una tintorería: la ficha de cada una, los contadores
     // de límites por IP, la memoria del sistema y el buzón del formulario
     // público (mensajes de gente que todavía no es cliente de nadie).
-    const sistema = new Set(["tintorerias", "limites", "sistema", "mensajes_contacto"]);
+    const sistema = new Set([
+      "tintorerias",
+      "limites",
+      "sistema",
+      "mensajes_contacto",
+      // Los billetes de soporte son de Windoce, no de una tintorería: los abre
+      // gente que muchas veces todavía no es cliente de nadie. Su candado es
+      // otro: solo entra quien esté en CORREOS_ADMIN (tests/integracion/admin.test.ts).
+      "tickets",
+      "ticket_mensajes",
+    ]);
     for (const { name } of results) {
       if (sistema.has(name)) continue;
       const cols = await e.env.DB.prepare(`pragma table_info(${name})`).all<{ name: string }>();

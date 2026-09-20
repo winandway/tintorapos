@@ -1,13 +1,11 @@
 import type { Variables } from "@/env";
-import { nuevoId } from "@/lib/codigos";
 import type { Idioma } from "@/lib/i18n";
-import { enviarCorreo } from "@/server/correo";
+import { abrirTicket } from "@/server/soporte/tickets";
 
 /**
- * El formulario de contacto del sitio. El mensaje se GUARDA siempre (así no se
- * pierde aunque el correo falle o no haya buzón de soporte configurado) y, si
- * hay `SUPPORT_EMAIL`, además se manda por correo con el remitente del sitio y
- * `reply_to` de quien escribe.
+ * El formulario de contacto del sitio abre un BILLETE de soporte: se guarda
+ * siempre (aunque el correo falle), llega el aviso al correo de soporte y se
+ * responde desde el panel de Windoce, que le manda el correo al cliente.
  */
 export interface MensajeContacto {
   nombre: string;
@@ -23,34 +21,14 @@ export async function guardarMensaje(
   idioma: Idioma,
   ipHash: string,
   ahora = Date.now(),
-): Promise<{ id: string; enviado: boolean }> {
-  const id = nuevoId();
-  await db
-    .prepare(
-      `insert into mensajes_contacto /* global: mensajes del sitio, no de una tintorería */
-         (id, nombre, correo, asunto, mensaje, idioma, ip_hash, creado_en)
-       values (?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .bind(id, m.nombre, m.correo, m.asunto ?? null, m.mensaje, idioma, ipHash, ahora)
-    .run();
-
-  if (!vars.SUPPORT_EMAIL) return { id, enviado: false };
-  const r = await enviarCorreo(
-    { ...vars, SUPPORT_EMAIL: m.correo },
-    {
-      para: vars.SUPPORT_EMAIL,
-      asunto: `Tintora POS · ${m.asunto?.trim() || "Mensaje del sitio"} — ${m.nombre}`,
-      texto: [`De: ${m.nombre} <${m.correo}>`, `Idioma: ${idioma}`, "", m.mensaje, "", `Mensaje ${id}`].join(
-        "\n",
-      ),
-    },
+): Promise<{ id: string; numero: number; enviado: boolean }> {
+  const r = await abrirTicket(
     db,
+    vars,
+    { nombre: m.nombre, correo: m.correo, asunto: m.asunto ?? null, mensaje: m.mensaje },
+    idioma,
+    ipHash,
+    ahora,
   );
-  const enviado = r.estado === "enviado";
-  if (enviado)
-    await db
-      .prepare("update mensajes_contacto /* global: mensajes del sitio */ set enviado_en = ? where id = ?")
-      .bind(ahora, id)
-      .run();
-  return { id, enviado };
+  return { id: r.id, numero: r.numero, enviado: r.avisado };
 }

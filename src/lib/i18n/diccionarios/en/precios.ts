@@ -4,7 +4,7 @@ import type { Forma } from "../../index";
 export const precios: Forma<typeof base> = {
   titulo: "Clear pricing, no surprises",
   texto:
-    "Start with 14 free days, no credit card. When it ends, you decide whether to stay. Your data is yours and you can take it whenever you want.",
+    "One price, everything included: $120 a year per store. Start with 14 free days, no credit card. Your data is yours and you can take it whenever you want.",
   meta: {
     titulo: "Pricing | Tintora POS",
     descripcion:
@@ -12,14 +12,21 @@ export const precios: Forma<typeof base> = {
   },
   mensual: "per month",
   anual: "per year",
+  porTienda: "per store",
+  equivale: "That's about {precio} a month, paid once a year.",
+  unSoloPrecio: "One price",
   aConsultar: "Write to us",
-  aConsultarTexto: "We'll send you the price for your case, based on how many stores and employees you have.",
+  aConsultarTexto: "More than one store? Write to us and we'll send you the chain price.",
   incluye: "Includes",
   empezar: "Try 14 days free",
   hablar: "Talk to us",
   destacado: "Most popular",
   preguntas: "Frequent questions",
   faq: [
+    {
+      p: "How much is it and what's included?",
+      r: "$120 a year per store, and everything is in there: front counter, production, pickup, register, reports, accounting, customer notifications, unlimited employees and devices.",
+    },
     {
       p: "Do I need a credit card to try it?",
       r: "No. The 14-day trial asks for no card and does not charge you when it ends.",

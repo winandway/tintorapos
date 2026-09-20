@@ -1,39 +1,26 @@
-# Plan: lanzar sin rojos + contabilidad de verdad + demo pública
+# Plan: entrar sin tropiezos, precio puesto y tu panel de dueño
 
-> Piloto automático (19 sep 2026). Se ejecuta en orden, se marca aquí y se publica.
-> Fuera de alcance por falta de credenciales: cobro con tarjeta (Stripe) y
-> Turnstile. Los SMS quedan guardados para después: los avisos van por correo.
+> Piloto automático (20 sep 2026). Se ejecuta en orden, se marca aquí y se publica.
+> Decisiones de Richard ya tomadas: **un solo precio, 120 USD al año por tienda**;
+> legal aprobado por el abogado; los avisos van por correo; SMS para después.
 
-## Fase A — Quitar lo que frena el lanzamiento
+## Fase D — Lo urgente
 
-- [x] A1. Reloj interno: los avisos, recordatorios y respaldos dejan de depender
-      de un Cron externo (se disparan con el tráfico del sitio, con candado de
-      una sola corrida a la vez). Canario en verde.
-- [x] A2. Verificación de correo al registrarse: se envía, se comprueba, se
-      reenvía, y el panel avisa mientras no esté verificado.
-- [x] A3. Contacto de soporte sin buzón: página `/contacto`, mensajes guardados
-      en la base y enviados por correo si hay `SUPPORT_EMAIL`.
-- [x] A4. Privacidad y términos completos (los dos idiomas), con contacto real.
-- [x] A5. Fin de la prueba gratis que de verdad bloquea + página de precios
-      (importes los pone Richard).
-- [x] A6. Demo pública con datos: cualquiera entra, prueba y toca todo; se
-      limpia sola.
+- [x] D1. **El segundo paso ya no deja a nadie afuera** (emergencia: bloqueaba
+      a TODO dueño nuevo). El secreto se conserva, la ventana de activación es
+      de ±2 min y, si el reloj del celular está corrido, el sistema lo DICE.
+- [x] D2. Precio en la página: 120 USD al año, todo incluido.
+- [x] D3. **Billetes de soporte**: el formulario de contacto abre un billete,
+      te llega el aviso a `go@windoce.com`, y cuando respondes desde el panel
+      el sistema le manda el correo al cliente.
+- [x] D4. **Panel de dueño (Soporte Windoce)**: cuántas cuentas se crearon,
+      cuántas están probando, cuántas pagando, órdenes, dinero registrado,
+      demos vivos, y el botón para activar el plan de quien pague.
+- [x] D5. Candados y pruebas de D3 y D4 (comprobados en rojo).
+- [x] D6. `npm run verify`, punta a punta, paquete, publicar y comprobar en vivo.
+- [ ] D7. Documentar (CANDADOS, PENDIENTES, Docs) y dejar el prompt de DNS para
+      la sesión de YaDominios Cloud.
 
-## Fase B — Contabilidad para tintorerías
+## Esperando por Richard (va en el reporte)
 
-- [x] B1. Investigar en internet qué lleva la contabilidad de una tintorería y
-      dejarlo escrito (`docs/CONTABILIDAD-TINTORERIA.md`).
-- [x] B2. Base: proveedores, gastos, compras, líneas, insumos y movimientos.
-- [x] B3. Servidor: categorías del oficio, gastos, compras, insumos,
-      proveedores, ganancia, impuestos y por cobrar.
-- [x] B4. Rutas `/datos/contabilidad/*` con sus permisos.
-- [x] B5. Pantallas con su menú: Ganancia, Gastos, Compras, Insumos,
-      Proveedores, Por cobrar e Impuestos.
-- [x] B6. Exportación para el contador.
-- [x] B7. Candados y pruebas de todo lo anterior.
-
-## Fase C — Publicar
-
-- [x] C1. `npm run verify`, punta a punta y paquete.
-- [x] C2. Publicar y comprobar en producción (registro, correo, demo, reloj).
-- [x] C3. Documentar en CANDADOS.md, PENDIENTES.md y las guías de Docs.
+- La clave de Stripe para cobrar los 120 USD al año dentro del sistema.

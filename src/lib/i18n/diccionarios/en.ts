@@ -27,6 +27,7 @@ import { contacto } from "./en/contacto";
 import { precios } from "./en/precios";
 import { demo } from "./en/demo";
 import { contabilidad } from "./en/contabilidad";
+import { admin } from "./en/admin";
 
 export const en: Forma<typeof es> = {
   comun,
@@ -56,4 +57,5 @@ export const en: Forma<typeof es> = {
   precios,
   demo,
   contabilidad,
+  admin,
 };

@@ -24,6 +24,7 @@ export const CODIGOS_ERROR = [
   "correo_en_uso",
   "turnstile",
   "codigo_incorrecto",
+  "reloj_desfasado",
   "cuenta_suspendida",
   "prueba_terminada",
   "demo_lleno",

@@ -24,6 +24,8 @@ export const errores: Record<CodigoError, string> = {
   correo_en_uso: "Ya existe una cuenta con ese correo. Entra o recupera tu contraseña.",
   turnstile: "No pudimos confirmar que eres una persona. Recarga la página e inténtalo de nuevo.",
   codigo_incorrecto: "El código no es correcto o ya se usó.",
+  reloj_desfasado:
+    "Tu código es bueno, pero la hora de tu celular está {minutos} minutos corrida. Ponla en automática (Ajustes → Fecha y hora) y escribe el código nuevo que te muestre la app.",
   cuenta_suspendida: "Esta cuenta está suspendida. Escríbenos a soporte.",
   prueba_terminada:
     "Tu prueba gratis terminó. Puedes ver y exportar todo lo tuyo; para seguir trabajando, escríbenos y activamos tu plan.",
