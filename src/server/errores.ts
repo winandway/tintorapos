@@ -25,6 +25,7 @@ export const CODIGOS_ERROR = [
   "turnstile",
   "codigo_incorrecto",
   "cuenta_suspendida",
+  "prueba_terminada",
   "estado_invalido",
   "monto_invalido",
   "pago_excede",

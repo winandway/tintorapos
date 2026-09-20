@@ -14,6 +14,7 @@ export const PAGINAS = {
   privacidad: { interna: "/privacidad", es: "/privacidad", en: "/privacy" },
   terminos: { interna: "/terminos", es: "/terminos", en: "/terms" },
   registro: { interna: "/registro", es: "/registro", en: "/signup" },
+  precios: { interna: "/precios", es: "/precios", en: "/pricing" },
   contacto: { interna: "/contacto", es: "/contacto", en: "/contact" },
 } as const;
 

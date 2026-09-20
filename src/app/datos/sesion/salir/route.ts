@@ -10,6 +10,7 @@ import { ruta } from "@/server/ruta";
  */
 export const POST = ruta({
   acceso: "publico",
+  permitirPruebaVencida: true,
   manejar: async (c) => {
     if (c.sesion) {
       await sentenciaAuditoria(

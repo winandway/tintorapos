@@ -36,6 +36,12 @@ export const COBERTURA: Record<string, Cobertura> = {
     casos: () => [{ metodo: "POST", cuerpo: { actual: "no-es", nueva: "Otra-Clave-2026" } }],
   },
   "/datos/clave/recuperar": { publica: "solo recibe un correo y siempre responde lo mismo" },
+  "/datos/contacto": {
+    publica: "formulario público: solo nombre, correo y mensaje; no recibe identificadores",
+  },
+  "/datos/cuenta/verificacion": {
+    casos: () => [{ metodo: "POST", esperado: [200, 400] }],
+  },
   "/datos/clave/restablecer": { publica: "solo recibe un token secreto de 256 bits" },
   "/datos/dispositivos": {
     casos: () => [

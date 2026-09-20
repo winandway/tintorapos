@@ -25,6 +25,8 @@ export const errores: Record<CodigoError, string> = {
   turnstile: "No pudimos confirmar que eres una persona. Recarga la página e inténtalo de nuevo.",
   codigo_incorrecto: "El código no es correcto o ya se usó.",
   cuenta_suspendida: "Esta cuenta está suspendida. Escríbenos a soporte.",
+  prueba_terminada:
+    "Tu prueba gratis terminó. Puedes ver y exportar todo lo tuyo; para seguir trabajando, escríbenos y activamos tu plan.",
   estado_invalido: "La orden no puede pasar a ese estado.",
   monto_invalido: "El monto no es válido.",
   pago_excede: "El pago es mayor que el saldo pendiente.",

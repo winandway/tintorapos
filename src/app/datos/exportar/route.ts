@@ -15,6 +15,7 @@ const SENSIBLES = new Set([
 /** Tus datos son tuyos: el dueño descarga todo en JSON o las tablas principales en CSV. */
 export const GET = ruta({
   acceso: "cuenta",
+  permitirPruebaVencida: true,
   permiso: "datos.exportar",
   limite: { clave: (c) => `exportar:${c.sesion?.tintoreria.id}`, max: 20, ventanaSeg: 3600 },
   manejar: async (c) => {

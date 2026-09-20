@@ -242,4 +242,36 @@ describe("envoltura de rutas /datos (candado de seguridad)", () => {
     const r4 = await conParams(req);
     expect(r4.status).toBe(200);
   });
+
+  it("prueba vencida: se puede mirar y exportar, pero no seguir trabajando (comprobado en rojo)", async () => {
+    const t = await crearTintoreria(e.env.DB);
+    await e.env.DB.prepare("update tintorerias set plan = 'prueba', prueba_hasta = ? where id = ?")
+      .bind(Date.now() - 86_400_000, t.id)
+      .run();
+    const n = new Navegador();
+    n.cookies.set("tp_sesion", await sesionPara(e.env.DB, t.id, t.duenoId));
+
+    const escribir = ruta({
+      acceso: "sesion",
+      manejar: async () => ({ ok: true }),
+    });
+    const mirar = ruta({ acceso: "sesion", manejar: async () => ({ ok: true }) });
+    const salvoconducto = ruta({
+      acceso: "sesion",
+      permitirPruebaVencida: true,
+      manejar: async () => ({ ok: true }),
+    });
+
+    expect((await n.llamar(mirar)).estado).toBe(200);
+    const bloqueado = await n.llamar<{ error: { codigo: string } }>(escribir, { cuerpo: {} });
+    expect(bloqueado.estado).toBe(402);
+    expect(bloqueado.datos.error.codigo).toBe("prueba_terminada");
+    expect((await n.llamar(salvoconducto, { cuerpo: {} })).estado).toBe(200);
+
+    // Con la prueba al día, se trabaja normal.
+    await e.env.DB.prepare("update tintorerias set prueba_hasta = ? where id = ?")
+      .bind(Date.now() + 86_400_000, t.id)
+      .run();
+    expect((await n.llamar(escribir, { cuerpo: {} })).estado).toBe(200);
+  });
 });

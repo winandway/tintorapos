@@ -18,13 +18,19 @@ export interface DocumentoLegal {
   contacto: { titulo: string; con: string; sin: string };
 }
 
-export const ACTUALIZADO_LEGAL = "2026-09-16";
+export const ACTUALIZADO_LEGAL = "2026-09-19";
 
 const privacidadEs: DocumentoLegal = {
   titulo: "Política de privacidad",
   descripcion: "Qué datos trata Tintora POS, para qué, con quién los comparte y cómo ejercer tus derechos.",
-  actualizado: "Última actualización: 16 de septiembre de 2026",
+  actualizado: "Última actualización: 19 de septiembre de 2026",
   secciones: [
+    {
+      titulo: "Quién trata tus datos",
+      parrafos: [
+        "El responsable de este sitio y del servicio es Windoce LLC (Estados Unidos), que opera Tintora POS en tintorapos.com. Para cualquier asunto de privacidad, escríbenos por el formulario de contacto del sitio; respondemos al correo que nos dejes.",
+      ],
+    },
     {
       titulo: "A quién aplica",
       parrafos: [
@@ -120,6 +126,37 @@ const privacidadEs: DocumentoLegal = {
         "Si hacemos un cambio importante, lo avisaremos dentro del sistema antes de que empiece a aplicar.",
       ],
     },
+    {
+      titulo: "Encargados que nos ayudan",
+      parrafos: [
+        "Para prestar el servicio usamos proveedores que tratan datos por nuestra cuenta y solo con nuestras instrucciones:",
+      ],
+      lista: [
+        "YaDominios Cloud (alojamiento, base de datos, archivos y envío de correo del dominio).",
+        "Cloudflare (red, protección contra ataques y medición anónima de visitas, sin cookies).",
+        "Twilio, solo si la tintorería activa los avisos por mensaje de texto.",
+        "Stripe, solo cuando se active el cobro con tarjeta; los datos de la tarjeta nunca pasan por nuestros servidores.",
+      ],
+    },
+    {
+      titulo: "Si algo sale mal (incidentes)",
+      parrafos: [
+        "Si ocurre una brecha de seguridad que afecte datos personales, avisamos a las tintorerías afectadas sin demora indebida y, como máximo, dentro de las 72 horas siguientes a conocerla, con lo que sepamos: qué pasó, a qué datos afectó y qué estamos haciendo.",
+      ],
+    },
+    {
+      titulo: "Decisiones automáticas",
+      parrafos: [
+        "Tintora POS no toma decisiones automatizadas con efectos jurídicos sobre personas, ni hace perfilado con fines publicitarios. No vendemos datos personales ni los compartimos para publicidad de terceros.",
+      ],
+    },
+    {
+      titulo: "Si vives en Europa o en California",
+      parrafos: [
+        "Tratamos los datos de la tintorería por la ejecución del contrato y nuestro interés legítimo en prestar y proteger el servicio; los datos de sus clientes, por encargo de ella. Puedes ejercer tus derechos de acceso, rectificación, supresión, limitación, oposición y portabilidad escribiéndonos.",
+        "Si vives en California: no vendemos ni compartimos información personal en el sentido de la CCPA/CPRA, y no discriminamos a quien ejerce sus derechos.",
+      ],
+    },
   ],
   contacto: {
     titulo: "Contacto",
@@ -131,8 +168,14 @@ const privacidadEs: DocumentoLegal = {
 const privacidadEn: DocumentoLegal = {
   titulo: "Privacy Policy",
   descripcion: "What data Tintora POS processes, why, who it’s shared with, and how to exercise your rights.",
-  actualizado: "Last updated: September 16, 2026",
+  actualizado: "Last updated: September 19, 2026",
   secciones: [
+    {
+      titulo: "Who processes your data",
+      parrafos: [
+        "This site and service are run by Windoce LLC (United States), which operates Tintora POS at tintorapos.com. For any privacy matter, write to us through the contact form on the site; we reply to the email you leave.",
+      ],
+    },
     {
       titulo: "Who this applies to",
       parrafos: [
@@ -226,6 +269,37 @@ const privacidadEn: DocumentoLegal = {
       titulo: "Changes to this policy",
       parrafos: ["If we make a material change, we’ll let you know inside the app before it takes effect."],
     },
+    {
+      titulo: "Processors that help us",
+      parrafos: [
+        "To run the service we use providers that process data on our behalf and only on our instructions:",
+      ],
+      lista: [
+        "YaDominios Cloud (hosting, database, files and sending email from the domain).",
+        "Cloudflare (network, attack protection and anonymous, cookie-free visit measurement).",
+        "Twilio, only if the store turns on text message notifications.",
+        "Stripe, only once card payments are enabled; card details never touch our servers.",
+      ],
+    },
+    {
+      titulo: "If something goes wrong (incidents)",
+      parrafos: [
+        "If a security breach affects personal data, we notify the affected stores without undue delay and within 72 hours of becoming aware of it, with what we know: what happened, which data it touched and what we are doing about it.",
+      ],
+    },
+    {
+      titulo: "Automated decisions",
+      parrafos: [
+        "Tintora POS makes no automated decisions with legal effects on people, and does no profiling for advertising. We do not sell personal data and do not share it for third-party advertising.",
+      ],
+    },
+    {
+      titulo: "If you are in Europe or California",
+      parrafos: [
+        "We process the store's data to perform our contract and on our legitimate interest in running and protecting the service; their customers' data we process on the store's instructions. You can exercise your rights of access, rectification, erasure, restriction, objection and portability by writing to us.",
+        "If you live in California: we do not sell or share personal information as defined by the CCPA/CPRA, and we do not discriminate against anyone who exercises their rights.",
+      ],
+    },
   ],
   contacto: {
     titulo: "Contact",
@@ -237,7 +311,7 @@ const privacidadEn: DocumentoLegal = {
 const terminosEs: DocumentoLegal = {
   titulo: "Términos del servicio",
   descripcion: "Las condiciones para usar Tintora POS en tu negocio.",
-  actualizado: "Última actualización: 16 de septiembre de 2026",
+  actualizado: "Última actualización: 19 de septiembre de 2026",
   secciones: [
     {
       titulo: "Aceptación",
@@ -328,6 +402,38 @@ const terminosEs: DocumentoLegal = {
         "Estos términos se rigen por las leyes de los Estados Unidos de América, sin perjuicio de los derechos que te otorgue la ley de tu país.",
       ],
     },
+    {
+      titulo: "Precios, facturación y reembolsos",
+      parrafos: [
+        "Mientras no publiquemos precios, el uso del sistema es gratuito durante la prueba. Cuando existan planes de pago, el precio, la moneda y el período se muestran antes de contratar; el cobro se renueva solo hasta que canceles.",
+        "Puedes cancelar cuando quieras desde el panel o escribiéndonos: el servicio sigue hasta el final del período ya pagado y no se cobra el siguiente. No hay reembolsos por períodos ya usados, salvo que la ley de tu país diga otra cosa.",
+      ],
+    },
+    {
+      titulo: "Soporte",
+      parrafos: [
+        "El soporte se presta por el formulario de contacto del sitio, en español e inglés, en días hábiles. Atendemos primero lo que impide operar (no se puede recibir ropa, cobrar o entregar).",
+      ],
+    },
+    {
+      titulo: "Si te vas: tus datos se van contigo",
+      parrafos: [
+        "Antes de cerrar la cuenta puedes exportar clientes, órdenes y pagos en CSV desde Ajustes → Tus datos. Después del cierre conservamos los datos 30 días por si te arrepientes, y luego los borramos junto con los respaldos, salvo lo que la ley nos obligue a guardar.",
+      ],
+    },
+    {
+      titulo: "Fuerza mayor",
+      parrafos: [
+        "Ninguna de las partes responde por incumplimientos causados por hechos fuera de su control razonable (cortes de internet o de energía, desastres, fallos de proveedores de infraestructura, actos de autoridad).",
+      ],
+    },
+    {
+      titulo: "Cesión, avisos y acuerdo completo",
+      parrafos: [
+        "No puedes ceder este contrato sin nuestro consentimiento; nosotros podemos cederlo a una empresa del grupo o en caso de venta del negocio, avisándote. Los avisos se mandan al correo de tu cuenta o se muestran en el panel.",
+        "Estos términos y la política de privacidad son el acuerdo completo entre tú y Windoce LLC sobre el servicio. Si una cláusula resulta inválida, el resto sigue vigente.",
+      ],
+    },
   ],
   contacto: {
     titulo: "Contacto",
@@ -339,7 +445,7 @@ const terminosEs: DocumentoLegal = {
 const terminosEn: DocumentoLegal = {
   titulo: "Terms of Service",
   descripcion: "The terms for using Tintora POS at your business.",
-  actualizado: "Last updated: September 16, 2026",
+  actualizado: "Last updated: September 19, 2026",
   secciones: [
     {
       titulo: "Acceptance",
@@ -428,6 +534,38 @@ const terminosEn: DocumentoLegal = {
       titulo: "Governing law",
       parrafos: [
         "These terms are governed by the laws of the United States of America, without limiting any rights your local law gives you.",
+      ],
+    },
+    {
+      titulo: "Pricing, billing and refunds",
+      parrafos: [
+        "Until we publish prices, using the system is free during the trial. Once paid plans exist, the price, currency and billing period are shown before you subscribe; billing renews automatically until you cancel.",
+        "You can cancel whenever you want from the panel or by writing to us: the service runs until the end of the period you already paid for and the next one is not charged. There are no refunds for periods already used, unless the law where you live says otherwise.",
+      ],
+    },
+    {
+      titulo: "Support",
+      parrafos: [
+        "Support is provided through the contact form on the site, in English and Spanish, on business days. We handle first whatever stops you from operating (you cannot take in clothes, charge or hand orders over).",
+      ],
+    },
+    {
+      titulo: "If you leave: your data leaves with you",
+      parrafos: [
+        "Before closing the account you can export customers, orders and payments as CSV from Settings → Your data. After closing we keep the data for 30 days in case you change your mind, and then delete it along with the backups, except what the law requires us to keep.",
+      ],
+    },
+    {
+      titulo: "Force majeure",
+      parrafos: [
+        "Neither party is liable for failures caused by events beyond its reasonable control (internet or power outages, disasters, infrastructure provider failures, acts of authority).",
+      ],
+    },
+    {
+      titulo: "Assignment, notices and entire agreement",
+      parrafos: [
+        "You may not assign this contract without our consent; we may assign it to a group company or on a sale of the business, with notice to you. Notices are sent to your account email or shown in the panel.",
+        "These terms and the privacy policy are the entire agreement between you and Windoce LLC about the service. If a clause turns out to be invalid, the rest stays in force.",
       ],
     },
   ],

@@ -18,6 +18,7 @@ import {
 } from "./auth/sesiones";
 import { COOKIE_CSRF, COOKIE_DISPOSITIVO, COOKIE_SESION, leerCookies } from "./cookies";
 import { ErrorConfiguracion, obtenerContexto, type Contexto } from "./entorno";
+import { pruebaTerminada } from "./prueba";
 import { ErrorApp, type CodigoError } from "./errores";
 import { limitar } from "./limites";
 import { usuarioPuede, type Permiso } from "./permisos";
@@ -50,6 +51,8 @@ interface OpcionesRuta<S extends z.ZodType | undefined> {
   cuerpo?: S;
   /** Permite entrar aunque el usuario deba cambiar su contraseña. */
   permitirCambioClave?: boolean;
+  /** Deja pasar aunque la prueba gratis haya terminado (salir, exportar, soporte). */
+  permitirPruebaVencida?: boolean;
   csrf?: boolean;
   limite?: { clave: (c: ContextoRuta<unknown>) => string; max: number; ventanaSeg: number };
   manejar: (c: ContextoRuta<S extends z.ZodType ? z.infer<S> : undefined>) => Promise<Response | object>;
@@ -191,6 +194,13 @@ export function ruta<S extends z.ZodType | undefined = undefined>(opciones: Opci
             }
             if (sesion.tintoreria.estado !== "activa")
               return respuestaError(idioma, 403, "cuenta_suspendida");
+            // Con la prueba vencida se puede mirar y exportar, no seguir trabajando.
+            if (
+              req.method !== "GET" &&
+              !opciones.permitirPruebaVencida &&
+              pruebaTerminada(sesion.tintoreria, ahora)
+            )
+              return respuestaError(idioma, 402, "prueba_terminada");
           }
           if ((opciones.acceso === "cuenta" || opciones.acceso === "pendiente") && sesion.tipo !== "cuenta") {
             return respuestaError(idioma, 403, "sin_permiso");

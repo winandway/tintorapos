@@ -42,6 +42,7 @@ export const RUTAS_INDEXABLES = [
   "/docs",
   ...GUIAS.map((g) => `/docs/${g.slug}`),
   "/registro",
+  "/precios",
   "/contacto",
   "/privacidad",
   "/terminos",

@@ -13,8 +13,8 @@
       reenvía, y el panel avisa mientras no esté verificado.
 - [x] A3. Contacto de soporte sin buzón: página `/contacto`, mensajes guardados
       en la base y enviados por correo si hay `SUPPORT_EMAIL`.
-- [ ] A4. Privacidad y términos completos (los dos idiomas), con contacto real.
-- [ ] A5. Fin de la prueba gratis que de verdad bloquea + página de precios
+- [x] A4. Privacidad y términos completos (los dos idiomas), con contacto real.
+- [x] A5. Fin de la prueba gratis que de verdad bloquea + página de precios
       (importes los pone Richard).
 - [ ] A6. Demo pública con datos: cualquiera entra, prueba y toca todo; se
       limpia sola.
