@@ -15,6 +15,8 @@ export const SLUG_EN: Record<string, string> = {
   caja: "cash-register-closing",
   autorizaciones: "roles-and-manager-approval",
   reportes: "reports",
+  contabilidad: "accounting",
+  "insumos-y-compras": "supplies-and-purchases",
   avisos: "text-notifications",
   "pagina-del-cliente": "customer-status-page",
   "dos-pasos": "two-step-verification",

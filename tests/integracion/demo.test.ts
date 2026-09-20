@@ -53,11 +53,15 @@ describe("demo público", () => {
               (select count(*) from orden_prendas where tintoreria_id = ?1) as prendas,
               (select count(*) from pagos where tintoreria_id = ?1) as pagos,
               (select count(*) from precios where tintoreria_id = ?1) as precios,
-              (select count(*) from turnos_caja where tintoreria_id = ?1 and estado = 'abierto') as caja`,
+              (select count(*) from turnos_caja where tintoreria_id = ?1 and estado = 'abierto') as caja,
+              (select count(*) from gastos where tintoreria_id = ?1) as gastos,
+              (select count(*) from insumos where tintoreria_id = ?1) as insumos,
+              (select count(*) from compras where tintoreria_id = ?1) as compras`,
     )
       .bind(id)
       .first<Record<string, number>>();
-    expect(conteos).toMatchObject({ clientes: 5, ordenes: 8, caja: 1 });
+    expect(conteos).toMatchObject({ clientes: 5, ordenes: 8, caja: 1, insumos: 6, compras: 1 });
+    expect(conteos!.gastos).toBe(7);
     expect(conteos!.prendas).toBeGreaterThan(10);
     expect(conteos!.pagos).toBeGreaterThan(0);
     expect(conteos!.precios).toBeGreaterThan(0);
@@ -132,10 +136,29 @@ describe("demo público", () => {
               (select count(*) from clientes where tintoreria_id = ?1) as c,
               (select count(*) from usuarios where tintoreria_id = ?1) as u,
               (select count(*) from sesiones where tintoreria_id = ?1) as s,
-              (select count(*) from auditoria where tintoreria_id = ?1) as a`,
+              (select count(*) from auditoria where tintoreria_id = ?1) as a,
+              (select count(*) from gastos where tintoreria_id = ?1) as g,
+              (select count(*) from compras where tintoreria_id = ?1) as co,
+              (select count(*) from compra_lineas where tintoreria_id = ?1) as cl,
+              (select count(*) from insumos where tintoreria_id = ?1) as i,
+              (select count(*) from proveedores where tintoreria_id = ?1) as pr`,
     )
       .bind(id)
       .first<Record<string, number>>();
-    expect(resto).toEqual({ t: 0, o: 0, p: 0, pagos: 0, c: 0, u: 0, s: 0, a: 0 });
+    expect(resto).toEqual({
+      t: 0,
+      o: 0,
+      p: 0,
+      pagos: 0,
+      c: 0,
+      u: 0,
+      s: 0,
+      a: 0,
+      g: 0,
+      co: 0,
+      cl: 0,
+      i: 0,
+      pr: 0,
+    });
   });
 });

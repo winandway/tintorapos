@@ -21,7 +21,8 @@ export interface TextoGuia {
   bloques: Bloque[];
 }
 
-export type ClaveSeccion = "empezar" | "mostrador" | "planta" | "dinero" | "clientes" | "seguridad";
+export type ClaveSeccion =
+  "empezar" | "mostrador" | "planta" | "dinero" | "contabilidad" | "clientes" | "seguridad";
 
 export interface Guia {
   slug: string;

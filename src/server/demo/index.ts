@@ -14,6 +14,7 @@
 import { codigoEtiqueta, codigoPublico, nuevoId } from "@/lib/codigos";
 import type { Idioma } from "@/lib/i18n/idiomas";
 import { PRENDAS_ESTANDAR, SERVICIOS_ESTANDAR } from "@/server/catalogo/estandar";
+import { INSUMOS_ESTANDAR } from "@/server/contabilidad/categorias";
 
 export const PLAN_DEMO = "demo";
 /** Cuánto vive un demo antes de que el reloj lo borre. */
@@ -299,6 +300,165 @@ export async function crearDemo(db: D1Database, idioma: Idioma, ahora = Date.now
     numero += 1;
   }
 
+  // Contabilidad: un proveedor, sus insumos, una compra del mes y los gastos
+  // de siempre. Sin esto, las pantallas de contabilidad salen vacías y el demo
+  // no enseña lo que más preguntan los dueños.
+  const proveedorId = nuevoId();
+  const compraId = nuevoId();
+  const fechaDe = (dias: number) => new Date(ahora - dias * 86_400_000).toISOString().slice(0, 10);
+  s.push(
+    db
+      .prepare(
+        `insert into proveedores (id, tintoreria_id, nombre, telefono, contacto, terminos_dias, activo, creado_por, creado_en, actualizado_en)
+         values (?, ?, ?, '3055550170', ?, 30, 1, ?, ?, ?)`,
+      )
+      .bind(
+        proveedorId,
+        tintoreriaId,
+        idioma === "en" ? "Cleaners Supply Co." : "Suministros del Sur",
+        idioma === "en" ? "Route sales rep" : "Vendedor de ruta",
+        usuarioId,
+        ahora,
+        ahora,
+      ),
+  );
+  const insumos = INSUMOS_ESTANDAR.slice(0, 6).map((i, n) => ({
+    id: nuevoId(),
+    nombre: i[idioma],
+    unidad: i.unidad,
+    orden: n,
+    existencia: [12, 8, 3, 6, 2, 9][n] ?? 5,
+    minimo: [4, 3, 4, 2, 3, 2][n] ?? 2,
+    costo: [3200, 2800, 4500, 8900, 1900, 2400][n] ?? 2000,
+  }));
+  for (const i of insumos)
+    s.push(
+      db
+        .prepare(
+          `insert into insumos (id, tintoreria_id, nombre, unidad, existencia, minimo, costo_unit_cents, proveedor_id, activo, orden, creado_en, actualizado_en)
+           values (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`,
+        )
+        .bind(
+          i.id,
+          tintoreriaId,
+          i.nombre,
+          i.unidad,
+          i.existencia,
+          i.minimo,
+          i.costo,
+          proveedorId,
+          i.orden,
+          ahora,
+          ahora,
+        ),
+    );
+  const lineasCompra = insumos.slice(0, 3).map((i) => ({
+    id: nuevoId(),
+    insumoId: i.id,
+    descripcion: i.nombre,
+    cantidad: 4,
+    costo: i.costo,
+  }));
+  const subtotalCompra = lineasCompra.reduce((n, l) => n + l.cantidad * l.costo, 0);
+  const impuestoCompra = Math.round((subtotalCompra * IMPUESTO_BPS) / 10_000);
+  const totalCompra = subtotalCompra + impuestoCompra;
+  s.push(
+    db
+      .prepare(
+        `insert into compras (id, tintoreria_id, sucursal_id, proveedor_id, numero_factura, fecha_local,
+           subtotal_cents, impuesto_cents, total_cents, pagado_cents, creado_por, creado_en, actualizado_en)
+         values (?, ?, ?, ?, 'A-4471', ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(
+        compraId,
+        tintoreriaId,
+        sucursalId,
+        proveedorId,
+        fechaDe(6),
+        subtotalCompra,
+        impuestoCompra,
+        totalCompra,
+        Math.round(totalCompra / 2),
+        usuarioId,
+        ahora,
+        ahora,
+      ),
+  );
+  for (const l of lineasCompra)
+    s.push(
+      db
+        .prepare(
+          `insert into compra_lineas (id, tintoreria_id, compra_id, insumo_id, descripcion, cantidad, costo_unit_cents, total_cents, creada_en)
+           values (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .bind(
+          l.id,
+          tintoreriaId,
+          compraId,
+          l.insumoId,
+          l.descripcion,
+          l.cantidad,
+          l.costo,
+          l.cantidad * l.costo,
+          ahora,
+        ),
+    );
+  const gastos: [string, number, number, string | null][] = [
+    ["renta", 180_000, 15, null],
+    ["luz", 46_500, 10, null],
+    ["agua", 12_400, 10, null],
+    ["nomina", 240_000, 7, null],
+    [
+      "mantenimiento",
+      32_000,
+      4,
+      idioma === "en" ? "Boiler service call" : "Visita del técnico de la caldera",
+    ],
+    ["publicidad", 9_000, 3, idioma === "en" ? "Flyers for the neighborhood" : "Volantes del barrio"],
+  ];
+  for (const [categoria, monto, dias, descripcion] of gastos)
+    s.push(
+      db
+        .prepare(
+          `insert into gastos (id, tintoreria_id, sucursal_id, categoria, descripcion, monto_cents, metodo_pago, fecha_local, creado_por, creado_en, actualizado_en)
+           values (?, ?, ?, ?, ?, ?, 'transferencia', ?, ?, ?, ?)`,
+        )
+        .bind(
+          nuevoId(),
+          tintoreriaId,
+          sucursalId,
+          categoria,
+          descripcion,
+          monto,
+          fechaDe(dias),
+          usuarioId,
+          ahora,
+          ahora,
+        ),
+    );
+  // El gasto de la compra, con su compra_id: la ganancia se calcula de una
+  // sola tabla y nada se cuenta dos veces.
+  s.push(
+    db
+      .prepare(
+        `insert into gastos (id, tintoreria_id, sucursal_id, categoria, proveedor_id, compra_id, descripcion,
+           monto_cents, metodo_pago, referencia, fecha_local, creado_por, creado_en, actualizado_en)
+         values (?, ?, ?, 'insumos', ?, ?, 'Factura A-4471', ?, 'credito', 'A-4471', ?, ?, ?, ?)`,
+      )
+      .bind(
+        nuevoId(),
+        tintoreriaId,
+        sucursalId,
+        proveedorId,
+        compraId,
+        totalCompra,
+        fechaDe(6),
+        usuarioId,
+        ahora,
+        ahora,
+      ),
+  );
+
   await db.batch(s);
   return { tintoreriaId, sucursalId, usuarioId };
 }
@@ -307,6 +467,12 @@ export async function crearDemo(db: D1Database, idioma: Idioma, ahora = Date.now
 const TABLAS_DEMO = [
   "operaciones_sync",
   "respaldos",
+  "gastos",
+  "movimientos_insumo",
+  "compra_lineas",
+  "compras",
+  "insumos",
+  "proveedores",
   "auditoria",
   "avisos",
   "pagos",

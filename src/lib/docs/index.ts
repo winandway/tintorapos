@@ -1,6 +1,7 @@
 import type { Idioma } from "@/lib/i18n";
 import { rutaGuia } from "@/lib/rutas-publicas";
 import { GUIAS_CLIENTES, GUIAS_SEGURIDAD } from "./guias-clientes";
+import { GUIAS_CONTABILIDAD } from "./guias-contabilidad";
 import { GUIAS_EMPEZAR } from "./guias-empezar";
 import { GUIAS_MOSTRADOR } from "./guias-mostrador";
 import { GUIAS_OPERACION } from "./guias-operacion";
@@ -13,6 +14,7 @@ export const SECCIONES: Seccion[] = [
   { clave: "mostrador", icono: "mostrador", es: "Mostrador", en: "Front counter" },
   { clave: "planta", icono: "escaner", es: "Planta", en: "Production" },
   { clave: "dinero", icono: "caja", es: "Caja y reportes", en: "Register & reports" },
+  { clave: "contabilidad", icono: "libro", es: "Contabilidad", en: "Accounting" },
   { clave: "clientes", icono: "mensaje", es: "Clientes", en: "Customers" },
   { clave: "seguridad", icono: "escudo", es: "Seguridad y datos", en: "Security & data" },
 ];
@@ -21,6 +23,7 @@ export const GUIAS: Guia[] = [
   ...GUIAS_EMPEZAR,
   ...GUIAS_MOSTRADOR,
   ...GUIAS_OPERACION,
+  ...GUIAS_CONTABILIDAD,
   ...GUIAS_CLIENTES,
   ...GUIAS_SEGURIDAD,
 ];
