@@ -7,6 +7,10 @@ import {
   tienePermiso,
   PERMISOS,
   ROLES,
+  permisosEfectivos,
+  permisosQueSePuedenDar,
+  permisosAGuardar,
+  usuarioPuede,
 } from "@/server/permisos";
 
 /**
@@ -68,5 +72,34 @@ describe("matriz de permisos (candado)", () => {
   it("valida roles", () => {
     expect(esRol("planta")).toBe(true);
     expect(esRol("admin")).toBe(false);
+  });
+
+  it("palomitas por persona: mandan sobre el rol y se recortan a lo que el actor tiene", () => {
+    const cajero = { rol: "cajero" as const, permisos: null };
+    expect(usuarioPuede(cajero, "reportes.ver")).toBe(false);
+    expect(permisosEfectivos(cajero)).toEqual(permisosDe("cajero"));
+
+    const cajeroConReportes = {
+      rol: "cajero" as const,
+      permisos: ["ordenes.crear", "reportes.ver"] as const,
+    };
+    expect(
+      usuarioPuede({ ...cajeroConReportes, permisos: [...cajeroConReportes.permisos] }, "reportes.ver"),
+    ).toBe(true);
+    // Lo que no está marcado, no se puede, aunque el rol lo diera.
+    expect(usuarioPuede({ rol: "gerente", permisos: ["ordenes.ver"] }, "empleados.gestionar")).toBe(false);
+    // El orden del catálogo manda y la basura se cae.
+    expect(
+      permisosEfectivos({ rol: "cajero", permisos: ["reportes.ver", "ordenes.crear", "inventado"] as never }),
+    ).toEqual(["ordenes.crear", "reportes.ver"]);
+
+    // Un gerente puede dar lo suyo, nunca «exportar datos» (solo del dueño).
+    const gerente = { rol: "gerente" as const, permisos: null };
+    expect(permisosQueSePuedenDar(gerente)).not.toContain("datos.exportar");
+    expect(permisosQueSePuedenDar({ rol: "dueno", permisos: null })).toContain("datos.exportar");
+    expect(permisosAGuardar(gerente, "cajero", ["datos.exportar", "reportes.ver"])).toEqual(["reportes.ver"]);
+    // Si queda exactamente lo del rol, no se guarda nada: manda el rol.
+    expect(permisosAGuardar(gerente, "cajero", permisosDe("cajero"))).toBeNull();
+    expect(permisosAGuardar(gerente, "cajero", null)).toBeNull();
   });
 });
