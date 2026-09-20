@@ -106,6 +106,13 @@ probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
   `mcp/server-card.json`, `agent-card.json` y `ai-catalog.json`. Las páginas
   públicas responden Markdown con `Accept: text/markdown` (reescritura a `/md`).
   **PROHIBIDO publicar metadatos de OAuth mientras no exista el servidor OAuth.**
+- **Ningún formulario pierde lo escrito:** todos usan `useBorrador`
+  (`src/lib/use-borrador.ts`). Guarda solo mientras se escribe, lo devuelve al
+  volver con la línea `AvisoBorrador`, se borra al guardar y al cerrar sesión, y
+  NUNCA guarda claves, PIN, códigos ni tarjetas. Formulario nuevo = con su
+  borrador y su prueba.
+- **Idioma:** el español va con la bandera de España y el inglés con la de
+  EE.UU. Nunca la de México ni la de ningún otro país.
 - Pie: `© <año> <dominio> | All rights reserved. Developed by Windoce LLC`.
 
 ## Cómo se trabaja (comandos)

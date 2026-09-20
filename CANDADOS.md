@@ -598,6 +598,42 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   billete, llega el aviso, se responde, sale el correo al cliente y el billete
   queda «respondido»).
 
+### B33. Los formularios perdían lo escrito
+
+- **Cómo se veía:** Richard estaba creando un cliente desde la computadora, la
+  ventana se cerró, volvió… y el formulario estaba en blanco. Lo mismo al
+  registrarse. Sus palabras: *«si yo estoy registrando a un usuario, debe
+  mantener los datos; en todo momento y en todos los formularios tiene que
+  haber consistencia»*. Un formulario que pierde lo escrito no se vuelve a
+  llenar: la persona se va.
+- **Arreglo:** una sola pieza para todos — `src/lib/borradores.ts` (guardar,
+  leer, borrar, y **quitar lo sensible**) y `src/lib/use-borrador.ts` (el hook:
+  guarda medio segundo después de dejar de escribir, también al cerrar la
+  pestaña con `pagehide`, y devuelve lo guardado al volver). El aviso es la
+  línea discreta `AvisoBorrador`, con «Empezar de nuevo».
+- **Dónde está puesto:** registro, cliente (nuevo y editar), contacto,
+  empleado, gasto, compra, insumo, proveedor y ajustes de la tienda.
+- **Lo que NUNCA se guarda:** contraseñas, PIN, códigos de un solo uso, CVV y
+  números de tarjeta — los quita `sinCamposSensibles` por el nombre del campo,
+  también dentro de objetos anidados.
+- **Se borra:** al guardar con éxito, al tocar «Empezar de nuevo», a los 7 días
+  y **al cerrar sesión** (`borrarTodosLosBorradores` en el botón de salir), para
+  que en una computadora compartida no le salgan a la siguiente persona.
+- **Candado:** `tests/ui/borradores.test.tsx`, comprobado en rojo dos veces (sin
+  guardar el borrador, y sin quitar los campos sensibles).
+- **Comprobado en pantalla:** se escribió un cliente, se salió de la pantalla, se
+  volvió a abrir y estaban los datos con el aviso.
+- **Qué NO tocar:** ningún formulario nuevo se entrega sin `useBorrador`, y no
+  se le quita el filtro de campos sensibles.
+
+### B34. La bandera del español
+
+- **Regla de la casa:** el español lleva la bandera de **España** y el inglés la
+  de **Estados Unidos**. Ninguna bandera de un país de América para el idioma.
+  El selector de PAÍS de los formularios es otra cosa: ahí cada país lleva la
+  suya y está bien.
+- **Dónde:** `src/components/selector-idioma.tsx`.
+
 ## C. Candados de publicación
 
 ### C1. El paquete que se publica es el que se prueba

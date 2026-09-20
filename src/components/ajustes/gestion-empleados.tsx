@@ -11,6 +11,8 @@ import { pedir } from "@/lib/api";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { fmt, formatoFecha } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
+import { useBorrador } from "@/lib/use-borrador";
+import { AvisoBorrador } from "@/components/ui/aviso-borrador";
 import { AREAS, permisosDe } from "@/server/permisos";
 import { useDatos } from "@/lib/use-datos";
 
@@ -162,6 +164,19 @@ function ModalEmpleado({
   const [campos, setCampos] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  // Lo escrito no se pierde. El PIN y la contraseña temporal NO se guardan
+  // nunca (los quita `sinCamposSensibles`).
+  const borrador = useBorrador(
+    `empleado:${editando?.id ?? "nuevo"}`,
+    { v, permisos },
+    {
+      activo: Boolean(editando),
+      alRecuperar: (g) => {
+        if (g.v) setV((x) => ({ ...x, ...g.v, pin: "", claveTemporal: "" }));
+        if (g.permisos) setPermisos(g.permisos);
+      },
+    },
+  );
 
   if (editando !== cargadoDe) {
     setCargadoDe(editando);
@@ -214,6 +229,7 @@ function ModalEmpleado({
         metodo: esNuevo ? "POST" : "PUT",
         cuerpo,
       });
+      borrador.olvidar();
       alGuardar();
     } catch (err) {
       setError(textoError(d, err));
@@ -240,6 +256,7 @@ function ModalEmpleado({
       }
     >
       <form id="form-empleado" onSubmit={guardar} className="space-y-4" noValidate autoComplete="off">
+        {borrador.recuperado && <AvisoBorrador alDescartar={borrador.descartar} />}
         {error && <Aviso tono="error">{error}</Aviso>}
         <CampoTexto
           etiqueta={de.nombre}

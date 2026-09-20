@@ -14,6 +14,8 @@ import { textoError } from "@/lib/errores-cliente";
 import { formatoDinero } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { useDatos } from "@/lib/use-datos";
+import { useBorrador } from "@/lib/use-borrador";
+import { AvisoBorrador } from "@/components/ui/aviso-borrador";
 import { CATEGORIAS, nombreCategoria } from "./categorias-cliente";
 import { MarcoContabilidad, useRango } from "./marco";
 
@@ -69,6 +71,11 @@ export function PantallaGastos({
   const [form, setForm] = useState<ReturnType<typeof vacio> | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [fallo, setFallo] = useState<unknown>(null);
+  // Regla de la casa: lo escrito no se pierde aunque se cierre la ventana.
+  const borrador = useBorrador("gasto", form, {
+    activo: form !== null,
+    alRecuperar: (guardado) => setForm(guardado),
+  });
   const dinero = (n: number) => formatoDinero(n, moneda, idioma);
   const cents = form ? aCentavos(form.monto) : null;
 
@@ -92,6 +99,7 @@ export function PantallaGastos({
           },
         },
       });
+      borrador.olvidar();
       setForm(null);
       recargar();
     } catch (e) {
@@ -200,6 +208,7 @@ export function PantallaGastos({
       >
         {form && (
           <div className="space-y-3">
+            {borrador.recuperado && <AvisoBorrador alDescartar={borrador.descartar} />}
             {fallo ? <Aviso tono="error">{textoError(d, fallo)}</Aviso> : null}
             <CampoTexto
               etiqueta={dg.fecha}

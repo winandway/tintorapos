@@ -7,6 +7,8 @@ import { CampoTexto } from "@/components/ui/campo";
 import { pedir } from "@/lib/api";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { useIdioma } from "@/lib/i18n/cliente";
+import { useBorrador } from "@/lib/use-borrador";
+import { AvisoBorrador } from "@/components/ui/aviso-borrador";
 
 export function FormContacto() {
   const { d } = useIdioma();
@@ -17,6 +19,9 @@ export function FormContacto() {
   const [campos, setCampos] = useState<Record<string, string>>({});
   const cambiar = (k: keyof typeof v) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setV({ ...v, [k]: e.target.value });
+  // Escribir un mensaje largo y perderlo por un toque en «atrás» es de lo que
+  // más molesta: se guarda solo y vuelve a salir.
+  const borrador = useBorrador("contacto", v, { alRecuperar: setV });
 
   if (estado === "enviado")
     return (
@@ -36,6 +41,7 @@ export function FormContacto() {
         setCampos({});
         try {
           await pedir("/datos/contacto", { cuerpo: v });
+          borrador.olvidar();
           setEstado("enviado");
         } catch (err) {
           setError(textoError(d, err));
@@ -44,6 +50,7 @@ export function FormContacto() {
         }
       }}
     >
+      {borrador.recuperado && <AvisoBorrador alDescartar={borrador.descartar} />}
       {error && <Aviso tono="error">{error}</Aviso>}
       <CampoTexto
         etiqueta={c.nombre}

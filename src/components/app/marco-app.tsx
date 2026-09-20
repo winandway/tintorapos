@@ -10,6 +10,7 @@ import { fmt } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { recargarEn } from "@/lib/navegacion";
 import { EstadoConexion } from "./estado-conexion";
+import { borrarTodosLosBorradores } from "@/lib/borradores";
 import { limpiarPaginasGuardadas } from "./registro-sw";
 import { IconoNav, type NombreIcono } from "./iconos";
 
@@ -94,6 +95,8 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
   const secundarios = visibles.filter((i) => !principales.includes(i));
 
   async function salir(destino: string) {
+    // En una computadora compartida no se queda ni un borrador del que sale.
+    borrarTodosLosBorradores();
     limpiarPaginasGuardadas();
     try {
       await pedir("/datos/sesion/salir", { metodo: "POST" });

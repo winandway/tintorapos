@@ -50,4 +50,6 @@ export const comun: Forma<typeof base> = {
   noEncontradaTitulo: "We couldn’t find this page",
   noEncontradaTexto: "The link may be incomplete, or the page may no longer exist.",
   irInicio: "Go to the home page",
+  borradorRecuperado: "We brought back what you were typing.",
+  borradorEmpezarDeNuevo: "Start over",
 };

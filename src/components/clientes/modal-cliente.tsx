@@ -7,6 +7,8 @@ import { Casilla, CampoArea, CampoSelector, CampoTexto } from "@/components/ui/c
 import { Modal } from "@/components/ui/modal";
 import { ErrorApi, pedir } from "@/lib/api";
 import { nuevoId } from "@/lib/codigos";
+import { useBorrador } from "@/lib/use-borrador";
+import { AvisoBorrador } from "@/components/ui/aviso-borrador";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { useIdioma } from "@/lib/i18n/cliente";
 
@@ -75,6 +77,13 @@ export function ModalCliente({
   const [error, setError] = useState<string | null>(null);
   const [existente, setExistente] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  // Regla de la casa: lo escrito no se pierde aunque se cierre la ventana.
+  // Un borrador por cliente (o «nuevo»), para no mezclar el que se está
+  // creando con el que se está editando.
+  const borrador = useBorrador(`cliente:${inicial?.id ?? "nuevo"}`, v, {
+    activo: abierto,
+    alRecuperar: (guardado) => setV(guardado),
+  });
 
   if (inicial !== origen) {
     setOrigen(inicial);
@@ -101,14 +110,17 @@ export function ModalCliente({
       const cuerpo = { ...v, id: undefined };
       if (v.id) {
         await pedir(`/datos/clientes/${v.id}`, { metodo: "PUT", cuerpo });
+        borrador.olvidar();
         alGuardar(v.id, v);
       } else {
         const r = await pedir<{ id: string }>("/datos/clientes", { cuerpo });
+        borrador.olvidar();
         alGuardar(r.id, v);
       }
     } catch (err) {
       if (permitirLocal && !v.id && err instanceof ErrorApi && err.sinConexion) {
         // Sin conexión: el cliente viaja dentro de la orden y se crea al sincronizar.
+        borrador.olvidar();
         alGuardar(nuevoId(), v, true);
         return;
       }
@@ -140,6 +152,7 @@ export function ModalCliente({
       }
     >
       <form id="form-cliente" onSubmit={guardar} className="space-y-4" noValidate>
+        {borrador.recuperado && <AvisoBorrador alDescartar={borrador.descartar} />}
         {error && (
           <Aviso tono="error">
             {error}

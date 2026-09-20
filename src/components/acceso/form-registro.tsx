@@ -12,6 +12,8 @@ import { pedir } from "@/lib/api";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { recargarEn } from "@/lib/navegacion";
+import { useBorrador } from "@/lib/use-borrador";
+import { AvisoBorrador } from "@/components/ui/aviso-borrador";
 import { listaMonedas, listaPaises, monedaDePais } from "@/lib/paises";
 import { rutaPagina } from "@/lib/rutas-publicas";
 
@@ -37,6 +39,11 @@ export function FormRegistro({ siteKey }: { siteKey: string | null }) {
   const [campos, setCampos] = useState<Record<string, string>>({});
   const [enviando, setEnviando] = useState(false);
   const alPase = useCallback((t: string | null) => setPase(t), []);
+  // Lo que escribe no se pierde si cierra la ventana o se le va el internet.
+  // La contraseña NO se guarda (la quita `sinCamposSensibles`).
+  const borrador = useBorrador("registro", v, {
+    alRecuperar: (guardado) => setV((x) => ({ ...x, ...guardado, clave: x.clave })),
+  });
 
   useEffect(() => {
     const propia = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -64,6 +71,7 @@ export function FormRegistro({ siteKey }: { siteKey: string | null }) {
     setCampos({});
     try {
       await pedir("/datos/registro", { cuerpo: { ...v, idioma }, turnstile: pase });
+      borrador.olvidar(); // Ya quedó guardado de verdad: el borrador estorba.
       recargarEn("/entrar/activar-dos-pasos");
     } catch (err) {
       setError(textoError(d, err));
@@ -75,6 +83,7 @@ export function FormRegistro({ siteKey }: { siteKey: string | null }) {
   const [antes, entre, despues] = d.acceso.aceptoTerminos.split(/\{terminos\}|\{privacidad\}/);
   return (
     <form onSubmit={enviar} className="space-y-5" noValidate>
+      {borrador.recuperado && <AvisoBorrador alDescartar={borrador.descartar} />}
       <div>
         <h1 className="titulo-ancho text-3xl leading-tight">{d.acceso.registroTitulo}</h1>
         <p className="mt-2 text-[15px] text-gris">{d.acceso.registroSubtitulo}</p>

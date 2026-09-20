@@ -10,6 +10,8 @@ import { pedir } from "@/lib/api";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { listaMonedas, listaPaises, monedaDePais } from "@/lib/paises";
+import { useBorrador } from "@/lib/use-borrador";
+import { AvisoBorrador } from "@/components/ui/aviso-borrador";
 
 interface Tienda {
   nombre: string;
@@ -51,6 +53,19 @@ export function FormTienda() {
   // Todos los países y monedas del mundo, con el nombre en el idioma de la tienda.
   const paises = useMemo(() => listaPaises(idioma), [idioma]);
   const monedas = useMemo(() => listaMonedas(idioma), [idioma]);
+  // Si se cierra la ventana a mitad de cambiar los datos de la tienda, vuelven
+  // a salir. «Empezar de nuevo» devuelve lo que hay guardado en el servidor.
+  const borrador = useBorrador(
+    "ajustes-tienda",
+    { t, pct },
+    {
+      activo: t !== null,
+      alRecuperar: (g) => {
+        if (g.t) setT(g.t);
+        if (g.pct) setPct(g.pct);
+      },
+    },
+  );
 
   useEffect(() => {
     pedir<{ tienda: Tienda }>("/datos/ajustes/tienda")
@@ -98,6 +113,7 @@ export function FormTienda() {
           descuentoMaxBps: textoABps(pct.descuento),
         },
       });
+      borrador.olvidar();
       avisar(d.comun.guardado);
     } catch (err) {
       setError(textoError(d, err));
@@ -111,6 +127,14 @@ export function FormTienda() {
   const dt = d.ajustes.tienda;
   return (
     <form onSubmit={guardar} className="space-y-4" noValidate>
+      {borrador.recuperado && (
+        <AvisoBorrador
+          alDescartar={() => {
+            borrador.descartar();
+            window.location.reload();
+          }}
+        />
+      )}
       {error && <Aviso tono="error">{error}</Aviso>}
       <Tarjeta>
         <TituloSeccion>{dt.identidad}</TituloSeccion>

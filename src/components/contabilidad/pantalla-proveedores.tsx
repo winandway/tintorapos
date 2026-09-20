@@ -12,6 +12,8 @@ import { textoError } from "@/lib/errores-cliente";
 import { fmt, formatoDinero } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { useDatos } from "@/lib/use-datos";
+import { useBorrador } from "@/lib/use-borrador";
+import { AvisoBorrador } from "@/components/ui/aviso-borrador";
 import { MarcoContabilidad } from "./marco";
 
 interface Proveedor {
@@ -47,6 +49,11 @@ export function PantallaProveedores({ moneda }: { moneda: string }) {
   const [form, setForm] = useState<ReturnType<typeof vacio> | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [fallo, setFallo] = useState<unknown>(null);
+  // Regla de la casa: lo escrito no se pierde aunque se cierre la ventana.
+  const borrador = useBorrador("proveedor", form, {
+    activo: form !== null,
+    alRecuperar: (guardado) => setForm(guardado),
+  });
   const dinero = (n: number) => formatoDinero(n, moneda, idioma);
 
   const guardar = async () => {
@@ -71,6 +78,7 @@ export function PantallaProveedores({ moneda }: { moneda: string }) {
           },
         },
       );
+      borrador.olvidar();
       setForm(null);
       recargar();
     } catch (e) {
@@ -175,6 +183,7 @@ export function PantallaProveedores({ moneda }: { moneda: string }) {
       >
         {form && (
           <div className="space-y-3">
+            {borrador.recuperado && <AvisoBorrador alDescartar={borrador.descartar} />}
             {fallo ? <Aviso tono="error">{textoError(d, fallo)}</Aviso> : null}
             <CampoTexto
               etiqueta={dp.nombre}

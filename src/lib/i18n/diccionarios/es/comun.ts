@@ -47,4 +47,6 @@ export const comun = {
   noEncontradaTitulo: "No encontramos esta página",
   noEncontradaTexto: "Puede que el enlace esté incompleto o que la página ya no exista.",
   irInicio: "Ir al inicio",
+  borradorRecuperado: "Recuperamos lo que estabas escribiendo.",
+  borradorEmpezarDeNuevo: "Empezar de nuevo",
 };

@@ -1,26 +1,18 @@
-# Plan: entrar sin tropiezos, precio puesto y tu panel de dueño
+# Plan: ningún formulario pierde lo escrito (+ bandera de España)
 
-> Piloto automático (20 sep 2026). Se ejecuta en orden, se marca aquí y se publica.
-> Decisiones de Richard ya tomadas: **un solo precio, 120 USD al año por tienda**;
-> legal aprobado por el abogado; los avisos van por correo; SMS para después.
+> Piloto automático (20 sep 2026). Regla nueva de Richard: TODO formulario
+> guarda lo escrito y lo devuelve al volver. Se hace una sola pieza y la usan
+> todos.
 
-## Fase D — Lo urgente
-
-- [x] D1. **El segundo paso ya no deja a nadie afuera** (emergencia: bloqueaba
-      a TODO dueño nuevo). El secreto se conserva, la ventana de activación es
-      de ±2 min y, si el reloj del celular está corrido, el sistema lo DICE.
-- [x] D2. Precio en la página: 120 USD al año, todo incluido.
-- [x] D3. **Billetes de soporte**: el formulario de contacto abre un billete,
-      te llega el aviso a `go@windoce.com`, y cuando respondes desde el panel
-      el sistema le manda el correo al cliente.
-- [x] D4. **Panel de dueño (Soporte Windoce)**: cuántas cuentas se crearon,
-      cuántas están probando, cuántas pagando, órdenes, dinero registrado,
-      demos vivos, y el botón para activar el plan de quien pague.
-- [x] D5. Candados y pruebas de D3 y D4 (comprobados en rojo).
-- [x] D6. `npm run verify`, punta a punta, paquete, publicar y comprobar en vivo.
-- [x] D7. Documentar (CANDADOS, PENDIENTES, Docs) y dejar el prompt de DNS para
-      la sesión de YaDominios Cloud.
-
-## Esperando por Richard (va en el reporte)
-
-- La clave de Stripe para cobrar los 120 USD al año dentro del sistema.
+- [x] E1. Bandera de España en el selector de idioma (nunca la de México).
+      Regla global escrita.
+- [x] E2. Regla global «ningún formulario pierde lo escrito» en `~/.claude/CLAUDE.md`.
+- [x] E3. La pieza: `useBorrador` — guarda mientras se escribe, devuelve al
+      volver, avisa en una línea con «empezar de nuevo», borra al guardar y al
+      salir, y NUNCA guarda claves, PIN ni códigos.
+- [x] E4. Usarla en TODOS los formularios: registro, cliente nuevo/editar,
+      contacto, empleado, gasto, compra, insumo, proveedor y ajustes de tienda.
+- [x] E5. Los borradores se borran al cerrar sesión.
+- [x] E6. Candados y pruebas (comprobados en rojo).
+- [x] E7. `npm run verify`, punta a punta, paquete, publicar y comprobar en vivo.
+- [x] E8. Documentar en CANDADOS.md y en el CLAUDE.md del proyecto.

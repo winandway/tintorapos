@@ -14,6 +14,8 @@ import { textoError } from "@/lib/errores-cliente";
 import { formatoDinero } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { useDatos } from "@/lib/use-datos";
+import { useBorrador } from "@/lib/use-borrador";
+import { AvisoBorrador } from "@/components/ui/aviso-borrador";
 import { MarcoContabilidad, useRango } from "./marco";
 
 interface Compra {
@@ -67,6 +69,11 @@ export function PantallaCompras({ moneda, hoy }: { moneda: string; hoy: string }
   const [abono, setAbono] = useState<{ compra: Compra; monto: string } | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [fallo, setFallo] = useState<unknown>(null);
+  // Regla de la casa: lo escrito no se pierde aunque se cierre la ventana.
+  const borrador = useBorrador("compra", form, {
+    activo: form !== null,
+    alRecuperar: (guardado) => setForm(guardado),
+  });
   const dinero = (n: number) => formatoDinero(n, moneda, idioma);
 
   const subtotal = (form?.lineas ?? []).reduce(
@@ -101,6 +108,7 @@ export function PantallaCompras({ moneda, hoy }: { moneda: string; hoy: string }
           },
         },
       });
+      borrador.olvidar();
       setForm(null);
       recargar();
     } catch (e) {
@@ -230,6 +238,7 @@ export function PantallaCompras({ moneda, hoy }: { moneda: string; hoy: string }
       >
         {form && (
           <div className="space-y-3">
+            {borrador.recuperado && <AvisoBorrador alDescartar={borrador.descartar} />}
             {fallo ? <Aviso tono="error">{textoError(d, fallo)}</Aviso> : null}
             <div className="grid gap-3 sm:grid-cols-2">
               <CampoSelector
