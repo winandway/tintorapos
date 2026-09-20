@@ -69,9 +69,9 @@ export async function revisarSalud(env: CloudflareEnv, vars: Variables, ahora = 
       ? { estado: "ok" }
       : { estado: "no_configurado", detalle: "TURNSTILE_SITE_KEY y TURNSTILE_SECRET_KEY" };
 
-  piezas.soporte = vars.SUPPORT_EMAIL
-    ? { estado: "ok" }
-    : { estado: "no_configurado", detalle: "SUPPORT_EMAIL (contacto de privacidad y términos)" };
+  // Siempre hay buzón de soporte: `SUPPORT_EMAIL` o el de la casa. Lo que el
+  // canario vigila es que los billetes tengan a dónde llegar.
+  piezas.soporte = { estado: "ok", detalle: vars.SUPPORT_EMAIL ? undefined : "por defecto" };
 
   if (piezas.base.estado === "ok") {
     const reloj = await leerSistema(env.DB, "reloj_ultima_corrida").catch(() => null);
