@@ -22,6 +22,8 @@ export interface InfoMarco {
   diasPrueba: number | null;
   /** Minutos de inactividad antes de bloquear (solo en dispositivos de la tienda). */
   bloqueoMin: number | null;
+  /** El correo que falta confirmar (null si ya está o si entró con PIN). */
+  correoPorVerificar?: string | null;
 }
 
 interface ItemNav {
@@ -238,6 +240,8 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
           </div>
         </header>
 
+        {info.correoPorVerificar && <AvisoVerificarCorreo correo={info.correoPorVerificar} />}
+
         {aviso && (
           <div
             className={`px-4 py-2 text-center text-sm font-medium no-imprimir ${aviso.tono === "fin" ? "bg-alerta-suave text-alerta" : "bg-tinta-suave text-tinta-oscura"}`}
@@ -298,6 +302,39 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
           </div>
         )}
       </nav>
+    </div>
+  );
+}
+
+/** Recordatorio de confirmar el correo, con su botón para reenviar el enlace. */
+function AvisoVerificarCorreo({ correo }: { correo: string }) {
+  const { d } = useIdioma();
+  const [estado, setEstado] = useState<"listo" | "enviando" | "enviado">("listo");
+  if (estado === "enviado")
+    return (
+      <div className="bg-ok-suave px-4 py-2 text-center text-sm font-medium text-ok no-imprimir">
+        {d.acceso.verificacionEnviada}
+      </div>
+    );
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2 bg-alerta-suave px-4 py-2 text-center text-sm font-medium text-alerta no-imprimir">
+      <span>{fmt(d.acceso.verificaTuCorreo, { correo })}</span>
+      <button
+        type="button"
+        disabled={estado === "enviando"}
+        onClick={async () => {
+          setEstado("enviando");
+          try {
+            await pedir("/datos/cuenta/verificacion", { metodo: "POST" });
+            setEstado("enviado");
+          } catch {
+            setEstado("listo");
+          }
+        }}
+        className="font-bold underline"
+      >
+        {d.acceso.reenviarVerificacion}
+      </button>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { crearSesion } from "@/server/auth/sesiones";
 import { cookieSesion } from "@/server/auth/cookies-sesion";
 import { verificarTurnstile } from "@/server/auth/turnstile";
 import { registrarTintoreria } from "@/server/cuentas/registro";
+import { pedirVerificacion } from "@/server/cuentas/verificacion";
 import {
   esquemaCorreo,
   esquemaMoneda,
@@ -55,6 +56,23 @@ export const POST = ruta({
       },
       c.ahora,
     );
+    // El correo de bienvenida con el enlace de verificación sale después de
+    // responder: si el proveedor tarda, el registro no se queda esperando.
+    c.esperarLuego(
+      pedirVerificacion(
+        c.db,
+        c.vars,
+        {
+          id: r.usuarioId,
+          tintoreriaId: r.tintoreriaId,
+          nombre: c.cuerpo.nombre,
+          correo: c.cuerpo.correo,
+        },
+        esIdioma(c.cuerpo.idioma) ? c.cuerpo.idioma : c.idioma,
+        c.ahora,
+      ).catch((e) => console.error("[registro] no se pudo mandar la verificación:", e)),
+    );
+
     const token = await crearSesion(
       c.db,
       {

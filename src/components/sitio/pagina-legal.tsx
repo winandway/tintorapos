@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cookies } from "next/headers";
 import { Pie } from "@/components/pie";
 import { EncabezadoSitio } from "@/components/sitio/encabezado-sitio";
@@ -70,7 +71,16 @@ export async function PaginaLegal({
                     .
                   </>
                 ) : (
-                  doc.contacto.sin
+                  <>
+                    {doc.contacto.sin}{" "}
+                    <Link
+                      href={rutaPagina(idioma, "contacto")}
+                      className="font-semibold text-tinta underline"
+                    >
+                      {diccionario(idioma).contacto.titulo}
+                    </Link>
+                    .
+                  </>
                 )}
               </p>
             </section>

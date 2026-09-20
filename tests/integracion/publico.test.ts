@@ -170,4 +170,31 @@ describe("página pública de la orden (datos mínimos)", () => {
     const vacio = await enviar("   ");
     expect(vacio.error!.code).toBe(-32602);
   });
+
+  it("contacto: el mensaje se guarda siempre, aunque no haya buzón de soporte", async () => {
+    const { POST: contacto } = await import("@/app/datos/contacto/route");
+    const enviar = async (cuerpo: object) =>
+      contacto(
+        new Request("https://tintorapos.com/datos/contacto", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(cuerpo),
+        }),
+        { params: Promise.resolve({}) },
+      );
+    const ok = await enviar({
+      nombre: "Dueña interesada",
+      correo: "interesada@tintoreria.com",
+      asunto: "Precios",
+      mensaje: "Hola, quiero saber cuánto cuesta para dos tiendas.",
+    });
+    expect(ok.status).toBe(200);
+    const fila = await e.env.DB.prepare(
+      "select nombre, correo, mensaje, enviado_en from mensajes_contacto order by creado_en desc limit 1",
+    ).first<{ nombre: string; correo: string; mensaje: string; enviado_en: number | null }>();
+    expect(fila).toMatchObject({ nombre: "Dueña interesada", correo: "interesada@tintoreria.com" });
+
+    // Lo corto o sin correo no entra.
+    expect((await enviar({ nombre: "A", correo: "no-es-correo", mensaje: "hola" })).status).toBe(400);
+  });
 });

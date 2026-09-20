@@ -132,6 +132,18 @@ CREATE TABLE IF NOT EXISTS tokens_recuperacion (
   usado_en INTEGER
 );
 
+-- Verificación del correo del dueño (y de cualquier usuario con correo).
+CREATE TABLE IF NOT EXISTS verificacion_correo (
+  usuario_id TEXT PRIMARY KEY REFERENCES usuarios(id),
+  tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
+  correo TEXT NOT NULL,
+  hash TEXT,
+  creado_en INTEGER NOT NULL,
+  expira_en INTEGER,
+  verificado_en INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_verificacion_correo_hash ON verificacion_correo (hash);
+
 CREATE TABLE IF NOT EXISTS clientes (
   id TEXT PRIMARY KEY,
   tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
@@ -419,6 +431,20 @@ CREATE TABLE IF NOT EXISTS operaciones_sync (
 CREATE INDEX IF NOT EXISTS idx_sync_tintoreria ON operaciones_sync (tintoreria_id, creado_en);
 
 -- Tablas del sistema (no son de ninguna tintorería).
+-- Mensajes del formulario de contacto del sitio (no son de ninguna tintorería).
+CREATE TABLE IF NOT EXISTS mensajes_contacto (
+  id TEXT PRIMARY KEY,
+  nombre TEXT NOT NULL,
+  correo TEXT NOT NULL,
+  asunto TEXT,
+  mensaje TEXT NOT NULL,
+  idioma TEXT NOT NULL DEFAULT 'es',
+  ip_hash TEXT,
+  enviado_en INTEGER,
+  creado_en INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_mensajes_contacto_fecha ON mensajes_contacto (creado_en);
+
 CREATE TABLE IF NOT EXISTS limites (
   clave TEXT PRIMARY KEY,
   conteo INTEGER NOT NULL,

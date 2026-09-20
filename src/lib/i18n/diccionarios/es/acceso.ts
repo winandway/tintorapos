@@ -1,4 +1,13 @@
 export const acceso = {
+  correoVerificado: "Correo confirmado",
+  correoVerificadoTexto:
+    "Listo. Ya puedes recuperar tu contraseña con este correo si algún día se te olvida.",
+  correoNoVerificado: "Ese enlace ya no sirve",
+  correoNoVerificadoTexto:
+    "El enlace venció o ya se usó. Entra al panel y toca «Reenviar el correo» para recibir uno nuevo.",
+  verificaTuCorreo: "Confirma tu correo: te mandamos un enlace a {correo}.",
+  reenviarVerificacion: "Reenviar el correo",
+  verificacionEnviada: "Te mandamos el enlace otra vez. Revisa tu correo.",
   ladoTitulo: "Cada prenda, en su lugar.",
   ladoTexto: "Recibe, etiqueta, avisa y entrega. Tu tintorería completa en una tablet, con o sin internet.",
   entrarTitulo: "Entra a tu tintorería",

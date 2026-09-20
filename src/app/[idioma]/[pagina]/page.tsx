@@ -3,6 +3,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { FormRegistro } from "@/components/acceso/form-registro";
 import { MarcoAcceso } from "@/components/acceso/marco-acceso";
 import { metadataLegal, metadataRegistro } from "@/components/sitio/metadatos-publicos";
+import { metadataContacto, PaginaContacto } from "@/components/sitio/pagina-contacto";
 import { PaginaLegal } from "@/components/sitio/pagina-legal";
 import { PRIVACIDAD, TERMINOS } from "@/lib/contenido/legal";
 import { esIdioma } from "@/lib/i18n";
@@ -11,7 +12,7 @@ import { obtenerContexto } from "@/server/entorno";
 
 type Props = { params: Promise<{ idioma: string; pagina: string }> };
 
-const ATENDIDAS = ["/privacidad", "/terminos", "/registro"];
+const ATENDIDAS = ["/privacidad", "/terminos", "/registro", "/contacto"];
 
 /** /es/privacidad, /en/privacy, /es/terminos, /en/terms, /es/registro, /en/signup. */
 async function resolver(params: Props["params"]) {
@@ -26,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const r = await resolver(params);
   if (!r) return {};
   if (r.interna === "/registro") return metadataRegistro(r.idioma, true);
+  if (r.interna === "/contacto") return metadataContacto(r.idioma, true);
   const doc = (r.interna === "/privacidad" ? PRIVACIDAD : TERMINOS)[r.idioma];
   return metadataLegal(doc, r.interna, r.idioma, true);
 }
@@ -44,6 +46,7 @@ export default async function PaginaConIdioma({ params }: Props) {
       </MarcoAcceso>
     );
   }
+  if (r.interna === "/contacto") return <PaginaContacto idioma={r.idioma} />;
   const doc = (r.interna === "/privacidad" ? PRIVACIDAD : TERMINOS)[r.idioma];
   return <PaginaLegal idioma={r.idioma} doc={doc} correoSoporte={vars.SUPPORT_EMAIL} />;
 }

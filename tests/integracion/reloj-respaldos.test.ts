@@ -2,6 +2,8 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/server/entorno", () => import("../ayuda/mock-entorno"));
 
+import { CLAVE_TURNO, MINUTOS_RELOJ, tomarTurno } from "@/server/reloj/interno";
+
 import { POST as reloj } from "@/app/datos/reloj/route";
 import { GET as exportar } from "@/app/datos/exportar/route";
 import { GET as respaldos } from "@/app/datos/respaldos/route";
@@ -145,5 +147,18 @@ describe("reloj, respaldos cifrados y exportación (candado de respaldo)", () =>
     for (let i = 0; i < lote.length; i += 100) await e.env.DB.batch(lote.slice(i, i + 100));
     const v = await volcarTintoreria(e.env.DB, esc.b.id);
     expect(v.tablas.auditoria!.filter((f) => f.accion === "prueba.carga")).toHaveLength(1203);
+  });
+
+  it("reloj interno: toma el turno una sola vez cada 5 minutos, aunque entren diez visitas a la vez", async () => {
+    await e.env.DB.prepare("delete from sistema where clave = ?").bind(CLAVE_TURNO).run();
+    const ahora = Date.now();
+    // Diez visitas al mismo tiempo: solo una se queda con el turno.
+    const turnos = await Promise.all(Array.from({ length: 10 }, () => tomarTurno(e.env.DB, ahora)));
+    expect(turnos.filter(Boolean)).toHaveLength(1);
+
+    // Un minuto después todavía no le toca.
+    expect(await tomarTurno(e.env.DB, ahora + 60_000)).toBe(false);
+    // Pasados los cinco, sí.
+    expect(await tomarTurno(e.env.DB, ahora + MINUTOS_RELOJ * 60_000 + 1)).toBe(true);
   });
 });

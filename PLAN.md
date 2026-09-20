@@ -6,12 +6,12 @@
 
 ## Fase A — Quitar lo que frena el lanzamiento
 
-- [ ] A1. Reloj interno: los avisos, recordatorios y respaldos dejan de depender
+- [x] A1. Reloj interno: los avisos, recordatorios y respaldos dejan de depender
       de un Cron externo (se disparan con el tráfico del sitio, con candado de
       una sola corrida a la vez). Canario en verde.
-- [ ] A2. Verificación de correo al registrarse: se envía, se comprueba, se
+- [x] A2. Verificación de correo al registrarse: se envía, se comprueba, se
       reenvía, y el panel avisa mientras no esté verificado.
-- [ ] A3. Contacto de soporte sin buzón: página `/contacto`, mensajes guardados
+- [x] A3. Contacto de soporte sin buzón: página `/contacto`, mensajes guardados
       en la base y enviados por correo si hay `SUPPORT_EMAIL`.
 - [ ] A4. Privacidad y términos completos (los dos idiomas), con contacto real.
 - [ ] A5. Fin de la prueba gratis que de verdad bloquea + página de precios

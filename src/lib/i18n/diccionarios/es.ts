@@ -21,6 +21,7 @@ import { reportes } from "./es/reportes";
 import { tablero } from "./es/tablero";
 import { sinConexion } from "./es/sinConexion";
 import { docs } from "./es/docs";
+import { contacto } from "./es/contacto";
 
 export const es = {
   comun,
@@ -46,4 +47,5 @@ export const es = {
   tablero,
   sinConexion,
   docs,
+  contacto,
 };

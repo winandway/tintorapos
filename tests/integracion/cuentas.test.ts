@@ -12,6 +12,8 @@ import { POST as verificarDosPasos } from "@/app/datos/sesion/dos-pasos/verifica
 import { POST as cambiarClave } from "@/app/datos/clave/cambiar/route";
 import { POST as recuperar } from "@/app/datos/clave/recuperar/route";
 import { POST as restablecer } from "@/app/datos/clave/restablecer/route";
+import { estadoVerificacion, pedirVerificacion, verificarCorreo } from "@/server/cuentas/verificacion";
+import { variablesDe } from "@/server/entorno";
 import { codigoTotp, pasoActual } from "@/server/auth/totp";
 import { ruta } from "@/server/ruta";
 import { crearEntorno, type EntornoPrueba } from "../ayuda/entorno";
@@ -181,6 +183,8 @@ describe("cuentas: registro, dos pasos, entrar y salir", () => {
     expect(reg.estado).toBe(200);
     const sesionVieja = n.cookies.get("tp_sesion")!;
 
+    // El registro manda su correo de bienvenida: se limpia para contar solo lo de aquí.
+    enviadosMsw.correo.length = 0;
     expect((await n.llamar(recuperar, { cuerpo: { correo: "nadie@ninguna.com" } })).datos).toEqual({
       ok: true,
     });
@@ -249,6 +253,86 @@ describe("cuentas: registro, dos pasos, entrar y salir", () => {
       cuerpo: { correo: "cajero@lavanderia.com", clave: "Cajero-Clave-2026" },
     });
     expect(r.datos.error.codigo).toBe("credenciales");
+  });
+  it("verificación de correo: llega el enlace al registrarse, sirve una vez y el vencido no cuela", async () => {
+    enviadosMsw.correo.length = 0;
+    const nav = new Navegador();
+    const alta = await nav.llamar<{ ok: boolean }>(registrar, {
+      cuerpo: {
+        negocio: "Tintorería Verificada",
+        nombre: "Dueña Nueva",
+        correo: "duena@tintoreria-nueva.com",
+        clave: "Contrasena-2026-ok",
+        zonaHoraria: "America/New_York",
+        idioma: "es",
+        pais: "US",
+        moneda: "USD",
+        aceptaTerminos: true,
+      },
+    });
+    expect(alta.estado).toBe(200);
+    // El correo de bienvenida sale con su enlace.
+    const correo = enviadosMsw.correo.find((c) => c.to?.[0]?.address === "duena@tintoreria-nueva.com");
+    expect(correo, "el correo de verificación").toBeTruthy();
+    const enlace = /\/entrar\/verificar\?token=([^\s]+)/.exec(String(correo?.text))?.[1];
+    expect(enlace, "el enlace del correo").toBeTruthy();
+    const token = decodeURIComponent(enlace!);
+
+    // Antes de tocarlo, el panel lo recuerda.
+    const fila = await e.env.DB.prepare("select verificado_en from verificacion_correo where correo = ?")
+      .bind("duena@tintoreria-nueva.com")
+      .first<{ verificado_en: number | null }>();
+    expect(fila?.verificado_en).toBeNull();
+
+    expect(await verificarCorreo(e.env.DB, token)).toBe(true);
+    // Una sola vez: el mismo enlace ya no sirve.
+    expect(await verificarCorreo(e.env.DB, token)).toBe(false);
+    expect(await verificarCorreo(e.env.DB, "inventado".repeat(4))).toBe(false);
+
+    // Un enlace vencido tampoco sirve: se pide otro y se le pone fecha vieja.
+    const usuarioPrevio = await e.env.DB.prepare("select id, tintoreria_id from usuarios where correo = ?")
+      .bind("duena@tintoreria-nueva.com")
+      .first<{ id: string; tintoreria_id: string }>();
+    enviadosMsw.correo.length = 0;
+    await pedirVerificacion(
+      e.env.DB,
+      variablesDe(e.env),
+      {
+        id: usuarioPrevio!.id,
+        tintoreriaId: usuarioPrevio!.tintoreria_id,
+        nombre: "Dueña Nueva",
+        correo: "duena@tintoreria-nueva.com",
+      },
+      "es",
+    );
+    const segundo = decodeURIComponent(/token=([^\s]+)/.exec(String(enviadosMsw.correo[0]?.text))![1]!);
+    await e.env.DB.prepare("update verificacion_correo set expira_en = ? where usuario_id = ?")
+      .bind(Date.now() - 1000, usuarioPrevio!.id)
+      .run();
+    expect(await verificarCorreo(e.env.DB, segundo)).toBe(false);
+
+    // Y uno nuevo sí, para dejarlo verificado.
+    await pedirVerificacion(
+      e.env.DB,
+      variablesDe(e.env),
+      {
+        id: usuarioPrevio!.id,
+        tintoreriaId: usuarioPrevio!.tintoreria_id,
+        nombre: "Dueña Nueva",
+        correo: "duena@tintoreria-nueva.com",
+      },
+      "es",
+    );
+    const tercero = decodeURIComponent(/token=([^\s]+)/.exec(String(enviadosMsw.correo.at(-1)?.text))![1]!);
+    expect(await verificarCorreo(e.env.DB, tercero)).toBe(true);
+
+    const usuario = await e.env.DB.prepare("select id, tintoreria_id from usuarios where correo = ?")
+      .bind("duena@tintoreria-nueva.com")
+      .first<{ id: string; tintoreria_id: string }>();
+    expect(await estadoVerificacion(e.env.DB, usuario!.id, usuario!.tintoreria_id)).toEqual({
+      correo: "duena@tintoreria-nueva.com",
+      verificado: true,
+    });
   });
 });
 

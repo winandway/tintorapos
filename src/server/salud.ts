@@ -75,7 +75,7 @@ export async function revisarSalud(env: CloudflareEnv, vars: Variables, ahora = 
 
   if (piezas.base.estado === "ok") {
     const reloj = await leerSistema(env.DB, "reloj_ultima_corrida").catch(() => null);
-    if (!reloj) piezas.reloj = { estado: "error", detalle: "el reloj externo nunca llamó a /datos/reloj" };
+    if (!reloj) piezas.reloj = { estado: "error", detalle: "el reloj todavía no ha corrido ni una vez" };
     else if (ahora - reloj.actualizadoEn > QUINCE_MIN)
       piezas.reloj = {
         estado: "error",

@@ -31,6 +31,9 @@ export function Pie({ idioma, compacto = false }: { idioma: Idioma; compacto?: b
             <Link href={rutaPagina(idioma, "terminos")} className="hover:text-tinta">
               {d.terminos}
             </Link>
+            <Link href={rutaPagina(idioma, "contacto")} className="hover:text-tinta">
+              {diccionario(idioma).contacto.titulo}
+            </Link>
           </nav>
         )}
       </div>

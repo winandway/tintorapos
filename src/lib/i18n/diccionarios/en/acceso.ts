@@ -2,6 +2,14 @@ import type { acceso as base } from "../es/acceso";
 import type { Forma } from "../../index";
 
 export const acceso: Forma<typeof base> = {
+  correoVerificado: "Email confirmed",
+  correoVerificadoTexto: "Done. You can now reset your password with this email if you ever forget it.",
+  correoNoVerificado: "That link no longer works",
+  correoNoVerificadoTexto:
+    "The link expired or was already used. Open the panel and tap “Resend the email” to get a new one.",
+  verificaTuCorreo: "Confirm your email: we sent a link to {correo}.",
+  reenviarVerificacion: "Resend the email",
+  verificacionEnviada: "We sent the link again. Check your inbox.",
   ladoTitulo: "Every garment, in its place.",
   ladoTexto: "Take in, tag, notify, and hand back. Your whole dry cleaner on a tablet, online or offline.",
   entrarTitulo: "Sign in to your store",

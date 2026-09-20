@@ -3,6 +3,7 @@ import { Archivo, Atkinson_Hyperlegible_Next } from "next/font/google";
 import { ProveedorIdioma } from "@/lib/i18n/cliente";
 import { obtenerTextos } from "@/lib/i18n/servidor";
 import { URL_SITIO } from "@/lib/sitio";
+import { latirReloj } from "@/server/reloj/interno";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -56,6 +57,9 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // El reloj late con el tráfico del sitio: avisos, recordatorios y respaldos
+  // salen sin depender de un cron de nadie. Corre DESPUÉS de responder.
+  latirReloj();
   const { idioma, d } = await obtenerTextos();
   return (
     <html lang={idioma} className={`${archivo.variable} ${atkinson.variable}`} suppressHydrationWarning>
