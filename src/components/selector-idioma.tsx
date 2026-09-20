@@ -23,24 +23,27 @@ function BanderaEEUU() {
   );
 }
 
-function BanderaMexico() {
+/**
+ * REGLA DE LA CASA: el español lleva la bandera de ESPAÑA, nunca la de México
+ * ni la de ningún otro país. El idioma viene de España; poner la bandera de un
+ * solo país de América deja fuera a todos los demás y confunde al cliente.
+ */
+function BanderaEspana() {
   return (
     <svg
       viewBox="0 0 30 20"
       aria-hidden="true"
       className="h-4 w-6 rounded-[3px] shadow-[0_0_0_1px_rgb(0_0_0/0.12)]"
     >
-      <rect width="10" height="20" fill="#006847" />
-      <rect x="10" width="10" height="20" fill="#fff" />
-      <rect x="20" width="10" height="20" fill="#CE1126" />
-      <circle cx="15" cy="10" r="2.4" fill="#8C5A2B" />
+      <rect width="30" height="20" fill="#AA151B" />
+      <rect y="5" width="30" height="10" fill="#F1BF00" />
     </svg>
   );
 }
 
 const OPCIONES: { idioma: Idioma; etiqueta: string; Bandera: () => React.JSX.Element }[] = [
   { idioma: "en", etiqueta: "English", Bandera: BanderaEEUU },
-  { idioma: "es", etiqueta: "Español", Bandera: BanderaMexico },
+  { idioma: "es", etiqueta: "Español", Bandera: BanderaEspana },
 ];
 
 export function SelectorIdioma({ compacto = false }: { compacto?: boolean }) {

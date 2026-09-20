@@ -30,7 +30,16 @@ describe("panel de Windoce y billetes de soporte", () => {
   const jefe = new Navegador();
   const duena = new Navegador();
   let tintoreriaId = "";
-  const correos = () => enviadosMsw.correo.map((c) => ({ to: c.to[0]!.address, subject: c.subject }));
+  // Ojo: `enviadosMsw.correo` lo comparten todos los archivos de prueba. Aquí se
+  // mira solo lo que salió DESPUÉS de cada marca, nunca se vacía la lista: si se
+  // vacía, otro archivo que corra a la vez se queda sin sus correos y falla sin
+  // motivo (pasó el 20 de septiembre de 2026).
+  let marca = 0;
+  const desdeAqui = () => {
+    marca = enviadosMsw.correo.length;
+  };
+  const correos = () =>
+    enviadosMsw.correo.slice(marca).map((c) => ({ to: c.to[0]!.address, subject: c.subject }));
 
   beforeAll(async () => {
     e = await crearEntorno({
@@ -101,7 +110,7 @@ describe("panel de Windoce y billetes de soporte", () => {
   });
 
   it("un mensaje del sitio abre un billete, avisa a soporte y la respuesta le llega al cliente", async () => {
-    enviadosMsw.correo.length = 0;
+    desdeAqui();
     const abrir = await new Navegador().llamar(contacto, {
       cuerpo: {
         nombre: "Dueña que pregunta",
@@ -120,7 +129,7 @@ describe("panel de Windoce y billetes de soporte", () => {
     const ticket = lista.datos.tickets[0]!;
     expect(ticket.estado).toBe("abierto");
 
-    enviadosMsw.correo.length = 0;
+    desdeAqui();
     const respuesta = await jefe.llamar<{ enviado: boolean }>(responderRuta, {
       params: { id: ticket.id },
       cuerpo: { mensaje: "Sí: cada tienda lleva sus órdenes y sus reportes por separado." },
