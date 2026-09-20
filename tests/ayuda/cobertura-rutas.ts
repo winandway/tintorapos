@@ -323,6 +323,92 @@ export const COBERTURA: Record<string, Cobertura> = {
     ],
   },
   "/datos/mostrador/cache": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/contabilidad/resumen": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/contabilidad/impuestos": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/contabilidad/cobrar": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/contabilidad/exportar": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  "/datos/contabilidad/gastos": {
+    casos: (e) => [
+      { metodo: "GET", esperado: [200] },
+      {
+        metodo: "POST",
+        cuerpo: {
+          gasto: {
+            fecha: "2026-09-10",
+            categoria: "luz",
+            montoCents: 100,
+            metodoPago: "efectivo",
+            proveedorId: e.a.ids.proveedorId,
+          },
+        },
+      },
+    ],
+  },
+  "/datos/contabilidad/gastos/[id]": {
+    casos: (e) => [
+      {
+        metodo: "PUT",
+        params: { id: e.a.ids.gastoId ?? "" },
+        cuerpo: {
+          gasto: { fecha: "2026-09-10", categoria: "luz", montoCents: 1, metodoPago: "efectivo" },
+        },
+      },
+      { metodo: "DELETE", params: { id: e.a.ids.gastoId ?? "" } },
+    ],
+  },
+  "/datos/contabilidad/proveedores": {
+    casos: () => [
+      { metodo: "GET", esperado: [200] },
+      { metodo: "POST", cuerpo: { proveedor: { nombre: "Proveedor B", terminosDias: 0 } }, esperado: [200] },
+    ],
+  },
+  "/datos/contabilidad/proveedores/[id]": {
+    casos: (e) => [
+      {
+        metodo: "PUT",
+        params: { id: e.a.ids.proveedorId ?? "" },
+        cuerpo: { proveedor: { nombre: "Robado", terminosDias: 0 } },
+      },
+      { metodo: "DELETE", params: { id: e.a.ids.proveedorId ?? "" } },
+    ],
+  },
+  "/datos/contabilidad/insumos": {
+    casos: () => [
+      { metodo: "GET", esperado: [200] },
+      { metodo: "POST", cuerpo: { insumo: { nombre: "Insumo B", unidad: "caja" } }, esperado: [200] },
+    ],
+  },
+  "/datos/contabilidad/insumos/[id]": {
+    casos: (e) => [
+      {
+        metodo: "PUT",
+        params: { id: e.a.ids.insumoId ?? "" },
+        cuerpo: { insumo: { nombre: "Robado", unidad: "caja" } },
+      },
+      { metodo: "POST", params: { id: e.a.ids.insumoId ?? "" }, cuerpo: { cantidad: -5 } },
+    ],
+  },
+  "/datos/contabilidad/compras": {
+    casos: (e) => [
+      { metodo: "GET", esperado: [200] },
+      {
+        metodo: "POST",
+        cuerpo: {
+          compra: {
+            proveedorId: e.a.ids.proveedorId,
+            fecha: "2026-09-10",
+            lineas: [{ insumoId: e.a.ids.insumoId, descripcion: "Robo", cantidad: 1, costoUnitCents: 1 }],
+          },
+        },
+      },
+    ],
+  },
+  "/datos/contabilidad/compras/[id]": {
+    casos: (e) => [
+      { metodo: "POST", params: { id: e.a.ids.compraId ?? "" }, cuerpo: { montoCents: 100 } },
+      { metodo: "DELETE", params: { id: e.a.ids.compraId ?? "" } },
+    ],
+  },
   "/datos/salud": { publica: "canario sin datos de ninguna tintorería" },
   "/datos/empleados": {
     casos: () => [

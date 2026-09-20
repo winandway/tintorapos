@@ -21,14 +21,16 @@
 
 ## Fase B — Contabilidad para tintorerías
 
-- [ ] B1. Investigar en internet qué lleva la contabilidad de una tintorería y
-      dejarlo escrito.
-- [ ] B2. Base: proveedores, gastos, categorías, compras, insumos y movimientos.
-- [ ] B3. Servidor y rutas `/datos/contabilidad/*`.
-- [ ] B4. Pantallas: Gastos, Insumos y compras, Proveedores, Ganancia, Impuestos
-      y Cuentas por cobrar, con su menú.
-- [ ] B5. Exportación para el contador.
-- [ ] B6. Candados y pruebas de todo lo anterior.
+- [x] B1. Investigar en internet qué lleva la contabilidad de una tintorería y
+      dejarlo escrito (`docs/CONTABILIDAD-TINTORERIA.md`).
+- [x] B2. Base: proveedores, gastos, compras, líneas, insumos y movimientos.
+- [x] B3. Servidor: categorías del oficio, gastos, compras, insumos,
+      proveedores, ganancia, impuestos y por cobrar.
+- [x] B4. Rutas `/datos/contabilidad/*` con sus permisos.
+- [x] B5. Pantallas con su menú: Ganancia, Gastos, Compras, Insumos,
+      Proveedores, Por cobrar e Impuestos.
+- [x] B6. Exportación para el contador.
+- [x] B7. Candados y pruebas de todo lo anterior.
 
 ## Fase C — Publicar
 

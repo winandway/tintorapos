@@ -72,6 +72,7 @@ export const ajustes: Forma<typeof base> = {
       ordenes: "Orders and garments",
       dinero: "Money",
       clientes: "Customers",
+      contabilidad: "Accounting",
       tienda: "Store and team",
     },
     listaPermisos: {
@@ -96,6 +97,8 @@ export const ajustes: Forma<typeof base> = {
       "clientes.ver": "See customers",
       "clientes.editar": "Create and edit customers",
       "clientes.eliminar": "Delete customers",
+      "contabilidad.ver": "See accounting and profit",
+      "contabilidad.gestionar": "Record expenses, purchases and supplies",
       "ajustes.tienda": "Change the store details",
       "ajustes.catalogo": "Change garments, services and prices",
       "ajustes.avisos": "Change customer notifications",

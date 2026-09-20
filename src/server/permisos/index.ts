@@ -27,6 +27,8 @@ export const PERMISOS = [
   "clientes.eliminar",
   "recibos.reimprimir",
   "reportes.ver",
+  "contabilidad.ver",
+  "contabilidad.gestionar",
   "ajustes.tienda",
   "ajustes.catalogo",
   "ajustes.avisos",
@@ -99,6 +101,7 @@ export const AREAS = [
     ],
   },
   { clave: "clientes", permisos: ["clientes.ver", "clientes.editar", "clientes.eliminar"] },
+  { clave: "contabilidad", permisos: ["contabilidad.ver", "contabilidad.gestionar"] },
   {
     clave: "tienda",
     permisos: [

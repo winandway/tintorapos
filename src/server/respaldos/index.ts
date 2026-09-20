@@ -23,6 +23,12 @@ export const TABLAS_RESPALDO = [
   "pagos",
   "avisos",
   "auditoria",
+  "proveedores",
+  "insumos",
+  "compras",
+  "compra_lineas",
+  "gastos",
+  "movimientos_insumo",
 ] as const;
 
 export type TablaRespaldo = (typeof TABLAS_RESPALDO)[number];

@@ -27,6 +27,7 @@ export const errores: Record<CodigoError, string> = {
   cuenta_suspendida: "Esta cuenta está suspendida. Escríbenos a soporte.",
   prueba_terminada:
     "Tu prueba gratis terminó. Puedes ver y exportar todo lo tuyo; para seguir trabajando, escríbenos y activamos tu plan.",
+  gasto_de_compra: "Este gasto salió de una compra a un proveedor. Cámbialo o bórralo desde la compra.",
   demo_lleno: "Ahora mismo hay demasiadas demostraciones abiertas. Vuelve a intentarlo en unos minutos.",
   estado_invalido: "La orden no puede pasar a ese estado.",
   monto_invalido: "El monto no es válido.",

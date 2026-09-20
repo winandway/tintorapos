@@ -52,6 +52,12 @@ const ITEMS: ItemNav[] = [
   { ruta: "/app/caja", clave: "caja", icono: "caja", permiso: "caja.abrir" },
   { ruta: "/app/reportes", clave: "reportes", icono: "reportes", permiso: "reportes.ver" },
   {
+    ruta: "/app/contabilidad",
+    clave: "contabilidad",
+    icono: "contabilidad",
+    permiso: "contabilidad.ver",
+  },
+  {
     ruta: "/app/ajustes",
     clave: "ajustes",
     icono: "ajustes",

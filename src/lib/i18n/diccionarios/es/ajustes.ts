@@ -72,6 +72,7 @@ export const ajustes = {
       ordenes: "Órdenes y prendas",
       dinero: "Dinero",
       clientes: "Clientes",
+      contabilidad: "Contabilidad",
       tienda: "Tienda y equipo",
     },
     listaPermisos: {
@@ -96,6 +97,8 @@ export const ajustes = {
       "clientes.ver": "Ver clientes",
       "clientes.editar": "Crear y editar clientes",
       "clientes.eliminar": "Eliminar clientes",
+      "contabilidad.ver": "Ver la contabilidad y la ganancia",
+      "contabilidad.gestionar": "Registrar gastos, compras e insumos",
       "ajustes.tienda": "Cambiar los datos de la tienda",
       "ajustes.catalogo": "Cambiar prendas, servicios y precios",
       "ajustes.avisos": "Cambiar los avisos al cliente",

@@ -462,3 +462,114 @@ CREATE TABLE IF NOT EXISTS sistema (
   valor TEXT NOT NULL,
   actualizado_en INTEGER NOT NULL
 );
+
+-- ---------------------------------------------------------------------------
+-- Contabilidad de la tintorería (ver docs/CONTABILIDAD-TINTORERIA.md).
+-- Nada de partida doble: lo que el dueño usa de verdad — lo que sale de la
+-- caja, lo que se le compra a un proveedor y cuánto queda de cada insumo.
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS proveedores (
+  id TEXT PRIMARY KEY,
+  tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
+  nombre TEXT NOT NULL,
+  telefono TEXT,
+  correo TEXT,
+  contacto TEXT,
+  terminos_dias INTEGER NOT NULL DEFAULT 0 CHECK (terminos_dias BETWEEN 0 AND 365),
+  notas TEXT,
+  activo INTEGER NOT NULL DEFAULT 1,
+  creado_por TEXT REFERENCES usuarios(id),
+  creado_en INTEGER NOT NULL,
+  actualizado_en INTEGER NOT NULL,
+  eliminado_en INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_proveedores_tienda ON proveedores (tintoreria_id, activo, nombre);
+
+CREATE TABLE IF NOT EXISTS insumos (
+  id TEXT PRIMARY KEY,
+  tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
+  nombre TEXT NOT NULL,
+  unidad TEXT NOT NULL DEFAULT 'unidad',
+  existencia REAL NOT NULL DEFAULT 0,
+  minimo REAL NOT NULL DEFAULT 0,
+  costo_unit_cents INTEGER NOT NULL DEFAULT 0 CHECK (costo_unit_cents >= 0),
+  proveedor_id TEXT REFERENCES proveedores(id),
+  activo INTEGER NOT NULL DEFAULT 1,
+  orden INTEGER NOT NULL DEFAULT 0,
+  creado_en INTEGER NOT NULL,
+  actualizado_en INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_insumos_tienda ON insumos (tintoreria_id, activo, orden);
+
+CREATE TABLE IF NOT EXISTS compras (
+  id TEXT PRIMARY KEY,
+  tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
+  sucursal_id TEXT REFERENCES sucursales(id),
+  proveedor_id TEXT REFERENCES proveedores(id),
+  numero_factura TEXT,
+  fecha_local TEXT NOT NULL,
+  subtotal_cents INTEGER NOT NULL DEFAULT 0 CHECK (subtotal_cents >= 0),
+  impuesto_cents INTEGER NOT NULL DEFAULT 0 CHECK (impuesto_cents >= 0),
+  total_cents INTEGER NOT NULL CHECK (total_cents >= 0),
+  pagado_cents INTEGER NOT NULL DEFAULT 0 CHECK (pagado_cents >= 0),
+  vence_en INTEGER,
+  notas TEXT,
+  creado_por TEXT REFERENCES usuarios(id),
+  creado_en INTEGER NOT NULL,
+  actualizado_en INTEGER NOT NULL,
+  eliminado_en INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_compras_tienda ON compras (tintoreria_id, fecha_local);
+
+CREATE TABLE IF NOT EXISTS compra_lineas (
+  id TEXT PRIMARY KEY,
+  tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
+  compra_id TEXT NOT NULL REFERENCES compras(id),
+  insumo_id TEXT REFERENCES insumos(id),
+  descripcion TEXT NOT NULL,
+  cantidad REAL NOT NULL CHECK (cantidad > 0),
+  costo_unit_cents INTEGER NOT NULL CHECK (costo_unit_cents >= 0),
+  total_cents INTEGER NOT NULL CHECK (total_cents >= 0),
+  creada_en INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_compra_lineas_compra ON compra_lineas (tintoreria_id, compra_id);
+
+-- El libro de lo que sale de la caja. Una compra a proveedor escribe TAMBIÉN
+-- su gasto (con compra_id), así la ganancia se calcula de una sola tabla y
+-- nada se cuenta dos veces.
+CREATE TABLE IF NOT EXISTS gastos (
+  id TEXT PRIMARY KEY,
+  tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
+  sucursal_id TEXT REFERENCES sucursales(id),
+  categoria TEXT NOT NULL,
+  proveedor_id TEXT REFERENCES proveedores(id),
+  compra_id TEXT REFERENCES compras(id),
+  empleado_id TEXT REFERENCES usuarios(id),
+  descripcion TEXT,
+  monto_cents INTEGER NOT NULL CHECK (monto_cents > 0),
+  metodo_pago TEXT NOT NULL DEFAULT 'efectivo',
+  referencia TEXT,
+  fecha_local TEXT NOT NULL,
+  creado_por TEXT REFERENCES usuarios(id),
+  creado_en INTEGER NOT NULL,
+  actualizado_en INTEGER NOT NULL,
+  eliminado_en INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_gastos_tienda ON gastos (tintoreria_id, fecha_local);
+CREATE INDEX IF NOT EXISTS idx_gastos_categoria ON gastos (tintoreria_id, categoria, fecha_local);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_gastos_compra ON gastos (compra_id) WHERE compra_id IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS movimientos_insumo (
+  id TEXT PRIMARY KEY,
+  tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
+  insumo_id TEXT NOT NULL REFERENCES insumos(id),
+  tipo TEXT NOT NULL CHECK (tipo IN ('compra', 'consumo', 'ajuste')),
+  cantidad REAL NOT NULL,
+  existencia_despues REAL NOT NULL,
+  motivo TEXT,
+  compra_id TEXT REFERENCES compras(id),
+  usuario_id TEXT REFERENCES usuarios(id),
+  creado_en INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_movimientos_insumo ON movimientos_insumo (tintoreria_id, insumo_id, creado_en);

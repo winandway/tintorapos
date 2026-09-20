@@ -7,6 +7,7 @@ export const app = {
     entrega: "Entregar",
     clientes: "Clientes",
     caja: "Caja",
+    contabilidad: "Contabilidad",
     reportes: "Reportes",
     ajustes: "Ajustes",
     mas: "Más",

@@ -26,6 +26,7 @@ export const errores: Record<CodigoError, string> = {
   cuenta_suspendida: "This account is suspended. Please contact support.",
   prueba_terminada:
     "Your free trial has ended. You can still see and export everything of yours; to keep working, write to us and we'll turn your plan on.",
+  gasto_de_compra: "This expense came from a supplier purchase. Change or delete it from the purchase.",
   demo_lleno: "There are too many demos open right now. Please try again in a few minutes.",
   estado_invalido: "The order can't move to that status.",
   monto_invalido: "That amount isn't valid.",

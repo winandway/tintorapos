@@ -2,6 +2,7 @@ import { nuevoId, sha256Hex } from "@/lib/codigos";
 import { registrarTintoreria } from "@/server/cuentas/registro";
 import { abrirTurno } from "@/server/caja";
 import { crearOrden } from "@/server/ordenes/crear";
+import { crearCompra, crearGasto, guardarInsumo, guardarProveedor } from "@/server/contabilidad";
 import { guardarFoto } from "@/server/fotos";
 import { sesionDe } from "./sesion";
 import type { EntornoPrueba } from "./entorno";
@@ -73,6 +74,35 @@ export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario>
       urgente: false,
       pago: { id: pagoId, metodo: "efectivo", montoCents: 100 },
     });
+    // Contabilidad: cada tintorería trae su proveedor, su insumo, su compra y
+    // su gasto, para que el candado de aislamiento también los cubra.
+    const proveedorId = await guardarProveedor(db, s, null, {
+      nombre: `Proveedor ${nombre}`,
+      terminosDias: 30,
+      activo: true,
+    });
+    const insumoId = await guardarInsumo(db, s, null, {
+      nombre: `Insumo ${nombre}`,
+      unidad: "caja",
+      minimo: 2,
+      costoUnitCents: 500,
+      proveedorId,
+      activo: true,
+    });
+    const compra = await crearCompra(db, s, {
+      proveedorId,
+      fecha: "2026-09-01",
+      impuestoCents: 0,
+      pagadoCents: 0,
+      lineas: [{ insumoId, descripcion: `Ganchos ${nombre}`, cantidad: 10, costoUnitCents: 500 }],
+    });
+    const gastoId = await crearGasto(db, s, {
+      fecha: "2026-09-02",
+      categoria: "luz",
+      montoCents: 12_345,
+      metodoPago: "efectivo",
+      descripcion: `Luz ${nombre}`,
+    });
     const fotoId = await guardarFoto(db, e.env.BUCKET, s, {
       ordenId,
       prendaId: prendaOrdenId,
@@ -98,6 +128,10 @@ export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario>
         turnoId,
         orden.codigoPublico,
         fotoId,
+        proveedorId,
+        insumoId,
+        compra.id,
+        gastoId,
       ],
       ids: {
         prendaId: prenda!.id,
@@ -110,6 +144,10 @@ export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario>
         turnoId,
         codigoPublico: orden.codigoPublico,
         fotoId,
+        proveedorId,
+        insumoId,
+        compraId: compra.id,
+        gastoId,
       },
     };
   };
@@ -136,6 +174,12 @@ const TABLAS = [
   "pagos",
   "avisos",
   "respaldos",
+  "proveedores",
+  "insumos",
+  "compras",
+  "compra_lineas",
+  "gastos",
+  "movimientos_insumo",
 ];
 
 /** Huella de todos los datos de una tintorería: si algo cambia, cambia la huella. */

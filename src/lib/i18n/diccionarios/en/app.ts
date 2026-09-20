@@ -10,6 +10,7 @@ export const app: Forma<typeof base> = {
     entrega: "Pick up",
     clientes: "Customers",
     caja: "Register",
+    contabilidad: "Accounting",
     reportes: "Reports",
     ajustes: "Settings",
     mas: "More",
