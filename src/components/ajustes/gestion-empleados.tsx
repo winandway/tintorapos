@@ -11,6 +11,7 @@ import { pedir } from "@/lib/api";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { fmt, formatoFecha } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
+import { AREAS, permisosDe } from "@/server/permisos";
 import { useDatos } from "@/lib/use-datos";
 
 type Rol = "dueno" | "gerente" | "cajero" | "planta" | "repartidor";
@@ -19,6 +20,7 @@ interface Empleado {
   id: string;
   nombre: string;
   rol: Rol;
+  permisos?: string[] | null;
   correo: string | null;
   tienePin: boolean;
   totpActivo: boolean;
@@ -32,7 +34,18 @@ function puedeGestionar(actor: Rol, objetivo: Rol) {
   return actor === "gerente" && objetivo !== "dueno" && objetivo !== "gerente";
 }
 
-export function GestionEmpleados({ miRol, miId, zona }: { miRol: Rol; miId: string; zona: string }) {
+export function GestionEmpleados({
+  miRol,
+  miId,
+  misPermisos,
+  zona,
+}: {
+  miRol: Rol;
+  miId: string;
+  /** Lo que puedo repartir: nadie da lo que no tiene. */
+  misPermisos: string[];
+  zona: string;
+}) {
   const { d, idioma } = useIdioma();
   const avisar = useAvisar();
   const { datos, error, recargar } = useDatos<{ empleados: Empleado[] }>("/datos/empleados");
@@ -107,6 +120,7 @@ export function GestionEmpleados({ miRol, miId, zona }: { miRol: Rol; miId: stri
       <ModalEmpleado
         editando={editando}
         miRol={miRol}
+        misPermisos={misPermisos}
         alCerrar={() => setEditando(null)}
         alGuardar={() => {
           setEditando(null);
@@ -130,17 +144,20 @@ function Etiqueta({ tono, children }: { tono: "ok" | "gris" | "peligro"; childre
 function ModalEmpleado({
   editando,
   miRol,
+  misPermisos,
   alCerrar,
   alGuardar,
 }: {
   editando: Partial<Empleado> | null;
   miRol: Rol;
+  misPermisos: string[];
   alCerrar: () => void;
   alGuardar: () => void;
 }) {
   const { d } = useIdioma();
   const de = d.ajustes.empleados;
   const [v, setV] = useState({ nombre: "", rol: "cajero" as Rol, pin: "", correo: "", claveTemporal: "" });
+  const [permisos, setPermisos] = useState<string[]>([]);
   const [cargadoDe, setCargadoDe] = useState<Partial<Empleado> | null>(null);
   const [campos, setCampos] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
@@ -157,6 +174,8 @@ function ModalEmpleado({
     });
     setCampos({});
     setError(null);
+    const rolInicial = editando?.rol ?? "cajero";
+    setPermisos(editando?.permisos ?? permisosDe(rolInicial));
   }
   if (!editando)
     return (
@@ -166,6 +185,8 @@ function ModalEmpleado({
     );
 
   const esNuevo = !editando.id;
+  const delRol = permisosDe(v.rol);
+  const mismosQueElRol = permisos.length === delRol.length && delRol.every((p) => permisos.includes(p));
   const conCuenta = v.rol === "dueno" || v.rol === "gerente";
   const roles: Rol[] = (["dueno", "gerente", "cajero", "planta", "repartidor"] as Rol[]).filter((r) =>
     puedeGestionar(miRol, r),
@@ -183,6 +204,7 @@ function ModalEmpleado({
     const cuerpo = {
       nombre: v.nombre,
       rol: v.rol,
+      permisos,
       ...(v.pin ? { pin: v.pin } : {}),
       correo: conCuenta ? v.correo.trim() : "",
       ...(conCuenta && v.claveTemporal ? { claveTemporal: v.claveTemporal } : {}),
@@ -230,11 +252,61 @@ function ModalEmpleado({
           <CampoSelector
             etiqueta={de.rol}
             value={v.rol}
-            onChange={(e) => setV({ ...v, rol: e.target.value as Rol })}
+            onChange={(e) => {
+              const rol = e.target.value as Rol;
+              setV({ ...v, rol });
+              setPermisos(permisosDe(rol));
+            }}
             opciones={roles.map((r) => ({ valor: r, texto: d.app.roles[r] }))}
           />
           <p className="mt-1 text-[13px] text-gris">{de.descripcionRoles[v.rol]}</p>
         </div>
+
+        <fieldset className="rounded-2xl bg-papel p-4">
+          <legend className="px-1 text-sm font-bold">{de.permisos}</legend>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <p className="text-[13px] text-gris">{de.permisosAyuda}</p>
+            {!mismosQueElRol && (
+              <button
+                type="button"
+                onClick={() => setPermisos(permisosDe(v.rol))}
+                className="text-[13px] font-semibold text-tinta underline"
+              >
+                {de.permisosDelRol}
+              </button>
+            )}
+          </div>
+          <div className="mt-3 space-y-3">
+            {AREAS.map((area) => {
+              const disponibles = area.permisos.filter((p) => misPermisos.includes(p));
+              if (disponibles.length === 0) return null;
+              return (
+                <div key={area.clave}>
+                  <p className="text-[12px] font-bold tracking-wide text-gris uppercase">
+                    {de.areas[area.clave]}
+                  </p>
+                  <div className="mt-1.5 grid gap-x-4 gap-y-1.5 sm:grid-cols-2">
+                    {disponibles.map((p) => (
+                      <label key={p} className="flex items-start gap-2 text-[14px]">
+                        <input
+                          type="checkbox"
+                          className="mt-0.5 size-5 shrink-0 accent-tinta"
+                          checked={permisos.includes(p)}
+                          onChange={(e) =>
+                            setPermisos((lista) =>
+                              e.target.checked ? [...lista, p] : lista.filter((x) => x !== p),
+                            )
+                          }
+                        />
+                        <span>{de.listaPermisos[p]}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </fieldset>
         <CampoClave
           etiqueta={esNuevo ? de.pin : de.pinNuevo}
           inputMode="numeric"

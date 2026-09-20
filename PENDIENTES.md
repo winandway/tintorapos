@@ -89,3 +89,7 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
   con buscador (faltaban Venezuela, Rumania y casi todo el mundo).
 - ✅ 2026-09-19 · Capturas reales del sistema en la página de venta, con carrusel
   del flujo de una orden.
+- ✅ 2026-09-19 · POS a pantalla completa con el menú en una hamburguesa, y la
+  entrada del menú se llama POS.
+- ✅ 2026-09-19 · Permisos por empleado con palomitas (tabla `permisos_usuario`),
+  con el rol como punto de partida y sin poder repartir lo que uno no tiene.

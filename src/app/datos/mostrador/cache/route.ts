@@ -1,5 +1,5 @@
 import { sinPermiso } from "@/server/errores";
-import { tienePermiso } from "@/server/permisos";
+import { usuarioPuede } from "@/server/permisos";
 import { ruta } from "@/server/ruta";
 import { datosParaSinConexion } from "@/server/sync";
 
@@ -7,11 +7,11 @@ import { datosParaSinConexion } from "@/server/sync";
 export const GET = ruta({
   acceso: "sesion",
   manejar: async (c) => {
-    const rol = c.sesion!.usuario.rol;
-    if (!tienePermiso(rol, "ordenes.ver")) throw sinPermiso();
+    const usuario = c.sesion!.usuario;
+    if (!usuarioPuede(usuario, "ordenes.ver")) throw sinPermiso();
     const datos = await datosParaSinConexion(c.db, c.sesion!.tintoreria.id);
     // Planta no ve montos ni teléfonos.
-    if (!tienePermiso(rol, "ordenes.ver_montos")) {
+    if (!usuarioPuede(usuario, "ordenes.ver_montos")) {
       return {
         ...datos,
         clientes: [],

@@ -4,7 +4,7 @@ import type { Forma } from "../../index";
 export const app: Forma<typeof base> = {
   nav: {
     inicio: "Home",
-    mostrador: "New order",
+    mostrador: "POS",
     ordenes: "Orders",
     produccion: "Production",
     entrega: "Pick up",
@@ -23,6 +23,7 @@ export const app: Forma<typeof base> = {
   },
   menuCuenta: "Account menu",
   bloquear: "Lock screen",
+  abrirMenu: "Open the menu",
   salir: "Sign out",
   pruebaQuedan: "Free trial: {dias} days left.",
   pruebaUltimoDia: "Free trial: today is your last day.",

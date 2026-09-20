@@ -457,6 +457,28 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
 - **NO tocar:** las capturas NUNCA salen de datos de un cliente real; se
   regeneran con el sembrado local. Si cambia una pantalla, se vuelven a tomar.
 
+### B25. El POS compartía la pantalla con el menú, y los permisos eran solo del rol
+
+- **Qué pedían los clientes:** (1) que el POS (la pantalla de atender) se abra a
+  pantalla completa, con el menú guardado en una hamburguesa; (2) poder darle a
+  cada empleado sus permisos con palomitas, no solo el paquete de su rol.
+- **Cómo está hecho:**
+  - `src/components/app/marco-app.tsx`: en `/app/mostrador` la barra lateral no
+    se dibuja, el contenido va a todo lo ancho y aparece una hamburguesa que abre
+    el menú como cajón (se cierra con Escape, al tocar fuera o al cambiar de
+    pantalla). En el menú, esa entrada ahora se llama **POS**.
+  - Permisos por persona: tabla `permisos_usuario` (no se toca `usuarios` para no
+    depender de un ALTER TABLE, que en SQLite no admite «si no existe»).
+    `leerSesion` los trae con la sesión; `usuarioPuede(usuario, permiso)`
+    reemplazó a `tienePermiso(rol, permiso)` en TODAS las rutas y pantallas.
+    `permisosAGuardar` recorta lo pedido a lo que tiene quien edita y, si queda
+    igual que el rol, no guarda nada (manda el rol).
+- **Candados:** `tests/integracion/ajustes.test.ts` («palomitas por empleado…»),
+  comprobado en rojo dos veces: primero haciendo que `usuarioPuede` mirara solo
+  el rol, después dejando que se pudiera dar cualquier permiso.
+- **NO tocar:** no volver a preguntar por el rol para decidir un permiso; se
+  pregunta por la persona. Y nadie puede dar un permiso que él no tenga.
+
 ---
 
 ## C. Candados de publicación

@@ -1,7 +1,7 @@
 import { siguientePaso } from "@/server/auth/cookies-sesion";
 import { leerDispositivo, necesitaDosPasos } from "@/server/auth/sesiones";
 import { COOKIE_DISPOSITIVO } from "@/server/cookies";
-import { permisosDe } from "@/server/permisos";
+import { permisosEfectivos } from "@/server/permisos";
 import { ruta } from "@/server/ruta";
 
 /** Quién está conectado en este navegador (o null) y si es un dispositivo de la tienda. */
@@ -16,7 +16,7 @@ export const GET = ruta({
             tipo: s.tipo,
             siguiente: siguientePaso(s.usuario, !necesitaDosPasos(s) || s.segundoFactorOk),
             usuario: { id: s.usuario.id, nombre: s.usuario.nombre, rol: s.usuario.rol },
-            permisos: permisosDe(s.usuario.rol),
+            permisos: permisosEfectivos(s.usuario),
             tintoreria: {
               nombre: s.tintoreria.nombre,
               moneda: s.tintoreria.moneda,

@@ -9,7 +9,7 @@ import { entregarOrden, esquemaEntrega } from "@/server/ordenes/acciones";
 import { crearOrden, esquemaNuevaOrden } from "@/server/ordenes/crear";
 import { cambiarEstado, esquemaCambioEstado } from "@/server/ordenes/estados";
 import { esquemaPago, registrarPago } from "@/server/pagos";
-import { tienePermiso, type Permiso } from "@/server/permisos";
+import { type Permiso, usuarioPuede } from "@/server/permisos";
 
 export const esquemaSync = z.object({
   ops: z
@@ -75,7 +75,7 @@ export async function sincronizar(
     const hora = horaOperacion(op.creadoEn, ahora);
     let resultado: ResultadoOp;
     try {
-      if (!tienePermiso(s.usuario.rol, PERMISO[op.tipo])) throw new ErrorApp(403, "sin_permiso");
+      if (!usuarioPuede(s.usuario, PERMISO[op.tipo])) throw new ErrorApp(403, "sin_permiso");
       let datos: unknown;
       switch (op.tipo) {
         case "crear_orden": {

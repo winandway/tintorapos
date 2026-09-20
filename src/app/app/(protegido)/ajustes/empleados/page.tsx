@@ -1,6 +1,7 @@
 import { GestionEmpleados } from "@/components/ajustes/gestion-empleados";
 import { EncabezadoPagina } from "@/components/ui/encabezado";
 import { obtenerTextos } from "@/lib/i18n/servidor";
+import { permisosEfectivos } from "@/server/permisos";
 import { exigirSesion } from "@/server/pagina";
 
 export default async function PaginaEmpleados() {
@@ -16,6 +17,7 @@ export default async function PaginaEmpleados() {
       <GestionEmpleados
         miRol={sesion.usuario.rol}
         miId={sesion.usuario.id}
+        misPermisos={permisosEfectivos(sesion.usuario)}
         zona={sesion.tintoreria.zonaHoraria}
       />
     </div>

@@ -6,12 +6,14 @@ import { cerrarSesionesUsuario, type Sesion } from "@/server/auth/sesiones";
 import { correoEnUso } from "@/server/cuentas/registro";
 import { esquemaCorreo, exigirClave, exigirNombreSoporte } from "@/server/cuentas/validaciones";
 import { ErrorApp, noEncontrado, sinPermiso } from "@/server/errores";
-import { puedeGestionarRol, ROLES, type Rol } from "@/server/permisos";
+import { permisosAGuardar, puedeGestionarRol, ROLES, type Rol } from "@/server/permisos";
 
 export interface Empleado {
   id: string;
   nombre: string;
   rol: Rol;
+  /** Palomitas a la medida (null = las de su rol). */
+  permisos: string[] | null;
   correo: string | null;
   tienePin: boolean;
   totpActivo: boolean;
@@ -20,12 +22,25 @@ export interface Empleado {
   bloqueadoHasta: number | null;
 }
 
+function leerLista(texto: string | null): string[] | null {
+  if (!texto) return null;
+  try {
+    const lista = JSON.parse(texto) as unknown;
+    return Array.isArray(lista) ? lista.filter((x): x is string => typeof x === "string") : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function listarEmpleados(db: D1Database, tintoreriaId: string): Promise<Empleado[]> {
   const { results } = await db
     .prepare(
-      `select id, nombre, rol, correo, pin_hash is not null as tiene_pin, totp_activo, activo, ultimo_ingreso_en, pin_bloqueado_hasta
-       from usuarios where tintoreria_id = ?
-       order by activo desc, case rol when 'dueno' then 0 when 'gerente' then 1 when 'cajero' then 2 when 'planta' then 3 else 4 end, nombre`,
+      `select u.id, u.nombre, u.rol, u.correo, u.pin_hash is not null as tiene_pin, u.totp_activo, u.activo,
+         u.ultimo_ingreso_en, u.pin_bloqueado_hasta, p.permisos
+       from usuarios u
+       left join permisos_usuario p on p.usuario_id = u.id and p.tintoreria_id = u.tintoreria_id
+       where u.tintoreria_id = ?
+       order by u.activo desc, case u.rol when 'dueno' then 0 when 'gerente' then 1 when 'cajero' then 2 when 'planta' then 3 else 4 end, u.nombre`,
     )
     .bind(tintoreriaId)
     .all<{
@@ -38,6 +53,7 @@ export async function listarEmpleados(db: D1Database, tintoreriaId: string): Pro
       activo: number;
       ultimo_ingreso_en: number | null;
       pin_bloqueado_hasta: number | null;
+      permisos: string | null;
     }>();
   return results.map((r) => ({
     id: r.id,
@@ -47,6 +63,7 @@ export async function listarEmpleados(db: D1Database, tintoreriaId: string): Pro
     tienePin: r.tiene_pin === 1,
     totpActivo: r.totp_activo === 1,
     activo: r.activo === 1,
+    permisos: leerLista(r.permisos),
     ultimoIngresoEn: r.ultimo_ingreso_en,
     bloqueadoHasta:
       r.pin_bloqueado_hasta && r.pin_bloqueado_hasta > Date.now() ? r.pin_bloqueado_hasta : null,
@@ -61,6 +78,8 @@ export const esquemaEmpleado = z.object({
   pin: opcional(z.string().regex(/^\d{4,6}$/, "pin_debil")),
   correo: opcional(z.union([z.literal(""), esquemaCorreo])),
   claveTemporal: opcional(z.string().max(200)),
+  /** Palomitas a la medida. null (o sin mandar) = los permisos de su rol. */
+  permisos: z.array(z.string().max(40)).max(60).nullable().optional(),
 });
 
 export type DatosEmpleado = z.infer<typeof esquemaEmpleado>;
@@ -110,6 +129,7 @@ export async function crearEmpleado(
         ahora,
         ahora,
       ),
+    ...sentenciasPermisos(db, s, id, d, ahora),
     sentenciaAuditoria(
       db,
       {
@@ -125,6 +145,38 @@ export async function crearEmpleado(
     ),
   ]);
   return id;
+}
+
+/**
+ * Las palomitas del empleado. Se recortan a lo que puede dar quien edita (nadie
+ * reparte lo que no tiene) y, si quedan exactamente las del rol, no se guarda
+ * nada: manda el rol.
+ */
+function sentenciasPermisos(
+  db: D1Database,
+  s: Sesion,
+  usuarioId: string,
+  d: DatosEmpleado,
+  ahora: number,
+): D1PreparedStatement[] {
+  if (d.permisos === undefined) return [];
+  const lista = permisosAGuardar(s.usuario, d.rol, d.permisos);
+  if (!lista)
+    return [
+      db
+        .prepare("delete from permisos_usuario where usuario_id = ? and tintoreria_id = ?")
+        .bind(usuarioId, s.tintoreria.id),
+    ];
+  return [
+    db
+      .prepare(
+        `insert into permisos_usuario (usuario_id, tintoreria_id, permisos, actualizado_en, actualizado_por)
+         values (?, ?, ?, ?, ?)
+         on conflict (usuario_id) do update set permisos = excluded.permisos,
+           actualizado_en = excluded.actualizado_en, actualizado_por = excluded.actualizado_por`,
+      )
+      .bind(usuarioId, s.tintoreria.id, JSON.stringify(lista), ahora, s.usuario.id),
+  ];
 }
 
 async function leer(db: D1Database, tintoreriaId: string, id: string) {
@@ -204,6 +256,7 @@ export async function editarEmpleado(
         .bind(await hashClave(d.claveTemporal), id, s.tintoreria.id),
     );
   }
+  sentencias.push(...sentenciasPermisos(db, s, id, d, ahora));
   sentencias.push(
     sentenciaAuditoria(
       db,

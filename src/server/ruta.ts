@@ -20,7 +20,7 @@ import { COOKIE_CSRF, COOKIE_DISPOSITIVO, COOKIE_SESION, leerCookies } from "./c
 import { ErrorConfiguracion, obtenerContexto, type Contexto } from "./entorno";
 import { ErrorApp, type CodigoError } from "./errores";
 import { limitar } from "./limites";
-import { tienePermiso, type Permiso } from "./permisos";
+import { usuarioPuede, type Permiso } from "./permisos";
 
 export type Acceso = "publico" | "sesion" | "cuenta" | "pendiente" | "dispositivo" | "reloj";
 
@@ -195,7 +195,7 @@ export function ruta<S extends z.ZodType | undefined = undefined>(opciones: Opci
           if ((opciones.acceso === "cuenta" || opciones.acceso === "pendiente") && sesion.tipo !== "cuenta") {
             return respuestaError(idioma, 403, "sin_permiso");
           }
-          if (opciones.permiso && !tienePermiso(sesion.usuario.rol, opciones.permiso)) {
+          if (opciones.permiso && !usuarioPuede(sesion.usuario, opciones.permiso)) {
             return respuestaError(idioma, 403, "sin_permiso");
           }
         }

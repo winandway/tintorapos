@@ -5,7 +5,7 @@
  */
 import { sha256Hex, tokenSecreto } from "@/lib/codigos";
 import type { Idioma } from "@/lib/i18n/idiomas";
-import type { Rol } from "@/server/permisos";
+import { esPermiso, type Permiso, type Rol } from "@/server/permisos";
 
 export const DURACION = {
   cuentaMax: 7 * 24 * 3600_000,
@@ -40,6 +40,8 @@ export interface UsuarioSesion {
   correo: string | null;
   totpActivo: boolean;
   debeCambiarClave: boolean;
+  /** Palomitas a la medida de esta persona. Si es null, mandan las de su rol. */
+  permisos: Permiso[] | null;
 }
 
 export interface Sesion {
@@ -55,6 +57,18 @@ export interface Sesion {
 /** El dueño SIEMPRE necesita dos pasos; los demás, si lo activaron. */
 export function necesitaDosPasos(s: Pick<Sesion, "tipo" | "usuario">): boolean {
   return s.tipo === "cuenta" && (s.usuario.rol === "dueno" || s.usuario.totpActivo);
+}
+
+/** El JSON de la tabla, filtrado al catálogo: si trae basura, se ignora. */
+function leerPermisos(texto: string | null): Permiso[] | null {
+  if (!texto) return null;
+  try {
+    const lista = JSON.parse(texto) as unknown;
+    if (!Array.isArray(lista)) return null;
+    return lista.filter(esPermiso);
+  } catch {
+    return null;
+  }
 }
 
 export async function crearSesion(
@@ -108,6 +122,7 @@ interface FilaSesion {
   u_totp: number;
   u_cambiar: number;
   u_activo: number;
+  u_permisos: string | null;
   t_id: string;
   t_nombre: string;
   t_zona: string;
@@ -143,12 +158,13 @@ export async function leerSesion(
          t.pais as t_pais, t.impuesto_bps as t_impuesto, t.recargo_urgente_bps as t_recargo,
          t.descuento_max_bps as t_descuento, t.dias_entrega as t_dias, t.bloqueo_inactividad_min as t_bloqueo,
          t.plan as t_plan, t.prueba_hasta as t_prueba, t.estado as t_estado,
-         d.revocado_en as d_revocado, d.sucursal_id as d_sucursal,
+         d.revocado_en as d_revocado, d.sucursal_id as d_sucursal, pu.permisos as u_permisos,
          (select id from sucursales where tintoreria_id = s.tintoreria_id and activa = 1 order by creada_en limit 1) as sucursal_principal
        from sesiones s
        join usuarios u on u.id = s.usuario_id and u.tintoreria_id = s.tintoreria_id
        join tintorerias t on t.id = s.tintoreria_id
        left join dispositivos d on d.id = s.dispositivo_id and d.tintoreria_id = s.tintoreria_id
+       left join permisos_usuario pu on pu.usuario_id = u.id and pu.tintoreria_id = s.tintoreria_id
        where s.id_hash = ?`,
     )
     .bind(idHash)
@@ -190,6 +206,7 @@ export async function leerSesion(
       correo: f.u_correo,
       totpActivo: f.u_totp === 1,
       debeCambiarClave: f.u_cambiar === 1,
+      permisos: leerPermisos(f.u_permisos),
     },
     tintoreria: {
       id: f.t_id,

@@ -5,7 +5,7 @@ import { Tarjeta } from "@/components/ui/encabezado";
 import { fmt, formatoDinero } from "@/lib/i18n";
 import { obtenerTextos } from "@/lib/i18n/servidor";
 import { exigirSesion } from "@/server/pagina";
-import { tienePermiso } from "@/server/permisos";
+import { usuarioPuede } from "@/server/permisos";
 import { datosTablero } from "@/server/tablero";
 
 export default async function Tablero({
@@ -19,8 +19,8 @@ export default async function Tablero({
   const sp = await searchParams;
   const t = sesion.tintoreria;
   const datos = await datosTablero(db, t.id, t.zonaHoraria);
-  const rol = sesion.usuario.rol;
-  const montos = tienePermiso(rol, "reportes.ver");
+  const usuario = sesion.usuario;
+  const montos = usuarioPuede(usuario, "reportes.ver");
   const acciones = [
     {
       href: "/app/mostrador",
@@ -40,7 +40,7 @@ export default async function Tablero({
       permiso: "ordenes.cambiar_estado" as const,
       variante: "secundario" as const,
     },
-  ].filter((a) => tienePermiso(rol, a.permiso));
+  ].filter((a) => usuarioPuede(usuario, a.permiso));
   const pasos = [
     { clave: "tienda" as const, href: "/app/ajustes/tienda" },
     { clave: "precios" as const, href: "/app/ajustes/precios" },
@@ -48,7 +48,8 @@ export default async function Tablero({
     { clave: "dispositivo" as const, href: "/app/ajustes/dispositivos" },
     { clave: "orden" as const, href: "/app/mostrador" },
   ];
-  const mostrarPasos = (rol === "dueno" || rol === "gerente") && Object.values(datos.pasos).some((v) => !v);
+  const mostrarPasos =
+    (usuario.rol === "dueno" || usuario.rol === "gerente") && Object.values(datos.pasos).some((v) => !v);
 
   return (
     <div className="mx-auto max-w-5xl space-y-5">

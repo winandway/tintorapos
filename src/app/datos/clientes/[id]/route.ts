@@ -1,6 +1,6 @@
 import { editarCliente, eliminarCliente, esquemaCliente, verCliente } from "@/server/clientes";
 import { sinPermiso } from "@/server/errores";
-import { tienePermiso } from "@/server/permisos";
+import { usuarioPuede } from "@/server/permisos";
 import { ruta } from "@/server/ruta";
 
 export const GET = ruta({
@@ -9,7 +9,7 @@ export const GET = ruta({
   manejar: async (c) => {
     const ficha = await verCliente(c.db, c.sesion!.tintoreria.id, c.params.id ?? "");
     // Quien no ve montos (planta) no recibe saldos ni totales.
-    if (!tienePermiso(c.sesion!.usuario.rol, "ordenes.ver_montos")) throw sinPermiso();
+    if (!usuarioPuede(c.sesion!.usuario, "ordenes.ver_montos")) throw sinPermiso();
     return { cliente: ficha };
   },
 });

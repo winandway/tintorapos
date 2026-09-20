@@ -5,7 +5,7 @@
  *   autoriza un gerente o el dueño con SU PIN, y queda su nombre en la auditoría.
  */
 import { ErrorApp } from "@/server/errores";
-import { puedeAutorizar, tienePermiso, type Permiso, type Rol } from "@/server/permisos";
+import { puedeAutorizar, type Permiso, type Rol, usuarioPuede } from "@/server/permisos";
 import { verificarClave } from "./claves";
 import type { Sesion } from "./sesiones";
 
@@ -86,7 +86,7 @@ export async function resolverAutorizacion(
   autorizacion: Autorizacion | null | undefined,
   ahora = Date.now(),
 ): Promise<string | null> {
-  if (tienePermiso(sesion.usuario.rol, permiso)) return null;
+  if (usuarioPuede(sesion.usuario, permiso)) return null;
   if (!autorizacion) throw new ErrorApp(403, "requiere_autorizacion", { permiso });
   const r = await verificarPinUsuario(
     db,

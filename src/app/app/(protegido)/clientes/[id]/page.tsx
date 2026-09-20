@@ -1,6 +1,6 @@
 import { FichaCliente } from "@/components/clientes/ficha-cliente";
 import { exigirSesion } from "@/server/pagina";
-import { tienePermiso } from "@/server/permisos";
+import { usuarioPuede } from "@/server/permisos";
 
 export default async function PaginaCliente({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -10,9 +10,9 @@ export default async function PaginaCliente({ params }: { params: Promise<{ id: 
       id={id}
       moneda={sesion.tintoreria.moneda}
       zona={sesion.tintoreria.zonaHoraria}
-      puedeEditar={tienePermiso(sesion.usuario.rol, "clientes.editar")}
-      puedeEliminar={tienePermiso(sesion.usuario.rol, "clientes.eliminar")}
-      puedeCrearOrden={tienePermiso(sesion.usuario.rol, "ordenes.crear")}
+      puedeEditar={usuarioPuede(sesion.usuario, "clientes.editar")}
+      puedeEliminar={usuarioPuede(sesion.usuario, "clientes.eliminar")}
+      puedeCrearOrden={usuarioPuede(sesion.usuario, "ordenes.crear")}
     />
   );
 }

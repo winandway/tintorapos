@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { abrirTurno, resumenTurno, turnoAbierto } from "@/server/caja";
-import { tienePermiso } from "@/server/permisos";
+import { usuarioPuede } from "@/server/permisos";
 import { ruta } from "@/server/ruta";
 
 /** Estado de la caja de esta tienda. El efectivo esperado solo lo ve quien puede ver diferencias. */
@@ -12,7 +12,7 @@ export const GET = ruta({
     const turno = await turnoAbierto(c.db, s.tintoreria.id, s.sucursalId);
     if (!turno) return { turno: null };
     const r = await resumenTurno(c.db, s.tintoreria.id, turno.id);
-    if (tienePermiso(s.usuario.rol, "caja.ver_diferencias")) return { turno: r };
+    if (usuarioPuede(s.usuario, "caja.ver_diferencias")) return { turno: r };
     return {
       turno: {
         turno: r.turno,

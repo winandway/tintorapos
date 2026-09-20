@@ -1,7 +1,7 @@
 export const app = {
   nav: {
     inicio: "Inicio",
-    mostrador: "Nueva orden",
+    mostrador: "POS",
     ordenes: "Órdenes",
     produccion: "Producción",
     entrega: "Entregar",
@@ -20,6 +20,7 @@ export const app = {
   },
   menuCuenta: "Menú de la cuenta",
   bloquear: "Bloquear pantalla",
+  abrirMenu: "Abrir el menú",
   salir: "Cerrar sesión",
   pruebaQuedan: "Prueba gratis: te quedan {dias} días.",
   pruebaUltimoDia: "Prueba gratis: hoy es tu último día.",

@@ -10,7 +10,7 @@ import { leerCatalogo } from "@/server/catalogo";
 import { crearCliente, esquemaCliente } from "@/server/clientes";
 import { ErrorApp, noEncontrado } from "@/server/errores";
 import { esErrorLimitePago, esquemaPago, sentenciasPago } from "@/server/pagos";
-import { tienePermiso } from "@/server/permisos";
+import { usuarioPuede } from "@/server/permisos";
 
 export const esquemaLinea = z.object({
   id: z.uuid(),
@@ -177,7 +177,7 @@ export async function crearOrden(
   const autorizacion = d.autorizacion as Autorizacion | undefined;
   if (totales.requiereAutorizacion)
     autorizadoPor = await resolverAutorizacion(db, s, "ordenes.descuento_mayor", autorizacion, ahora);
-  if (precioManualMenor && !tienePermiso(s.usuario.rol, "ordenes.precio_manual")) {
+  if (precioManualMenor && !usuarioPuede(s.usuario, "ordenes.precio_manual")) {
     autorizadoPor =
       (await resolverAutorizacion(db, s, "ordenes.precio_manual", autorizacion, ahora)) ?? autorizadoPor;
   }

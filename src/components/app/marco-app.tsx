@@ -60,6 +60,12 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
   const ruta = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [masAbierto, setMasAbierto] = useState(false);
+  const [cajonAbierto, setCajonAbierto] = useState(false);
+  /**
+   * El POS manda: al abrirlo, la barra de la izquierda se guarda y la pantalla
+   * es toda para atender. El menú sigue a un toque, en la hamburguesa.
+   */
+  const pantallaCompleta = ruta.startsWith("/app/mostrador");
   const visibles = ITEMS.filter((i) => {
     if (!i.permiso) return true;
     const lista = Array.isArray(i.permiso) ? i.permiso : [i.permiso];
@@ -79,12 +85,61 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
     }
   }
 
+  // Al cambiar de pantalla el cajón se cierra solo (sin efectos: basta la ruta).
+  const [rutaDelCajon, setRutaDelCajon] = useState(ruta);
+  if (rutaDelCajon !== ruta) {
+    setRutaDelCajon(ruta);
+    if (cajonAbierto) setCajonAbierto(false);
+  }
+  useEffect(() => {
+    if (!cajonAbierto) return;
+    const tecla = (e: KeyboardEvent) => e.key === "Escape" && setCajonAbierto(false);
+    document.addEventListener("keydown", tecla);
+    return () => document.removeEventListener("keydown", tecla);
+  }, [cajonAbierto]);
+
   useBloqueoInactividad(info.bloqueoMin, () => void salir("/app/pin"));
   const aviso = avisoPrueba(info, d);
 
   return (
-    <div className="min-h-dvh md:grid md:grid-cols-[232px_1fr]">
-      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-percha/70 bg-superficie md:flex no-imprimir">
+    <div className={pantallaCompleta ? "min-h-dvh" : "min-h-dvh md:grid md:grid-cols-[232px_1fr]"}>
+      {cajonAbierto && (
+        <div className="fixed inset-0 z-40 flex no-imprimir">
+          <div
+            className="absolute inset-0 bg-noche/40"
+            onClick={() => setCajonAbierto(false)}
+            aria-hidden="true"
+          />
+          <aside className="relative flex h-dvh w-72 max-w-[85vw] flex-col bg-superficie shadow-2xl">
+            <div className="flex items-center gap-2.5 px-5 py-5">
+              <Isotipo className="size-8" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[15px] leading-tight font-bold">{info.tienda}</span>
+                <span className="block text-xs text-gris">Tintora POS</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setCajonAbierto(false)}
+                aria-label={d.comun.cerrar}
+                className="size-9 rounded-full text-xl text-gris hover:bg-papel"
+              >
+                ×
+              </button>
+            </div>
+            <nav className="flex-1 space-y-0.5 overflow-y-auto px-3" aria-label="Tintora POS">
+              {visibles.map((i) => (
+                <EnlaceNav key={i.ruta} item={i} activo={activo(i.ruta)} texto={d.app.nav[i.clave]} />
+              ))}
+            </nav>
+            <div className="border-t border-percha/70 p-3">
+              <SelectorIdioma />
+            </div>
+          </aside>
+        </div>
+      )}
+      <aside
+        className={`sticky top-0 h-dvh flex-col border-r border-percha/70 bg-superficie no-imprimir ${pantallaCompleta ? "hidden" : "hidden md:flex"}`}
+      >
         <Link href="/app" className="flex items-center gap-2.5 px-5 py-5">
           <Isotipo className="size-8" />
           <span className="min-w-0">
@@ -94,17 +149,7 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
         </Link>
         <nav className="flex-1 space-y-0.5 overflow-y-auto px-3" aria-label="Tintora POS">
           {visibles.map((i) => (
-            <Link
-              key={i.ruta}
-              href={i.ruta}
-              aria-current={activo(i.ruta) ? "page" : undefined}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold transition ${
-                activo(i.ruta) ? "bg-tinta text-white" : "text-noche hover:bg-tinta-suave"
-              }`}
-            >
-              <IconoNav nombre={i.icono} />
-              {d.app.nav[i.clave]}
-            </Link>
+            <EnlaceNav key={i.ruta} item={i} activo={activo(i.ruta)} texto={d.app.nav[i.clave]} />
           ))}
         </nav>
         <div className="border-t border-percha/70 p-3">
@@ -114,11 +159,24 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
 
       <div className="flex min-w-0 flex-col">
         <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-percha/70 bg-papel/90 px-4 backdrop-blur no-imprimir">
-          <Link href="/app" className="flex min-w-0 items-center gap-2 md:hidden">
-            <Isotipo className="size-7" />
-            <span className="truncate text-[15px] font-bold">{info.tienda}</span>
-          </Link>
-          <div className="hidden md:block" />
+          <div className="flex min-w-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCajonAbierto(true)}
+              aria-label={d.app.abrirMenu}
+              aria-expanded={cajonAbierto}
+              className={`grid size-10 shrink-0 place-items-center rounded-xl text-noche hover:bg-tinta-suave ${pantallaCompleta ? "" : "md:hidden"}`}
+            >
+              <IconoNav nombre="mas" />
+            </button>
+            <Link
+              href="/app"
+              className={`flex min-w-0 items-center gap-2 ${pantallaCompleta ? "" : "md:hidden"}`}
+            >
+              <Isotipo className="size-7" />
+              <span className="truncate text-[15px] font-bold">{info.tienda}</span>
+            </Link>
+          </div>
           <div className="flex items-center gap-2">
             <EstadoConexion copiaLocal={info.bloqueoMin !== null && info.permisos.includes("ordenes.ver")} />
             <div className="md:hidden">
@@ -188,13 +246,16 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
           </div>
         )}
 
-        <main id="contenido" className="flex-1 px-4 pt-5 pb-28 md:px-8 md:pb-10">
+        <main
+          id="contenido"
+          className={`flex-1 pt-5 ${pantallaCompleta ? "px-3 pb-6 md:px-5" : "px-4 pb-28 md:px-8 md:pb-10"}`}
+        >
           {children}
         </main>
       </div>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-percha/70 bg-superficie/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden no-imprimir"
+        className={`fixed inset-x-0 bottom-0 z-30 border-t border-percha/70 bg-superficie/95 pb-[env(safe-area-inset-bottom)] backdrop-blur no-imprimir ${pantallaCompleta ? "hidden" : "md:hidden"}`}
         aria-label="Tintora POS"
       >
         <div className="grid grid-cols-5">
@@ -238,6 +299,21 @@ export function MarcoApp({ info, children }: { info: InfoMarco; children: ReactN
         )}
       </nav>
     </div>
+  );
+}
+
+function EnlaceNav({ item, activo, texto }: { item: ItemNav; activo: boolean; texto: string }) {
+  return (
+    <Link
+      href={item.ruta}
+      aria-current={activo ? "page" : undefined}
+      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-semibold transition ${
+        activo ? "bg-tinta text-white" : "text-noche hover:bg-tinta-suave"
+      }`}
+    >
+      <IconoNav nombre={item.icono} />
+      {texto}
+    </Link>
   );
 }
 

@@ -1,7 +1,7 @@
 import { encolarAvisos, procesarCola } from "@/server/avisos";
 import { crearOrden, esquemaNuevaOrden } from "@/server/ordenes/crear";
 import { listarOrdenes, ESTADOS, type FiltroOrdenes } from "@/server/ordenes/consultas";
-import { tienePermiso } from "@/server/permisos";
+import { usuarioPuede } from "@/server/permisos";
 import { ruta } from "@/server/ruta";
 
 export const GET = ruta({
@@ -22,7 +22,7 @@ export const GET = ruta({
     };
     const s = c.sesion!;
     const ordenes = await listarOrdenes(c.db, s.tintoreria.id, s.tintoreria.zonaHoraria, filtro, c.ahora);
-    const montos = tienePermiso(s.usuario.rol, "ordenes.ver_montos");
+    const montos = usuarioPuede(s.usuario, "ordenes.ver_montos");
     return { ordenes: montos ? ordenes : ordenes.map((o) => ({ ...o, totalCents: 0, saldoCents: 0 })) };
   },
 });

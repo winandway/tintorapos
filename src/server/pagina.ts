@@ -11,7 +11,7 @@ import {
 } from "@/server/auth/sesiones";
 import { COOKIE_DISPOSITIVO, COOKIE_SESION } from "@/server/cookies";
 import { obtenerContexto } from "@/server/entorno";
-import { tienePermiso, type Permiso } from "@/server/permisos";
+import { type Permiso, usuarioPuede } from "@/server/permisos";
 
 export interface ContextoPagina {
   env: CloudflareEnv;
@@ -44,7 +44,7 @@ export async function exigirSesion(permiso?: Permiso): Promise<ContextoPagina & 
   if (!c.sesion) redirect(c.dispositivo ? "/app/pin" : "/entrar");
   const paso = siguientePaso(c.sesion.usuario, !necesitaDosPasos(c.sesion) || c.sesion.segundoFactorOk);
   if (paso !== "app") redirect(RUTA_SIGUIENTE[paso]);
-  if (permiso && !tienePermiso(c.sesion.usuario.rol, permiso)) redirect("/app?sin-permiso=1");
+  if (permiso && !usuarioPuede(c.sesion.usuario, permiso)) redirect("/app?sin-permiso=1");
   return c as ContextoPagina & { sesion: Sesion };
 }
 

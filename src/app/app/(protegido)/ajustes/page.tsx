@@ -2,7 +2,7 @@ import Link from "next/link";
 import { EncabezadoPagina } from "@/components/ui/encabezado";
 import { obtenerTextos } from "@/lib/i18n/servidor";
 import { exigirSesion } from "@/server/pagina";
-import { tienePermiso, type Permiso } from "@/server/permisos";
+import { type Permiso, usuarioPuede } from "@/server/permisos";
 
 const SECCIONES: {
   clave: "tienda" | "precios" | "empleados" | "dispositivos" | "avisos" | "seguridad" | "datos";
@@ -22,7 +22,7 @@ export default async function PaginaAjustes() {
   const { sesion } = await exigirSesion();
   const { d } = await obtenerTextos();
   const visibles = SECCIONES.filter((s) =>
-    s.permiso ? tienePermiso(sesion.usuario.rol, s.permiso) : sesion.tipo === "cuenta",
+    s.permiso ? usuarioPuede(sesion.usuario, s.permiso) : sesion.tipo === "cuenta",
   );
   return (
     <div className="mx-auto max-w-5xl">

@@ -4,7 +4,7 @@ import { sentenciaAuditoria } from "@/server/auditoria";
 import { resolverAutorizacion, type Autorizacion } from "@/server/auth/autorizacion";
 import type { Sesion } from "@/server/auth/sesiones";
 import { ErrorApp, noEncontrado } from "@/server/errores";
-import { tienePermiso } from "@/server/permisos";
+import { usuarioPuede } from "@/server/permisos";
 
 export const esquemaAutorizacion = z.object({
   usuarioId: z.string().min(1).max(64),
@@ -286,7 +286,7 @@ export async function cerrarTurno(
       ahora,
     ),
   ]);
-  if (tienePermiso(s.usuario.rol, "caja.ver_diferencias")) {
+  if (usuarioPuede(s.usuario, "caja.ver_diferencias")) {
     return { turnoId: turno.id, esperadoCents: r.esperadoCents, diferenciaCents: diferencia };
   }
   return { turnoId: turno.id };

@@ -69,6 +69,16 @@ CREATE TABLE IF NOT EXISTS usuarios (
 CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_correo ON usuarios (correo) WHERE correo IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_usuarios_tintoreria ON usuarios (tintoreria_id, activo);
 
+-- Permisos a la medida de un empleado (palomitas). Si no hay fila, manda su rol.
+CREATE TABLE IF NOT EXISTS permisos_usuario (
+  usuario_id TEXT PRIMARY KEY REFERENCES usuarios(id),
+  tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),
+  permisos TEXT NOT NULL,
+  actualizado_en INTEGER NOT NULL,
+  actualizado_por TEXT REFERENCES usuarios(id)
+);
+CREATE INDEX IF NOT EXISTS idx_permisos_usuario_tintoreria ON permisos_usuario (tintoreria_id);
+
 CREATE TABLE IF NOT EXISTS dispositivos (
   id TEXT PRIMARY KEY,
   tintoreria_id TEXT NOT NULL REFERENCES tintorerias(id),

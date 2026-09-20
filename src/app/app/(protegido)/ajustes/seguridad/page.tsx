@@ -2,7 +2,7 @@ import { AjustesSeguridad } from "@/components/ajustes/ajustes-seguridad";
 import { EncabezadoPagina } from "@/components/ui/encabezado";
 import { obtenerTextos } from "@/lib/i18n/servidor";
 import { exigirSesion } from "@/server/pagina";
-import { tienePermiso } from "@/server/permisos";
+import { usuarioPuede } from "@/server/permisos";
 
 export default async function PaginaSeguridad() {
   const { sesion } = await exigirSesion();
@@ -17,7 +17,7 @@ export default async function PaginaSeguridad() {
       <AjustesSeguridad
         cuenta={sesion.tipo === "cuenta"}
         totpActivo={sesion.usuario.totpActivo}
-        verActividad={tienePermiso(sesion.usuario.rol, "auditoria.ver")}
+        verActividad={usuarioPuede(sesion.usuario, "auditoria.ver")}
         zona={sesion.tintoreria.zonaHoraria}
       />
     </div>

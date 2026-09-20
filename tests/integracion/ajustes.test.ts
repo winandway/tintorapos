@@ -10,15 +10,17 @@ import { POST as crearServicio } from "@/app/datos/catalogo/servicios/route";
 import { PUT as editarServicio } from "@/app/datos/catalogo/servicios/[id]/route";
 import { PUT as precios } from "@/app/datos/catalogo/precios/route";
 import { GET as listarEmpleados, POST as crearEmpleado } from "@/app/datos/empleados/route";
+import { GET as reportes } from "@/app/datos/reportes/route";
 import { PATCH as estadoEmpleado, PUT as editarEmpleado } from "@/app/datos/empleados/[id]/route";
 import { POST as entrar } from "@/app/datos/sesion/entrar/route";
 import type { Catalogo } from "@/server/catalogo";
 import type { Empleado } from "@/server/empleados";
+import { permisosDe } from "@/server/permisos";
 import { crearEntorno, type EntornoPrueba } from "../ayuda/entorno";
 import { usarEntorno } from "../ayuda/mock-entorno";
 import { Navegador } from "../ayuda/cliente-http";
 import { escenarioAislamiento, type Escenario } from "../ayuda/escenario";
-import { sesionPara } from "../ayuda/fabrica";
+import { crearUsuario, sesionPara } from "../ayuda/fabrica";
 
 type Err = { error: { codigo: string; campos?: Record<string, string> } };
 
@@ -293,5 +295,58 @@ describe("ajustes: tienda, catálogo, precios y empleados", () => {
       .bind(gerenteId)
       .first();
     expect(fila).toEqual({ correo: null, clave_hash: null });
+  });
+
+  it("palomitas por empleado: se guardan solo si cambian, mandan sobre el rol y nadie da lo que no tiene", async () => {
+    const cajeroDeRol = permisosDe("cajero");
+    // 1. Un cajero con un permiso de más: ver reportes.
+    const conReportes = await dueno.llamar<{ id: string }>(crearEmpleado, {
+      cuerpo: {
+        nombre: "Cajera con reportes",
+        rol: "cajero",
+        pin: "5137",
+        permisos: [...cajeroDeRol, "reportes.ver"],
+      },
+    });
+    expect(conReportes.estado).toBe(200);
+
+    const lista = await dueno.llamar<{ empleados: Empleado[] }>(listarEmpleados);
+    const guardada = lista.datos.empleados.find((x) => x.id === conReportes.datos.id)!;
+    expect(guardada.permisos).toContain("reportes.ver");
+
+    // Entra con su PIN y de verdad puede ver los reportes (antes, 403).
+    const tablet = new Navegador();
+    tablet.cookies.set(
+      "tp_sesion",
+      await sesionPara(e.env.DB, esc.a.id, conReportes.datos.id, { tipo: "pin" }),
+    );
+    expect((await tablet.llamar(reportes)).estado).toBe(200);
+
+    // 2. Si se le quitan, vuelve a lo del rol y deja de entrar.
+    await dueno.llamar(editarEmpleado, {
+      metodo: "PUT",
+      params: { id: conReportes.datos.id },
+      cuerpo: { nombre: "Cajera con reportes", rol: "cajero", permisos: cajeroDeRol },
+    });
+    const sinExtra = await dueno.llamar<{ empleados: Empleado[] }>(listarEmpleados);
+    expect(sinExtra.datos.empleados.find((x) => x.id === conReportes.datos.id)!.permisos).toBeNull();
+    expect((await tablet.llamar(reportes)).estado).toBe(403);
+
+    // 3. Nadie reparte lo que no tiene: un gerente no puede dar «exportar datos».
+    const gerenteId = await crearUsuario(e.env.DB, esc.a.id, "gerente", { nombre: "Gerenta", pin: "8461" });
+    const gerenteNav = new Navegador();
+    gerenteNav.cookies.set("tp_sesion", await sesionPara(e.env.DB, esc.a.id, gerenteId));
+    const intento = await gerenteNav.llamar<{ id: string }>(crearEmpleado, {
+      cuerpo: {
+        nombre: "Cajero listo",
+        rol: "cajero",
+        pin: "9274",
+        permisos: [...cajeroDeRol, "datos.exportar"],
+      },
+    });
+    expect(intento.estado).toBe(200);
+    const despues = await dueno.llamar<{ empleados: Empleado[] }>(listarEmpleados);
+    const creado = despues.datos.empleados.find((x) => x.id === intento.datos.id)!;
+    expect(creado.permisos ?? []).not.toContain("datos.exportar");
   });
 });

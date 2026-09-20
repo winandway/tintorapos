@@ -15,6 +15,7 @@ import { AjustesSeguridad } from "@/components/ajustes/ajustes-seguridad";
 import { EditorPrecios } from "@/components/ajustes/editor-precios";
 import { FormTienda } from "@/components/ajustes/form-tienda";
 import { GestionDispositivos } from "@/components/ajustes/gestion-dispositivos";
+import { permisosDe } from "@/server/permisos";
 import { GestionEmpleados } from "@/components/ajustes/gestion-empleados";
 import { variablesDe } from "@/server/entorno";
 import { crearRespaldo } from "@/server/respaldos";
@@ -105,7 +106,9 @@ describe("ajustes (contra el servidor real)", () => {
 
   it("empleados: agrega con PIN y desactiva", async () => {
     const u = userEvent.setup();
-    montar(<GestionEmpleados miRol="dueno" miId={esc.usuarioId} zona={ZONA} />);
+    montar(
+      <GestionEmpleados miRol="dueno" miId={esc.usuarioId} misPermisos={permisosDe("dueno")} zona={ZONA} />,
+    );
     await u.click(await screen.findByRole("button", { name: `+ ${dajustes.empleados.agregar}` }));
     const modal = await screen.findByRole("dialog");
     await u.type(within(modal).getByLabelText(dajustes.empleados.nombre), "Planta Uno");
