@@ -11,7 +11,7 @@ export default async function PaginaImpresoras() {
   const { sesion } = await exigirSesion("ordenes.ver");
   const { d } = await obtenerTextos();
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-3xl" data-captura="impresoras">
       <EncabezadoPagina
         titulo={d.ajustes.secciones.impresoras.titulo}
         subtitulo={d.ajustes.secciones.impresoras.texto}

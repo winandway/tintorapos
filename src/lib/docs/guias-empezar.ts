@@ -307,7 +307,8 @@ export const GUIAS_EMPEZAR: Guia[] = [
     icono: "impresora",
     es: {
       titulo: "Impresoras de recibos y etiquetas",
-      resumen: "Qué impresoras sirven, cómo configurar la impresión y cómo reimprimir.",
+      resumen:
+        "Qué impresoras sirven, cómo conectar la de recibos y la de etiquetas, cómo probarlas sin comprar nada y cómo reimprimir.",
       bloques: [
         {
           t: "p",
@@ -328,7 +329,19 @@ export const GUIAS_EMPEZAR: Guia[] = [
         {
           t: "p",
           texto:
-            "**Dos**, y son distintas. El **recibo** sale en la térmica de recibos (rollo de 80 mm, papel sin pegamento). La **etiqueta** va en una impresora de etiquetas adhesivas (rollo de 2 × 1 pulgadas), que es la que se pega a la prenda. Forzar la etiqueta en la de recibos funciona, pero sale en papel sin pegamento: no se queda en la ropa.",
+            "Lo definitivo son **dos**, y son distintas: la **térmica de recibos** (rollo de 80 mm) saca el recibo del cliente, y la **impresora de etiquetas** saca la etiqueta o el tag de cada prenda. Las dos se conectan en **Ajustes → Impresoras**, cada una en su tarjeta, y el equipo las recuerda por separado.",
+        },
+        {
+          t: "p",
+          texto:
+            "Pero puedes **empezar con una sola**. En la tarjeta **Impresora de etiquetas** elige **En la misma impresora de recibos**: cada etiqueta sale en papel de recibo, cortada, con su número en grande y su QR. Sirve para probar todo el recorrido hoy mismo y para salir del paso.",
+        },
+        { t: "captura", captura: "impresoras" },
+        {
+          t: "nota",
+          tono: "importante",
+          texto:
+            "El papel térmico de recibo **se oscurece con el calor de la plancha y se borra con el solvente**. Para el trabajo de todos los días usa tags o etiquetas **para tintorería** en una impresora de etiquetas. Mira [El camino de una prenda](/docs/camino-de-una-prenda).",
         },
         {
           t: "nota",
@@ -336,7 +349,7 @@ export const GUIAS_EMPEZAR: Guia[] = [
           texto:
             "¿Todavía no tienes etiquetera? En la pantalla de etiquetas elige **Hoja carta (30 etiquetas)** e imprime en tu impresora normal con hojas de etiquetas adhesivas de 2⅝ × 1 pulgadas (las de tipo Avery 5160). Salen 30 por hoja.",
         },
-        { t: "h2", texto: "El tamaño de la etiqueta" },
+        { t: "h2", texto: "El tamaño de la etiqueta (por la ventana del navegador)" },
         {
           t: "p",
           texto:
@@ -372,6 +385,61 @@ export const GUIAS_EMPEZAR: Guia[] = [
           tono: "consejo",
           texto:
             "Se conecta **una vez por computadora**. La tablet del mostrador tiene su impresora; tu celular no, y está bien: desde ahí no imprimes.",
+        },
+        { t: "h2", texto: "Conectar la impresora de etiquetas" },
+        {
+          t: "pasos",
+          items: [
+            "Enchufa la impresora de etiquetas por USB a la computadora del mostrador y ponle su rollo.",
+            "En **Ajustes → Impresoras**, baja a la tarjeta **Impresora de etiquetas** y elige **En una etiquetera conectada**.",
+            "Toca **Conectar impresora USB**, elige tu etiquetera en la lista y toca **Conectar**.",
+            "Elige el **idioma de la etiquetera**: **TSPL** para casi todas las económicas (Rollo, Munbyn, Polono, iDPRT, TSC, Xprinter) o **ZPL** si es una Zebra. Viene en la caja o en el manual.",
+            "Elige el **tamaño de la etiqueta** de tu rollo: 2 × 1, 2¼ × 1¼ o 3 × 1 pulgadas.",
+            "Toca **Imprimir una etiqueta de prueba**. Tiene que salir UNA etiqueta, con el QR a la izquierda y el texto a la derecha. Escanea el QR con tu celular.",
+          ],
+        },
+        { t: "captura", captura: "etiquetaDirecta" },
+        {
+          t: "p",
+          texto:
+            "Desde ese momento, **Imprimir etiquetas** en el mostrador y dentro de la orden las manda directo: una por prenda, de un toque, sin la ventana de imprimir.",
+        },
+        { t: "h2", texto: "Si la etiqueta de prueba sale mal" },
+        {
+          t: "lista",
+          items: [
+            "**No sale nada, o sale una tira de letras:** el idioma elegido no es el de tu impresora. Cambia de TSPL a ZPL (o al revés) y prueba otra vez.",
+            "**Sale corrida o salta etiquetas en blanco:** el tamaño elegido no es el de tu rollo. Cámbialo. Si sigue igual, haz que la impresora mida su rollo (en su manual aparece como «calibrar»; casi siempre es mantener presionado el botón de avance).",
+            "**Sale de cabeza:** no es un fallo; depende del lado por el que sale el papel. Se lee y se escanea igual.",
+            "**Dice que el sistema tiene tomada la impresora:** estás en Windows. Conéctala por **puerto serie (COM)** o deja las etiquetas por la ventana del navegador.",
+          ],
+        },
+        { t: "h2", texto: "Probar las etiquetas sin tener etiquetera" },
+        {
+          t: "pasos",
+          items: [
+            "Conecta tu impresora de recibos, como se explica arriba.",
+            "En la tarjeta **Impresora de etiquetas** elige **En la misma impresora de recibos** y toca **Imprimir una etiqueta de prueba**.",
+            "Crea una orden de prueba con dos o tres prendas y toca **Imprimir etiquetas**: sale una por prenda, cortada.",
+            "Abre **Producción** en tu celular y escanea cada QR con la cámara: la prenda correcta cambia de estado.",
+          ],
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "Así pruebas todo el recorrido —el botón, los datos de cada prenda, el QR y el escaneo— con la impresora que ya tienes. Cuando compres la etiquetera, lo único que cambia es el papel.",
+        },
+        { t: "h2", texto: "Qué impresora de etiquetas comprar" },
+        {
+          t: "lista",
+          items: [
+            "**Térmica directa, de 203 puntos por pulgada, con USB**, que acepte rollos de 2 a 4 pulgadas de ancho. Es la más común y la más económica.",
+            "**Que hable TSPL o ZPL.** Casi todas las Rollo, Munbyn, Polono, iDPRT, TSC y Xprinter hablan TSPL; las Zebra hablan ZPL. Las dos sirven.",
+            "**Evita las que solo funcionan con su propia app del celular** (muchas pequeñas por Bluetooth, de «etiquetas para la casa»): no aceptan órdenes de otro programa.",
+            "**Dymo y Brother QL** usan un idioma propio. Funcionan con Tintora POS, pero por la **ventana del navegador**, no directo.",
+            "Compra con ella el papel correcto: tags para grapar o etiquetas **para tintorería**, que resisten el solvente y el calor.",
+          ],
         },
         { t: "h2", texto: "Según tu equipo" },
         {
@@ -409,7 +477,7 @@ export const GUIAS_EMPEZAR: Guia[] = [
             "En la ventana de imprimir, mira la casilla **Destino**. Si dice **Guardar como PDF**, ahí está el problema: tócala, elige **Ver más…** y selecciona tu impresora. Chrome se acuerda para la próxima.",
             "Si tu impresora **no aparece** en esa lista, la computadora no la tiene instalada. Instala el programa del fabricante (en Mac: Ajustes → Impresoras y escáneres → agregar).",
             "Si en **Ajustes → Impresoras** dice que *el sistema tiene tomada la impresora*, estás en Windows: usa el puerto serie o el modo silencioso de arriba.",
-            "Si sale **papel en blanco o letras raras**, esa impresora no habla el idioma de las de recibos (ESC/POS). Suele pasar con las de etiquetas: esas van por la ventana de imprimir.",
+            "Si sale **papel en blanco o letras raras**, esa impresora no habla el idioma de las de recibos (ESC/POS). Suele ser una etiquetera: conéctala en la tarjeta **Impresora de etiquetas**, no en la de recibos.",
             "Si por puerto serie sale basura, cambia la **velocidad del puerto**: lo más común es 9600 o 115200.",
           ],
         },
@@ -453,7 +521,8 @@ export const GUIAS_EMPEZAR: Guia[] = [
     },
     en: {
       titulo: "Receipt and tag printers",
-      resumen: "Which printers work, how to set up printing and how to reprint.",
+      resumen:
+        "Which printers work, how to connect the receipt printer and the tag printer, how to test them without buying anything, and how to reprint.",
       bloques: [
         {
           t: "p",
@@ -474,7 +543,19 @@ export const GUIAS_EMPEZAR: Guia[] = [
         {
           t: "p",
           texto:
-            "**Two**, and they're different. The **receipt** comes out of the thermal receipt printer (80 mm roll, plain paper). The **tag** needs an adhesive label printer (2 × 1 inch roll) — that's the one that sticks to the garment. You can force a tag through the receipt printer, but it prints on paper with no adhesive: it won't stay on the clothes.",
+            "The permanent setup is **two**, and they're different: the **thermal receipt printer** (80 mm roll) prints the customer receipt, and the **tag printer** prints the label or tag for each garment. You connect both under **Settings → Printers**, each in its own card, and the device remembers them separately.",
+        },
+        {
+          t: "p",
+          texto:
+            "But you can **start with just one**. In the **Tag printer** card choose **On the same receipt printer**: each tag comes out on receipt paper, cut, with its number in large type and its QR code. It lets you test the whole workflow today and works as a stopgap.",
+        },
+        { t: "captura", captura: "impresoras" },
+        {
+          t: "nota",
+          tono: "importante",
+          texto:
+            "Thermal receipt paper **darkens under the heat of pressing and fades in solvent**. For everyday work, use **dry-cleaning** tags or labels in a label printer. See [A garment's journey](/docs/camino-de-una-prenda).",
         },
         {
           t: "nota",
@@ -482,7 +563,7 @@ export const GUIAS_EMPEZAR: Guia[] = [
           texto:
             "No label printer yet? On the tags screen pick **Letter sheet (30 labels)** and print on your regular printer with 2⅝ × 1 inch adhesive label sheets (Avery 5160 style). You get 30 per sheet.",
         },
-        { t: "h2", texto: "Tag size" },
+        { t: "h2", texto: "Tag size (through the browser window)" },
         {
           t: "p",
           texto:
@@ -518,6 +599,61 @@ export const GUIAS_EMPEZAR: Guia[] = [
           tono: "consejo",
           texto:
             "You connect it **once per computer**. The counter tablet has its printer; your phone doesn't, and that's fine: you don't print from there.",
+        },
+        { t: "h2", texto: "Connect the tag printer" },
+        {
+          t: "pasos",
+          items: [
+            "Plug the label printer into the counter computer by USB and load its roll.",
+            "Under **Settings → Printers**, scroll to the **Tag printer** card and choose **On a connected label printer**.",
+            "Tap **Connect USB printer**, pick your label printer from the list and tap **Connect**.",
+            "Pick the **label printer language**: **TSPL** for almost every budget model (Rollo, Munbyn, Polono, iDPRT, TSC, Xprinter) or **ZPL** for a Zebra. It's on the box or in the manual.",
+            "Pick the **tag size** on your roll: 2 × 1, 2¼ × 1¼ or 3 × 1 inches.",
+            "Tap **Print a test tag**. ONE tag should come out, with the QR code on the left and the text on the right. Scan the QR code with your phone.",
+          ],
+        },
+        { t: "captura", captura: "etiquetaDirecta" },
+        {
+          t: "p",
+          texto:
+            "From then on, **Print tags** at the counter and inside the order sends them straight to the printer: one per garment, in one tap, with no print window.",
+        },
+        { t: "h2", texto: "If the test tag comes out wrong" },
+        {
+          t: "lista",
+          items: [
+            "**Nothing prints, or you get a strip of letters:** the language you picked isn't your printer's. Switch from TSPL to ZPL (or the other way around) and try again.",
+            "**It prints off-center or skips blank labels:** the size you picked isn't your roll's. Change it. If it keeps happening, have the printer measure its roll (the manual calls it “calibrate”; it's almost always holding down the feed button).",
+            "**It comes out upside down:** that's not a fault; it depends on which side the paper exits. It reads and scans the same.",
+            "**It says the system is holding the printer:** you're on Windows. Connect it by **serial port (COM)** or keep tags on the browser window.",
+          ],
+        },
+        { t: "h2", texto: "Test tags without owning a label printer" },
+        {
+          t: "pasos",
+          items: [
+            "Connect your receipt printer, as explained above.",
+            "In the **Tag printer** card choose **On the same receipt printer** and tap **Print a test tag**.",
+            "Create a test order with two or three garments and tap **Print tags**: one comes out per garment, cut.",
+            "Open **Production** on your phone and scan each QR code with the camera: the right garment changes status.",
+          ],
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "That tests the whole workflow — the button, each garment's data, the QR code and the scan — with the printer you already own. When you buy a label printer, the only thing that changes is the paper.",
+        },
+        { t: "h2", texto: "Which label printer to buy" },
+        {
+          t: "lista",
+          items: [
+            "**Direct thermal, 203 dpi, with USB**, that takes rolls 2 to 4 inches wide. It's the most common and the most affordable kind.",
+            "**It should speak TSPL or ZPL.** Nearly all Rollo, Munbyn, Polono, iDPRT, TSC and Xprinter models speak TSPL; Zebra printers speak ZPL. Both work.",
+            "**Avoid the ones that only work with their own phone app** (many small Bluetooth “home label” printers): they don't take commands from other software.",
+            "**Dymo and Brother QL** use their own language. They work with Tintora POS, but through the **browser window**, not directly.",
+            "Buy the right paper with it: staple tags or **dry-cleaning** labels that stand up to solvent and heat.",
+          ],
         },
         { t: "h2", texto: "Depending on your device" },
         {
@@ -555,7 +691,7 @@ export const GUIAS_EMPEZAR: Guia[] = [
             "In the print window, look at the **Destination** box. If it says **Save as PDF**, that's the problem: tap it, choose **See more…** and select your printer. Chrome remembers it next time.",
             "If your printer **isn't on that list**, the computer doesn't have it installed. Install the manufacturer's software (on Mac: Settings → Printers & Scanners → add).",
             "If **Settings → Printers** says *the system is holding the printer*, you're on Windows: use the serial port or the silent mode above.",
-            "If **blank paper or strange letters** come out, that printer doesn't speak the receipt-printer language (ESC/POS). It usually happens with label printers: those go through the print window.",
+            "If **blank paper or strange letters** come out, that printer doesn't speak the receipt-printer language (ESC/POS). It's usually a label printer: connect it in the **Tag printer** card, not the receipt one.",
             "If garbage comes out over the serial port, change the **port speed**: 9600 or 115200 are the most common.",
           ],
         },

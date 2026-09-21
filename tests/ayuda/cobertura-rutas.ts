@@ -423,6 +423,9 @@ export const COBERTURA: Record<string, Cobertura> = {
       { metodo: "PUT", params: { id: e.a.id }, cuerpo: { estado: "cerrado" }, esperado: [403] },
     ],
   },
+  "/datos/ordenes/[id]/etiquetas": {
+    casos: (e) => [{ metodo: "GET", params: { id: e.a.ids.ordenId ?? "" } }],
+  },
   "/datos/ordenes/[id]/recibo": { casos: (e) => [{ metodo: "GET", params: { id: e.a.ids.ordenId ?? "" } }] },
   "/datos/salud": { publica: "canario sin datos de ninguna tintorería" },
   "/datos/empleados": {

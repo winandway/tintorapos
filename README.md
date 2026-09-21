@@ -69,6 +69,13 @@ cd "/Users/windocellc/Software-Tintora POS" && npm run demo:local && node script
 Salen en 2x; se pasan a webp a la mitad (ver el encabezado de `scripts/capturas.mjs`)
 y se describen en `src/lib/contenido/capturas.ts`.
 
+Las etiquetas para impresoras Zebra se comprueban contra un emulador público (no
+entra en `verify` porque le pega a un servicio de afuera):
+
+```bash
+cd "/Users/windocellc/Software-Tintora POS" && node scripts/comprobar-zpl.mjs
+```
+
 ## Para agentes de IA
 
 | Dirección | Qué es |

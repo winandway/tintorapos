@@ -11,7 +11,7 @@ export const ajustes: Forma<typeof base> = {
     dispositivos: { titulo: "Devices", texto: "Store tablets and phones. Turn off a lost one." },
     impresoras: {
       titulo: "Printers",
-      texto: "Connect this device's receipt printer and test it.",
+      texto: "Connect this device's receipt printer and tag printer, and test them.",
     },
     avisos: { titulo: "Customer notifications", texto: "Text and email messages when clothes are ready." },
     seguridad: { titulo: "Security", texto: "Two-step verification and activity log." },

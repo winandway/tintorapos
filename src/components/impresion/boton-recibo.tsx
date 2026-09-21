@@ -4,14 +4,14 @@ import { useState, type ReactNode } from "react";
 import { useAvisar } from "@/components/ui/aviso";
 import { clasesBoton } from "@/components/ui/boton";
 import { ErrorImpresora } from "@/lib/impresion/conexion";
-import { imprimirReciboDirecto } from "@/lib/impresion/imprimir";
+import { imprimirEtiquetasDirecto, imprimirReciboDirecto } from "@/lib/impresion/imprimir";
 import { useIdioma } from "@/lib/i18n/cliente";
 
 type Variante = Parameters<typeof clasesBoton>[0];
 type Tamano = Parameters<typeof clasesBoton>[1];
 
 /**
- * «Imprimir recibo» sin saltos: si este equipo tiene la impresora conectada
+ * «Imprimir recibo» e «Imprimir etiquetas» sin saltos: si este equipo tiene la impresora conectada
  * directo, el papel sale con ESTE toque — sin abrir otra pantalla ni la ventana
  * del navegador. Si no hay, o si la impresora falla, se abre el camino de
  * siempre para que el cliente nunca se quede sin su recibo.
@@ -26,7 +26,7 @@ export function BotonRecibo({
   className = "",
 }: {
   ordenId: string;
-  tipo: "recibo" | "interna";
+  tipo: "recibo" | "interna" | "etiquetas";
   children: ReactNode;
   variante?: Variante;
   tamano?: Tamano;
@@ -44,8 +44,12 @@ export function BotonRecibo({
   const imprimir = async () => {
     setOcupado(true);
     try {
-      if (await imprimirReciboDirecto(ordenId, tipo)) {
-        avisar(di.directoOk);
+      const salio =
+        tipo === "etiquetas"
+          ? await imprimirEtiquetasDirecto(ordenId)
+          : await imprimirReciboDirecto(ordenId, tipo);
+      if (salio) {
+        avisar(tipo === "etiquetas" ? di.etiquetasOk : di.directoOk);
         return;
       }
       abrirVentana();

@@ -74,6 +74,43 @@ export const impresion: Forma<typeof base> = {
     verGuia: "See the printers guide",
     reciboPrueba: "PRINT TEST",
     reciboPruebaTexto: "If you can read this and a QR code shows up below, your printer is connected.",
+    recibos: "Receipt printer",
+    recibosAyuda: "The 80 mm roll thermal printer at the counter. It prints the customer receipt.",
+    etiquetas: "Tag printer",
+    etiquetasAyuda:
+      "The one that prints each garment's tag. It can be a separate label printer, or the same receipt printer.",
+    comoEtiquetas: "How do you print tags?",
+    modos: {
+      navegador: "Through the browser window",
+      recibos: "On the same receipt printer",
+      directa: "On a connected label printer",
+    },
+    modosAyuda: {
+      navegador: "As before: the print window opens.",
+      recibos:
+        "Each tag comes out on receipt paper, cut, with its QR code. Great for testing today and as a stopgap, with nothing to buy. Heads-up: that paper darkens under the heat of pressing.",
+      directa: "A label or tag printer plugged into this device. This is the permanent setup.",
+    },
+    faltaRecibos: "Connect the receipt printer first, right above.",
+    lenguaje: "Label printer language",
+    lenguajeAyuda:
+      "If nothing or odd text comes out, try the other one. It's on the box or in your printer's manual.",
+    lenguajes: {
+      tspl: "TSPL — Rollo, Munbyn, Polono, iDPRT, TSC, Xprinter (most of them)",
+      zpl: "ZPL — Zebra",
+      escpos: "ESC/POS — receipt printers loaded with a label roll",
+    },
+    tamano: "Tag size",
+    tamanos: {
+      "2x1": "2 × 1 inches",
+      "2.25x1.25": "2¼ × 1¼ inches",
+      "3x1": "3 × 1 inches (staple tag)",
+    },
+    probarEtiqueta: "Print a test tag",
+    pruebaPieza: "MON · Piece 1 of 1",
+    pruebaPrenda: "Test shirt",
+    pruebaCliente: "Your store",
+    etiquetasOk: "Tags sent to the printer.",
     errores: {
       sin_soporte: "This browser can't talk straight to the printer. Use Chrome or Edge.",
       cancelado: "You didn't pick a printer.",

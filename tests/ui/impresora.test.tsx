@@ -8,6 +8,7 @@ import {
   soporteDelEquipo,
   type ImpresoraGuardada,
 } from "@/lib/impresion/conexion";
+import { bytesDeEtiquetas, etiquetaDePrueba } from "@/lib/impresion/imprimir";
 
 /**
  * CANDADO DE LA CONEXIÓN DIRECTA. No hay impresora en las pruebas, así que se
@@ -149,6 +150,56 @@ describe("conexión directa con la impresora", () => {
     await mandarAImpresora({ ...IMPRESORA, camino: "serie", baudios: 115200 }, new Uint8Array(321));
     expect(puerto.open).toHaveBeenCalledOnce();
     expect(escritos).toEqual([321]);
+  });
+
+  /**
+   * CANDADO DE LAS DOS IMPRESORAS: la de recibos y la de etiquetas se guardan
+   * aparte, y «usar la misma de recibos» manda las etiquetas por ESA impresora,
+   * en su idioma (ESC/POS) y con su papel.
+   */
+  it("recibos y etiquetas se guardan aparte: conectar una no pisa la otra", () => {
+    guardarImpresora(IMPRESORA, "recibos");
+    guardarImpresora(
+      { ...IMPRESORA, nombre: "Etiquetera", productId: 0x7777, lenguaje: "tspl" },
+      "etiquetas",
+    );
+    expect(leerImpresora("recibos")?.nombre).toBe("Térmica de prueba");
+    expect(leerImpresora("etiquetas")?.nombre).toBe("Etiquetera");
+    guardarImpresora(null, "etiquetas");
+    expect(leerImpresora("recibos")?.nombre).toBe("Térmica de prueba");
+    expect(hayImpresoraDirecta("etiquetas")).toBe(false);
+  });
+
+  it("«en la misma impresora de recibos»: las etiquetas salen por la de recibos, en ESC/POS", async () => {
+    const { enviados } = usbSimulado();
+    guardarImpresora({ ...IMPRESORA, ancho: 32 }, "recibos");
+    const deEtiquetas: ImpresoraGuardada = { ...IMPRESORA, camino: "recibos", nombre: "misma" };
+    const bytes = bytesDeEtiquetas(
+      etiquetaDePrueba({ pieza: "LUN · Pieza 1 de 1", prenda: "Camisa", cliente: "Tienda" }),
+      deEtiquetas,
+    );
+    // Arranca como un recibo (ESC @), no como una orden de etiquetera.
+    expect([...bytes].slice(0, 2)).toEqual([0x1b, 0x40]);
+    await mandarAImpresora(deEtiquetas, bytes);
+    expect(enviados.length).toBeGreaterThan(0);
+    expect(enviados[0]?.endpoint).toBe(3);
+  });
+
+  it("si se eligió «la misma de recibos» y no hay ninguna conectada, se avisa", async () => {
+    usbSimulado();
+    await expect(
+      mandarAImpresora({ ...IMPRESORA, camino: "recibos", nombre: "misma" }, new Uint8Array(4)),
+    ).rejects.toMatchObject({ codigo: "sin_impresora" });
+  });
+
+  it("una etiquetera habla su propio idioma: TSPL por defecto, ZPL si es Zebra", () => {
+    const prueba = etiquetaDePrueba({ pieza: "LUN · Pieza 1 de 1", prenda: "Camisa", cliente: "Tienda" });
+    const texto = (b: Uint8Array) => new TextDecoder("latin1").decode(b);
+    expect(texto(bytesDeEtiquetas(prueba, { ...IMPRESORA, lenguaje: "tspl", tamano: "3x1" }))).toContain(
+      "SIZE 3,1",
+    );
+    expect(texto(bytesDeEtiquetas(prueba, { ...IMPRESORA, lenguaje: "zpl" })).startsWith("^XA")).toBe(true);
+    expect(texto(bytesDeEtiquetas(prueba, { ...IMPRESORA })).startsWith("SIZE 2,1")).toBe(true);
   });
 
   it("la impresora se recuerda en ESTE equipo, y sin ella se usa la ventana del navegador", () => {

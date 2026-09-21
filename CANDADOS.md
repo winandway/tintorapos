@@ -724,8 +724,8 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   **Windows** el driver de la impresora acapara el USB → se usa puerto serie
   (COM) o el modo silencioso de Chrome (`--kiosk-printing`, documentado con su
   comando exacto). En **iPad/iPhone** no existe ni WebUSB ni Web Serial → AirPrint
-  por la ventana. Las **etiqueteras** (Zebra ZPL, TSPL) hablan otro idioma: las
-  etiquetas siguen por la ventana del navegador.
+  por la ventana. Las **etiqueteras** (Zebra ZPL, TSPL) hablan otro idioma: eso
+  quedó resuelto en B40.
 - **Candados:** `tests/unit/escpos.test.ts` (bytes uno por uno),
   `tests/ui/impresora.test.tsx` (impresora simulada: salida «bulk», trozos de
   4 KB, fallos traducidos) y `tests/integracion/recibo-directo.test.ts`. Los
@@ -735,6 +735,53 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   del cliente pide gerente. Una ruta nueva no puede ser la puerta de atrás.
 - **Lo que NO está probado:** con una impresora física. Aquí no hay ninguna. Lo
   prueba Richard con el botón «Imprimir una prueba».
+
+### B40. Solo se podía conectar UNA impresora, y las etiquetas seguían por la ventana
+
+- **Cómo se veía:** el recibo ya salía directo (B39, probado por Richard con su
+  impresora el 20 sep 2026: imprimió y el QR abrió la orden). Pero en **Ajustes →
+  Impresoras** solo había sitio para una impresora, y «Imprimir etiquetas»
+  seguía abriendo la ventana del navegador. Sus palabras: *«solamente vi para
+  conectar esta impresora… no sé si se puede conectar otra»*.
+- **Causa real:** B39 dejó las etiquetas para después porque las etiqueteras no
+  hablan ESC/POS. Hablan **TSPL** (Rollo, Munbyn, Polono, iDPRT, TSC, Xprinter:
+  casi todas las económicas) o **ZPL** (Zebra).
+- **Lo que se hizo:**
+  - `src/lib/impresion/etiquetas.ts`: la misma etiqueta en tres idiomas —TSPL,
+    ZPL y ESC/POS—, con el **QR dibujado por la impresora** en los tres. Tamaños
+    2 × 1, 2¼ × 1¼ y 3 × 1 pulgadas a 203 puntos por pulgada.
+  - `GET /datos/ordenes/[id]/etiquetas`: los datos de cada etiqueta, en el
+    idioma del cliente. Filtra por `tintoreria_id` de la sesión (está en el
+    candado de aislamiento).
+  - `conexion.ts`: **dos puestos por equipo**, `recibos` y `etiquetas`, cada uno
+    con su clave (`tintora:impresora` y `tintora:impresora:etiquetas`). El camino
+    `"recibos"` en el puesto de etiquetas significa «usa la de recibos».
+  - **Ajustes → Impresoras** con dos tarjetas. La de etiquetas tiene tres modos:
+    ventana del navegador, **en la misma impresora de recibos** (para probar hoy
+    sin comprar nada) y **en una etiquetera conectada** (idioma + tamaño + botón
+    «Imprimir una etiqueta de prueba»).
+  - «Imprimir etiquetas» (mostrador y orden) manda directo con ese toque
+    (`imprimirEtiquetasDirecto`); si no hay impresora o falla, abre la ventana.
+- **Candados:** `tests/unit/etiquetas-impresora.test.ts` (órdenes exactas de
+  TSPL y ZPL, acentos, comillas y `^`/`~` que no rompen la orden, un corte por
+  etiqueta) y `tests/ui/impresora.test.tsx` (las dos impresoras se guardan
+  aparte; «la misma de recibos» manda ESC/POS por la de recibos; avisa si no hay).
+  Comprobados en rojo: clave compartida y `PRINT 1,1` quitado.
+- **Cómo se comprueba sin etiquetera:**
+  - **ZPL:** `node scripts/comprobar-zpl.mjs` manda el código real al emulador
+    público de Labelary, que lo dibuja como una Zebra, y lee el QR del dibujo.
+    20 sep 2026: los tres tamaños en verde; en rojo al mover el QR fuera de la
+    etiqueta. No va en `verify` porque le pega a un servicio de afuera.
+  - **ESC/POS (misma de recibos):** con la impresora de Richard, botón
+    «Imprimir una etiqueta de prueba».
+- **Lo que NO está probado:** **TSPL en una etiquetera física.** No existe
+  emulador público confiable y aquí no hay impresora. Las órdenes están
+  comprobadas contra el manual, no contra papel. Se prueba con el botón de prueba
+  el día que haya una; si sale corrida, se ajustan `X_TEXTO`, `GAP` y las filas en
+  `etiquetasTspl`.
+- **NO tocar:** el papel térmico de recibo se oscurece con la plancha. El modo
+  «misma impresora de recibos» es para probar y salir del paso, y la pantalla y
+  la guía lo dicen. No quitar ese aviso.
 
 ## C. Candados de publicación
 

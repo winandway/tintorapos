@@ -44,6 +44,34 @@ export const CAPTURAS = {
       en: "You pick the size up top; that computer remembers it.",
     },
   },
+  impresoras: {
+    archivo: "/capturas/impresoras.webp",
+    ancho: 768,
+    alto: 1203,
+    marco: "escritorio",
+    alt: {
+      es: "Pantalla Ajustes → Impresoras con dos tarjetas: la impresora de recibos conectada, con su ancho de papel, y la impresora de etiquetas con tres opciones (ventana del navegador, la misma de recibos o una etiquetera conectada), su idioma, su tamaño y el botón de imprimir una etiqueta de prueba.",
+      en: "Settings → Printers screen with two cards: the connected receipt printer with its paper width, and the tag printer with three options (browser window, the same receipt printer, or a connected label printer), its language, its size and the button to print a test tag.",
+    },
+    pie: {
+      es: "Cada equipo recuerda sus dos impresoras: la de recibos y la de etiquetas.",
+      en: "Each device remembers its two printers: receipts and tags.",
+    },
+  },
+  etiquetaDirecta: {
+    archivo: "/capturas/etiqueta-directa.webp",
+    ancho: 860,
+    alto: 454,
+    marco: "papel",
+    alt: {
+      es: "Etiqueta de 2 × 1 pulgadas tal como la dibuja una etiquetera conectada: el código QR a la izquierda y, a la derecha, el número de la orden en grande, el día y la pieza, la prenda, el cliente, la fecha de entrega y las marcas.",
+      en: "A 2 × 1 inch tag as a connected label printer draws it: the QR code on the left and, on the right, the order number in large type, the day and piece, the garment, the customer, the due date and the marks.",
+    },
+    pie: {
+      es: "Así dibuja la etiqueta una etiquetera conectada (2 × 1 pulgadas).",
+      en: "How a connected label printer draws the tag (2 × 1 inches).",
+    },
+  },
   mostrador: {
     archivo: "/capturas/mostrador.webp",
     ancho: 1440,

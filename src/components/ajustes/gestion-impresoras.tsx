@@ -17,200 +17,348 @@ import {
   mandarAImpresora,
   soporteDelEquipo,
   type ImpresoraGuardada,
+  type PuestoImpresora,
 } from "@/lib/impresion/conexion";
-import { reciboDePrueba } from "@/lib/impresion/imprimir";
+import { LENGUAJES_ETIQUETA, TAMANOS_ETIQUETA, type TamanoEtiqueta } from "@/lib/impresion/etiquetas";
+import { bytesDeEtiquetas, etiquetaDePrueba, reciboDePrueba } from "@/lib/impresion/imprimir";
 import { reciboAEscPos } from "@/lib/impresion/recibo";
 import { useIdioma } from "@/lib/i18n/cliente";
 
 type Soporte = ReturnType<typeof soporteDelEquipo>;
+type ModoEtiquetas = "navegador" | "recibos" | "directa";
+
+const BASE: Omit<ImpresoraGuardada, "camino" | "nombre"> = { ancho: 48, cortar: true, abrirCajon: false };
 
 /**
- * La impresora se conecta POR EQUIPO: la computadora del mostrador tiene la
- * suya y el celular del dueño no. Por eso todo esto vive en el navegador y no
- * en la cuenta.
+ * Las impresoras se conectan POR EQUIPO: la computadora del mostrador tiene las
+ * suyas y el celular del dueño no. Cada equipo puede tener dos: la de recibos y
+ * la de etiquetas (que puede ser la misma de recibos).
  */
 export function GestionImpresoras({ tienda }: { tienda: string }) {
   const { d } = useIdioma();
   const di = d.impresion.impresoras;
   const [soporte, setSoporte] = useState<Soporte | null>(null);
-  const [impresora, setImpresora] = useState<ImpresoraGuardada | null>(null);
-  const [ocupado, setOcupado] = useState(false);
-  const [aviso, setAviso] = useState<{ tono: "ok" | "error"; texto: string } | null>(null);
+  const [recibos, setRecibos] = useState<ImpresoraGuardada | null>(null);
+  const [etiquetas, setEtiquetas] = useState<ImpresoraGuardada | null>(null);
+  const [ocupado, setOcupado] = useState<PuestoImpresora | null>(null);
+  const [aviso, setAviso] = useState<{ puesto: PuestoImpresora; tono: "ok" | "error"; texto: string } | null>(
+    null,
+  );
 
   // Lo que sabe hacer este equipo se averigua en el navegador, no en el servidor.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSoporte(soporteDelEquipo());
-    setImpresora(leerImpresora());
+    setRecibos(leerImpresora("recibos"));
+    setEtiquetas(leerImpresora("etiquetas"));
   }, []);
 
-  const guardar = (i: ImpresoraGuardada | null) => {
-    guardarImpresora(i);
-    setImpresora(i);
+  const guardar = (puesto: PuestoImpresora, i: ImpresoraGuardada | null) => {
+    guardarImpresora(i, puesto);
+    if (puesto === "recibos") setRecibos(i);
+    else setEtiquetas(i);
   };
 
-  const fallo = (e: unknown) => {
+  const fallo = (puesto: PuestoImpresora, e: unknown) => {
     const codigo = e instanceof ErrorImpresora ? e.codigo : "desconocido";
-    if (codigo !== "cancelado") setAviso({ tono: "error", texto: di.errores[codigo] });
+    if (codigo !== "cancelado") setAviso({ puesto, tono: "error", texto: di.errores[codigo] });
   };
 
-  const conectar = async (camino: "usb" | "serie") => {
+  const conectar = async (puesto: PuestoImpresora, camino: "usb" | "serie") => {
     setAviso(null);
-    setOcupado(true);
+    setOcupado(puesto);
     try {
       const elegida = camino === "usb" ? await elegirUsb() : await elegirSerie();
-      guardar({
+      const anterior = puesto === "recibos" ? recibos : etiquetas;
+      guardar(puesto, {
+        ...BASE,
+        ...(anterior ?? {}),
         camino,
         nombre: elegida.nombre,
         vendorId: elegida.vendorId,
         productId: elegida.productId,
-        baudios: camino === "serie" ? 9600 : undefined,
-        ancho: impresora?.ancho ?? 48,
-        cortar: impresora?.cortar ?? true,
-        abrirCajon: impresora?.abrirCajon ?? false,
+        baudios: camino === "serie" ? (anterior?.baudios ?? 9600) : undefined,
+        ...(puesto === "etiquetas"
+          ? { lenguaje: anterior?.lenguaje ?? "tspl", tamano: anterior?.tamano ?? "2x1" }
+          : {}),
       });
     } catch (e) {
-      fallo(e);
+      fallo(puesto, e);
     } finally {
-      setOcupado(false);
+      setOcupado(null);
     }
   };
 
-  const probar = async () => {
+  const probar = async (puesto: PuestoImpresora) => {
+    const impresora = puesto === "recibos" ? recibos : etiquetas;
     if (!impresora) return;
     setAviso(null);
-    setOcupado(true);
+    setOcupado(puesto);
     try {
-      await mandarAImpresora(
-        impresora,
-        reciboAEscPos(reciboDePrueba(tienda, di.reciboPrueba, di.reciboPruebaTexto), {
-          ancho: impresora.ancho,
-          cortar: impresora.cortar,
-        }),
-      );
-      setAviso({ tono: "ok", texto: di.pruebaOk });
+      const bytes =
+        puesto === "recibos"
+          ? reciboAEscPos(reciboDePrueba(tienda, di.reciboPrueba, di.reciboPruebaTexto), {
+              ancho: impresora.ancho,
+              cortar: impresora.cortar,
+            })
+          : bytesDeEtiquetas(
+              etiquetaDePrueba({ pieza: di.pruebaPieza, prenda: di.pruebaPrenda, cliente: tienda }),
+              impresora,
+            );
+      await mandarAImpresora(impresora, bytes);
+      setAviso({ puesto, tono: "ok", texto: di.pruebaOk });
     } catch (e) {
-      fallo(e);
+      fallo(puesto, e);
     } finally {
-      setOcupado(false);
+      setOcupado(null);
     }
   };
 
   if (!soporte) return <p className="text-gris">{d.comun.cargando}</p>;
-  const directa = impresora && impresora.camino !== "navegador" ? impresora : null;
   const puedeDirecto = soporte.usb || soporte.serie;
+  const recibosDirecta = recibos && recibos.camino !== "navegador" ? recibos : null;
+  const modoEtiquetas: ModoEtiquetas =
+    !etiquetas || etiquetas.camino === "navegador"
+      ? "navegador"
+      : etiquetas.camino === "recibos"
+        ? "recibos"
+        : "directa";
+  const etiquetera = modoEtiquetas === "directa" ? etiquetas : null;
+
+  const elegirModo = (modo: ModoEtiquetas) => {
+    setAviso(null);
+    if (modo === "navegador") guardar("etiquetas", null);
+    else if (modo === "recibos")
+      guardar("etiquetas", { ...BASE, camino: "recibos", nombre: di.modos.recibos, lenguaje: "escpos" });
+    // «directa» no guarda nada hasta que se elige la etiquetera con su botón.
+    else if (modoEtiquetas !== "directa")
+      setEtiquetas({ ...BASE, camino: "usb", nombre: "", lenguaje: "tspl", tamano: "2x1" });
+  };
+
+  const botonesConectar = (puesto: PuestoImpresora, conectada: boolean) =>
+    puedeDirecto && (
+      <>
+        {soporte.usb && (
+          <Boton
+            onClick={() => conectar(puesto, "usb")}
+            cargando={ocupado === puesto}
+            variante={conectada ? "secundario" : "primario"}
+          >
+            {di.conectarUsb}
+          </Boton>
+        )}
+        {soporte.serie && (
+          <Boton
+            onClick={() => conectar(puesto, "serie")}
+            cargando={ocupado === puesto}
+            variante="secundario"
+          >
+            {di.conectarSerie}
+          </Boton>
+        )}
+      </>
+    );
+
+  const menuDesconectar = (puesto: PuestoImpresora, nombre: string) => (
+    <MenuTresPuntos
+      etiqueta={nombre}
+      opciones={[
+        {
+          texto: di.desconectar,
+          destructiva: {
+            titulo: di.confirmarDesconectar,
+            mensaje: di.confirmarDesconectarTexto,
+            confirmar: di.desconectar,
+          },
+          alElegir: () => guardar(puesto, null),
+        },
+      ]}
+    />
+  );
 
   return (
     <div className="space-y-4">
-      {aviso && <Aviso tono={aviso.tono}>{aviso.texto}</Aviso>}
+      {soporte.ios && <Aviso tono="info">{di.enIpad}</Aviso>}
+      {!soporte.ios && !puedeDirecto && <Aviso tono="alerta">{di.noSoporta}</Aviso>}
+      {soporte.windows && puedeDirecto && !recibosDirecta && <Aviso tono="info">{di.enWindows}</Aviso>}
 
+      {/* ---------------- Recibos ---------------- */}
       <Tarjeta>
-        <TituloSeccion>{di.esteEquipo}</TituloSeccion>
-        {directa ? (
+        <TituloSeccion>{di.recibos}</TituloSeccion>
+        <p className="-mt-2 mb-3 text-[14px] text-gris">{di.recibosAyuda}</p>
+        {aviso?.puesto === "recibos" && (
+          <Aviso tono={aviso.tono} className="mb-3">
+            {aviso.texto}
+          </Aviso>
+        )}
+        {recibosDirecta ? (
           <div className="flex items-start gap-3">
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-ok" data-testid="impresora-conectada">
-                ✓ {di.conectada}: {directa.nombre}
+                ✓ {di.conectada}: {recibosDirecta.nombre}
               </p>
               <p className="text-[14px] text-gris">{di.directa}</p>
             </div>
-            <MenuTresPuntos
-              etiqueta={directa.nombre}
-              opciones={[
-                {
-                  texto: di.desconectar,
-                  destructiva: {
-                    titulo: di.confirmarDesconectar,
-                    mensaje: di.confirmarDesconectarTexto,
-                    confirmar: di.desconectar,
-                  },
-                  alElegir: () => guardar(null),
-                },
-              ]}
-            />
+            {menuDesconectar("recibos", recibosDirecta.nombre)}
           </div>
         ) : (
           <p className="text-[15px] text-gris">{di.ninguna}</p>
         )}
-
-        {soporte.ios && (
-          <Aviso tono="info" className="mt-3">
-            {di.enIpad}
-          </Aviso>
-        )}
-        {!soporte.ios && !puedeDirecto && (
-          <Aviso tono="alerta" className="mt-3">
-            {di.noSoporta}
-          </Aviso>
-        )}
-        {soporte.windows && puedeDirecto && !directa && (
-          <Aviso tono="info" className="mt-3">
-            {di.enWindows}
-          </Aviso>
-        )}
-
-        {puedeDirecto && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {soporte.usb && (
-              <Boton
-                onClick={() => conectar("usb")}
-                cargando={ocupado}
-                variante={directa ? "secundario" : "primario"}
-              >
-                {di.conectarUsb}
-              </Boton>
-            )}
-            {soporte.serie && (
-              <Boton onClick={() => conectar("serie")} cargando={ocupado} variante="secundario">
-                {di.conectarSerie}
-              </Boton>
-            )}
-            {directa && (
-              <Boton onClick={probar} cargando={ocupado} variante="exito">
-                {ocupado ? di.probando : di.probar}
-              </Boton>
-            )}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {botonesConectar("recibos", Boolean(recibosDirecta))}
+          {recibosDirecta && (
+            <Boton onClick={() => probar("recibos")} cargando={ocupado === "recibos"} variante="exito">
+              {di.probar}
+            </Boton>
+          )}
+        </div>
+        {recibosDirecta && (
+          <div className="mt-5 border-t border-percha/60 pt-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <CampoSelector
+                etiqueta={di.papel}
+                value={String(recibosDirecta.ancho)}
+                onChange={(e) =>
+                  guardar("recibos", { ...recibosDirecta, ancho: Number(e.target.value) as 48 | 42 | 32 })
+                }
+                opciones={[
+                  { valor: "48", texto: di.papel80 },
+                  { valor: "42", texto: di.papel72 },
+                  { valor: "32", texto: di.papel58 },
+                ]}
+              />
+              {recibosDirecta.camino === "serie" && (
+                <CampoSelector
+                  etiqueta={di.velocidad}
+                  ayuda={di.velocidadAyuda}
+                  value={String(recibosDirecta.baudios ?? 9600)}
+                  onChange={(e) => guardar("recibos", { ...recibosDirecta, baudios: Number(e.target.value) })}
+                  opciones={BAUDIOS.map((b) => ({ valor: String(b), texto: String(b) }))}
+                />
+              )}
+            </div>
+            <div className="mt-4 space-y-3">
+              <Casilla
+                etiqueta={di.cortar}
+                checked={recibosDirecta.cortar}
+                onChange={(e) => guardar("recibos", { ...recibosDirecta, cortar: e.target.checked })}
+              />
+              <Casilla
+                etiqueta={di.cajon}
+                checked={recibosDirecta.abrirCajon}
+                onChange={(e) => guardar("recibos", { ...recibosDirecta, abrirCajon: e.target.checked })}
+              />
+            </div>
           </div>
         )}
       </Tarjeta>
 
-      {directa && (
-        <Tarjeta>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <CampoSelector
-              etiqueta={di.papel}
-              value={String(directa.ancho)}
-              onChange={(e) => guardar({ ...directa, ancho: Number(e.target.value) as 48 | 42 | 32 })}
-              opciones={[
-                { valor: "48", texto: di.papel80 },
-                { valor: "42", texto: di.papel72 },
-                { valor: "32", texto: di.papel58 },
-              ]}
-            />
-            {directa.camino === "serie" && (
-              <CampoSelector
-                etiqueta={di.velocidad}
-                ayuda={di.velocidadAyuda}
-                value={String(directa.baudios ?? 9600)}
-                onChange={(e) => guardar({ ...directa, baudios: Number(e.target.value) })}
-                opciones={BAUDIOS.map((b) => ({ valor: String(b), texto: String(b) }))}
-              />
-            )}
+      {/* ---------------- Etiquetas ---------------- */}
+      <Tarjeta>
+        <TituloSeccion>{di.etiquetas}</TituloSeccion>
+        <p className="-mt-2 mb-3 text-[14px] text-gris">{di.etiquetasAyuda}</p>
+        {aviso?.puesto === "etiquetas" && (
+          <Aviso tono={aviso.tono} className="mb-3">
+            {aviso.texto}
+          </Aviso>
+        )}
+        <div
+          className="flex flex-col gap-2"
+          role="radiogroup"
+          aria-label={di.comoEtiquetas}
+          data-testid="modo-etiquetas"
+        >
+          {(["navegador", "recibos", "directa"] as const).map((modo) => {
+            const elegido = modoEtiquetas === modo;
+            const bloqueado = modo !== "navegador" && !puedeDirecto;
+            return (
+              <button
+                key={modo}
+                type="button"
+                role="radio"
+                aria-checked={elegido}
+                disabled={bloqueado}
+                onClick={() => elegirModo(modo)}
+                className={`rounded-2xl px-4 py-3 text-left text-[15px] font-semibold ring-1 disabled:opacity-50 ${elegido ? "bg-tinta text-white ring-tinta" : "bg-superficie ring-percha hover:bg-tinta-suave"}`}
+              >
+                {di.modos[modo]}
+                <span className={`block text-[13px] font-normal ${elegido ? "text-white/80" : "text-gris"}`}>
+                  {di.modosAyuda[modo]}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {modoEtiquetas === "recibos" && !recibosDirecta && (
+          <Aviso tono="alerta" className="mt-3">
+            {di.faltaRecibos}
+          </Aviso>
+        )}
+
+        {modoEtiquetas === "directa" && (
+          <div className="mt-4">
+            {etiquetera?.nombre ? (
+              <div className="flex items-start gap-3">
+                <p className="min-w-0 flex-1 font-semibold text-ok" data-testid="etiquetera-conectada">
+                  ✓ {di.conectada}: {etiquetera.nombre}
+                </p>
+                {menuDesconectar("etiquetas", etiquetera.nombre)}
+              </div>
+            ) : null}
+            <div className="mt-3 flex flex-wrap gap-2">
+              {botonesConectar("etiquetas", Boolean(etiquetera?.nombre))}
+            </div>
+            {etiquetera?.nombre ? (
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <CampoSelector
+                  etiqueta={di.lenguaje}
+                  ayuda={di.lenguajeAyuda}
+                  value={etiquetera.lenguaje ?? "tspl"}
+                  onChange={(e) =>
+                    guardar("etiquetas", {
+                      ...etiquetera,
+                      lenguaje: e.target.value as (typeof LENGUAJES_ETIQUETA)[number],
+                    })
+                  }
+                  opciones={LENGUAJES_ETIQUETA.map((l) => ({ valor: l, texto: di.lenguajes[l] }))}
+                />
+                {etiquetera.lenguaje !== "escpos" && (
+                  <CampoSelector
+                    etiqueta={di.tamano}
+                    value={etiquetera.tamano ?? "2x1"}
+                    onChange={(e) =>
+                      guardar("etiquetas", { ...etiquetera, tamano: e.target.value as TamanoEtiqueta })
+                    }
+                    opciones={(Object.keys(TAMANOS_ETIQUETA) as TamanoEtiqueta[]).map((t) => ({
+                      valor: t,
+                      texto: di.tamanos[t],
+                    }))}
+                  />
+                )}
+                {etiquetera.camino === "serie" && (
+                  <CampoSelector
+                    etiqueta={di.velocidad}
+                    ayuda={di.velocidadAyuda}
+                    value={String(etiquetera.baudios ?? 9600)}
+                    onChange={(e) => guardar("etiquetas", { ...etiquetera, baudios: Number(e.target.value) })}
+                    opciones={BAUDIOS.map((b) => ({ valor: String(b), texto: String(b) }))}
+                  />
+                )}
+              </div>
+            ) : null}
           </div>
-          <div className="mt-4 space-y-3">
-            <Casilla
-              etiqueta={di.cortar}
-              checked={directa.cortar}
-              onChange={(e) => guardar({ ...directa, cortar: e.target.checked })}
-            />
-            <Casilla
-              etiqueta={di.cajon}
-              checked={directa.abrirCajon}
-              onChange={(e) => guardar({ ...directa, abrirCajon: e.target.checked })}
-            />
+        )}
+
+        {((modoEtiquetas === "recibos" && recibosDirecta) ||
+          (modoEtiquetas === "directa" && etiquetera?.nombre)) && (
+          <div className="mt-4">
+            <Boton onClick={() => probar("etiquetas")} cargando={ocupado === "etiquetas"} variante="exito">
+              {di.probarEtiqueta}
+            </Boton>
           </div>
-        </Tarjeta>
-      )}
+        )}
+      </Tarjeta>
 
       <p className="text-[15px]">
         <Link href="/docs/impresoras" className="font-semibold text-tinta underline">

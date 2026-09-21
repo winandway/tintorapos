@@ -16,7 +16,7 @@ import { nuevoId } from "@/lib/codigos";
 import { aCentavos } from "@/lib/dinero";
 import { textoError } from "@/lib/errores-cliente";
 import { fmt, formatoDinero, formatoFecha, textoBilingue } from "@/lib/i18n";
-import { imprimirReciboDirecto } from "@/lib/impresion/imprimir";
+import { imprimirEtiquetasDirecto, imprimirReciboDirecto } from "@/lib/impresion/imprimir";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { redimensionarFoto } from "@/lib/imagen";
 import { registrarPago } from "@/lib/operaciones";
@@ -119,13 +119,21 @@ export function DetalleOrden({
     window.open(`/app/ordenes/${o.id}/imprimir?tipo=${tipo}`, "_blank", "noopener");
   };
   /**
-   * El recibo y la copia interna salen directo por la impresora conectada en
-   * este equipo, si la hay; si no, o si falla, por la ventana de siempre.
+   * Recibo, copia interna y etiquetas salen directo por la impresora conectada
+   * en este equipo, si la hay; si no, o si falla, por la ventana de siempre.
    */
   const imprimir = (tipo: string): void => {
-    if (tipo !== "recibo" && tipo !== "interna") return abrirVentana(tipo);
-    imprimirReciboDirecto(o.id, tipo)
-      .then((salio) => (salio ? avisar(d.impresion.impresoras.directoOk) : abrirVentana(tipo)))
+    const directo =
+      tipo === "etiquetas"
+        ? imprimirEtiquetasDirecto(o.id)
+        : tipo === "recibo" || tipo === "interna"
+          ? imprimirReciboDirecto(o.id, tipo)
+          : null;
+    if (!directo) return abrirVentana(tipo);
+    const listo =
+      tipo === "etiquetas" ? d.impresion.impresoras.etiquetasOk : d.impresion.impresoras.directoOk;
+    directo
+      .then((salio) => (salio ? avisar(listo) : abrirVentana(tipo)))
       .catch(() => {
         avisar(d.impresion.impresoras.directoFallo);
         abrirVentana(tipo);

@@ -11,7 +11,7 @@ export const ajustes = {
     },
     impresoras: {
       titulo: "Impresoras",
-      texto: "Conecta la impresora de recibos de este equipo y pruébala.",
+      texto: "Conecta la impresora de recibos y la de etiquetas de este equipo, y pruébalas.",
     },
     avisos: { titulo: "Avisos a clientes", texto: "Mensajes por SMS y correo cuando la ropa está lista." },
     seguridad: { titulo: "Seguridad", texto: "Verificación en dos pasos y registro de actividad." },

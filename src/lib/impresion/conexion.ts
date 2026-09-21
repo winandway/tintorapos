@@ -58,7 +58,13 @@ const usb = (): ApiUsb | undefined =>
 const serie = (): ApiSerie | undefined =>
   typeof navigator === "undefined" ? undefined : (navigator as unknown as { serial?: ApiSerie }).serial;
 
-export type CaminoImpresion = "usb" | "serie" | "navegador";
+/**
+ * `recibos` solo vale para el puesto de etiquetas: «saca las etiquetas por la
+ * misma impresora de recibos», en papel, para graparlas a la prenda.
+ */
+export type CaminoImpresion = "usb" | "serie" | "navegador" | "recibos";
+/** Cada equipo puede tener dos impresoras: la de recibos y la de etiquetas. */
+export type PuestoImpresora = "recibos" | "etiquetas";
 export const BAUDIOS = [9600, 19200, 38400, 57600, 115200] as const;
 
 export interface ImpresoraGuardada {
@@ -71,23 +77,29 @@ export interface ImpresoraGuardada {
   ancho: 48 | 42 | 32;
   cortar: boolean;
   abrirCajon: boolean;
+  /** Solo etiquetas: el idioma que habla la etiquetera. */
+  lenguaje?: "tspl" | "zpl" | "escpos";
+  /** Solo etiquetas: el tamaño de la etiqueta del rollo. */
+  tamano?: "2x1" | "2.25x1.25" | "3x1";
 }
 
 export const CLAVE_IMPRESORA = "tintora:impresora";
+const clave = (puesto: PuestoImpresora) =>
+  puesto === "recibos" ? CLAVE_IMPRESORA : `${CLAVE_IMPRESORA}:etiquetas`;
 
-export function leerImpresora(): ImpresoraGuardada | null {
+export function leerImpresora(puesto: PuestoImpresora = "recibos"): ImpresoraGuardada | null {
   try {
-    const t = localStorage.getItem(CLAVE_IMPRESORA);
+    const t = localStorage.getItem(clave(puesto));
     return t ? (JSON.parse(t) as ImpresoraGuardada) : null;
   } catch {
     return null;
   }
 }
 
-export function guardarImpresora(i: ImpresoraGuardada | null): void {
+export function guardarImpresora(i: ImpresoraGuardada | null, puesto: PuestoImpresora = "recibos"): void {
   try {
-    if (i) localStorage.setItem(CLAVE_IMPRESORA, JSON.stringify(i));
-    else localStorage.removeItem(CLAVE_IMPRESORA);
+    if (i) localStorage.setItem(clave(puesto), JSON.stringify(i));
+    else localStorage.removeItem(clave(puesto));
   } catch {
     /* modo privado: se sigue sin recordar */
   }
@@ -221,11 +233,17 @@ async function mandarPorSerie(i: ImpresoraGuardada, datos: Uint8Array): Promise<
 export async function mandarAImpresora(i: ImpresoraGuardada, datos: Uint8Array): Promise<void> {
   if (i.camino === "usb") return mandarPorUsb(i, datos);
   if (i.camino === "serie") return mandarPorSerie(i, datos);
+  if (i.camino === "recibos") {
+    const deRecibos = leerImpresora("recibos");
+    if (!deRecibos || deRecibos.camino === "navegador" || deRecibos.camino === "recibos")
+      throw new ErrorImpresora("sin_impresora");
+    return mandarAImpresora(deRecibos, datos);
+  }
   throw new ErrorImpresora("sin_impresora");
 }
 
 /** Hay una impresora conectada directo en este equipo (no la del navegador). */
-export function hayImpresoraDirecta(): boolean {
-  const i = leerImpresora();
+export function hayImpresoraDirecta(puesto: PuestoImpresora = "recibos"): boolean {
+  const i = leerImpresora(puesto);
   return Boolean(i && i.camino !== "navegador");
 }

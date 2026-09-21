@@ -73,6 +73,43 @@ export const impresion = {
     reciboPrueba: "PRUEBA DE IMPRESIÓN",
     reciboPruebaTexto:
       "Si lees esto con sus acentos (áéíóú ñ ¿?) y abajo sale un código QR, tu impresora quedó conectada.",
+    recibos: "Impresora de recibos",
+    recibosAyuda: "La térmica de rollo de 80 mm del mostrador. Saca el recibo del cliente.",
+    etiquetas: "Impresora de etiquetas",
+    etiquetasAyuda:
+      "La que saca la etiqueta de cada prenda. Puede ser una etiquetera aparte, o la misma impresora de recibos.",
+    comoEtiquetas: "¿Cómo imprimes las etiquetas?",
+    modos: {
+      navegador: "Por la ventana del navegador",
+      recibos: "En la misma impresora de recibos",
+      directa: "En una etiquetera conectada",
+    },
+    modosAyuda: {
+      navegador: "Como hasta ahora: se abre la ventana de imprimir.",
+      recibos:
+        "Sale cada etiqueta en papel de recibo, cortada, con su QR. Para probar hoy y para salir del paso, sin comprar nada. Ojo: ese papel se oscurece con el calor de la plancha.",
+      directa: "Una impresora de etiquetas o de tags enchufada a este equipo. Es la definitiva.",
+    },
+    faltaRecibos: "Primero conecta la impresora de recibos, aquí arriba.",
+    lenguaje: "Idioma de la etiquetera",
+    lenguajeAyuda:
+      "Si no sale nada o sale texto raro, prueba el otro. Viene en la caja o en el manual de tu impresora.",
+    lenguajes: {
+      tspl: "TSPL — Rollo, Munbyn, Polono, iDPRT, TSC, Xprinter (casi todas)",
+      zpl: "ZPL — Zebra",
+      escpos: "ESC/POS — térmicas de recibos con rollo de etiquetas",
+    },
+    tamano: "Tamaño de la etiqueta",
+    tamanos: {
+      "2x1": "2 × 1 pulgadas",
+      "2.25x1.25": "2¼ × 1¼ pulgadas",
+      "3x1": "3 × 1 pulgadas (tag para grapar)",
+    },
+    probarEtiqueta: "Imprimir una etiqueta de prueba",
+    pruebaPieza: "LUN · Pieza 1 de 1",
+    pruebaPrenda: "Camisa de prueba",
+    pruebaCliente: "Tu tienda",
+    etiquetasOk: "Etiquetas enviadas a la impresora.",
     errores: {
       sin_soporte: "Este navegador no sabe hablar directo con la impresora. Usa Chrome o Edge.",
       cancelado: "No elegiste ninguna impresora.",

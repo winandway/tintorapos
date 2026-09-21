@@ -337,7 +337,6 @@ export function Mostrador({
         </div>
       );
     }
-    const url = (tipo: string) => `/app/ordenes/${creada.id}/imprimir?tipo=${tipo}`;
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center py-6 text-center">
         <Ticket
@@ -357,14 +356,9 @@ export function Mostrador({
           </Aviso>
         )}
         <div className="mt-6 grid w-full gap-2 sm:grid-cols-2">
-          <a
-            href={url("etiquetas")}
-            target="_blank"
-            rel="noopener"
-            className={clasesBoton("primario", "grande", true)}
-          >
+          <BotonRecibo ordenId={creada.id} tipo="etiquetas" variante="primario">
             {dm.imprimirEtiquetas}
-          </a>
+          </BotonRecibo>
           <BotonRecibo ordenId={creada.id} tipo="recibo">
             {dm.imprimirRecibo}
           </BotonRecibo>

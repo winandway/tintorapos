@@ -6,6 +6,8 @@
  *   npm run dev                             # servidor en el puerto 3000
  *   node scripts/capturas.mjs http://localhost:3000 <tp_sesion> public/capturas
  *
+ * Solo algunas: `SOLO=impresoras,orden node scripts/capturas.mjs …`
+ *
  * Después se pasan a webp a la mitad del tamaño (salen en 2x):
  *   for f in public/capturas/*.png; do cwebp -q 82 -resize $(($(sips -g pixelWidth $f | awk 'NR==2{print $2}')/2)) 0 "$f" -o "${f%.png}.webp"; rm "$f"; done
  */
@@ -16,8 +18,10 @@ import { execFileSync } from "node:child_process";
 const [, , url, sesion, salida = "public/capturas"] = process.argv;
 await mkdir(salida, { recursive: true });
 const b = await chromium.launch();
+const SOLO = (process.env.SOLO ?? "").split(",").filter(Boolean);
 
-async function tomar(nombre, { ancho = 1440, alto = 900, movil = false, antes }) {
+async function tomar(nombre, { ancho = 1440, alto = 900, movil = false, antes, guardado, recorte }) {
+  if (SOLO.length > 0 && !SOLO.includes(nombre)) return;
   const ctx = await b.newContext({
     viewport: { width: ancho, height: alto },
     deviceScaleFactor: 2,
@@ -28,6 +32,11 @@ async function tomar(nombre, { ancho = 1440, alto = 900, movil = false, antes })
     { name: "tp_sesion", value: sesion, url },
     { name: "tp_csrf", value: "demo-local-0123456789", url },
   ]);
+  // Lo que ese equipo «recuerda» (p. ej. sus impresoras) va en el navegador.
+  if (guardado)
+    await ctx.addInitScript((g) => {
+      for (const [k, v] of Object.entries(g)) localStorage.setItem(k, JSON.stringify(v));
+    }, guardado);
   const p = await ctx.newPage();
   p.setDefaultTimeout(60000);
   await antes(p);
@@ -36,7 +45,9 @@ async function tomar(nombre, { ancho = 1440, alto = 900, movil = false, antes })
     .addStyleTag({ content: "nextjs-portal, #nextjs-portal { display: none !important; }" })
     .catch(() => {});
   await p.waitForTimeout(700);
-  await p.screenshot({ path: `${salida}/${nombre}.png` });
+  // Con `recorte` sale solo esa parte de la pantalla, entera aunque sea larga.
+  if (recorte) await p.locator(recorte).screenshot({ path: `${salida}/${nombre}.png` });
+  else await p.screenshot({ path: `${salida}/${nombre}.png` });
   await ctx.close();
   console.info("ok", nombre);
 }
@@ -162,5 +173,25 @@ await tomar("recibo", {
   },
 });
 await tomar("orden", { antes: ir(`/app/ordenes/${orden.id}`) });
+
+// Ajustes → Impresoras con las dos conectadas. En la captura no hay aparatos:
+// se deja guardado lo mismo que guarda la pantalla al conectarlos.
+const IMPRESORA = { camino: "usb", vendorId: 0, productId: 0, ancho: 48, cortar: true, abrirCajon: false };
+await tomar("impresoras", {
+  ancho: 1100,
+  // Alta, para que entre sin desplazarse: si no, el encabezado fijo tapa el título.
+  alto: 1640,
+  guardado: {
+    "tintora:impresora": { ...IMPRESORA, nombre: "Impresora de recibos 80 mm" },
+    "tintora:impresora:etiquetas": {
+      ...IMPRESORA,
+      nombre: "Impresora de etiquetas 2 × 1",
+      lenguaje: "tspl",
+      tamano: "2x1",
+    },
+  },
+  recorte: "[data-captura=impresoras]",
+  antes: ir("/app/ajustes/impresoras"),
+});
 
 await b.close();

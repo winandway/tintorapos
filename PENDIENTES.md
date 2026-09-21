@@ -21,7 +21,14 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
    de descubrimiento del informe de agentes.
 4. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
    **Destranca:** protección de entrar, registrarse y recuperar contraseña.
-5. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU. **Va al final**: los
+5. 👤 **Probar las etiquetas en papel.** Hoy, sin comprar nada: Ajustes →
+   Impresoras → tarjeta «Impresora de etiquetas» → «En la misma impresora de
+   recibos» → «Imprimir una etiqueta de prueba». Y cuando tengas una etiquetera
+   (de las que hablan TSPL: Rollo, Munbyn, Polono, iDPRT…), el mismo botón en
+   «En una etiquetera conectada». **Destranca:** poder decir que la etiquetera
+   directa está probada en papel (hoy solo lo está contra el manual; la de Zebra,
+   contra un emulador).
+6. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU. **Va al final**: los
    avisos van por correo. **Destranca:** avisos por SMS reales.
 
 ## Fila de la IA (🤖), en orden
@@ -42,6 +49,11 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 - Búsqueda de marca «Tintora» en USPTO antes de comprar el dominio.
 
 ## Hecho (✅)
+
+- ✅ 2026-09-20 · **Dos impresoras por equipo y etiquetas de un toque**: la de
+  recibos y la de etiquetas se conectan cada una en su tarjeta; las etiquetas
+  salen directo en TSPL, ZPL o por la misma impresora de recibos, con su botón de
+  prueba. Guía de Docs con qué etiquetera comprar y cómo probar sin tener una.
 
 - ✅ 2026-09-20 · **El segundo paso ya no deja a nadie afuera** (bloqueaba a todo
   dueño nuevo), **precio de 120 USD al año** publicado, **billetes de soporte**
