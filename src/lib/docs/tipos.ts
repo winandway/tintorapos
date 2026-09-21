@@ -15,6 +15,8 @@ export type Bloque =
   | { t: "lista"; items: string[] }
   | { t: "nota"; tono: "consejo" | "importante"; texto: string }
   | { t: "figura"; figura: NombreFigura; pie: string }
+  /** Un valor para copiar y pegar tal cual (un comando, una dirección). */
+  | { t: "codigo"; texto: string; etiqueta?: string }
   /** Una captura REAL del sistema (las mismas de la página de venta). */
   | { t: "captura"; captura: ClaveCaptura; pie?: string };
 

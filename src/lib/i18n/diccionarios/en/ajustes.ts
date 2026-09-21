@@ -9,6 +9,10 @@ export const ajustes: Forma<typeof base> = {
     precios: { titulo: "Items & prices", texto: "What you take in and what you charge for each service." },
     empleados: { titulo: "Employees", texto: "Who works here, what they can do, and their PIN." },
     dispositivos: { titulo: "Devices", texto: "Store tablets and phones. Turn off a lost one." },
+    impresoras: {
+      titulo: "Printers",
+      texto: "Connect this device's receipt printer and test it.",
+    },
     avisos: { titulo: "Customer notifications", texto: "Text and email messages when clothes are ready." },
     seguridad: { titulo: "Security", texto: "Two-step verification and activity log." },
     datos: { titulo: "Your data", texto: "Export everything and check daily backups." },

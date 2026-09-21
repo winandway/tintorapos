@@ -35,6 +35,7 @@ import { crearOrden, type RespuestaOrden } from "@/lib/operaciones";
 import { useDatos } from "@/lib/use-datos";
 import { useEnLinea } from "@/lib/sin-conexion/use-en-linea";
 import { iconoDePrenda } from "@/lib/mostrador/iconos";
+import { BotonRecibo } from "@/components/impresion/boton-recibo";
 import { EtiquetasLocales, type DatosEtiquetasLocales } from "./etiquetas-locales";
 import { IconoPrenda } from "./icono-prenda";
 import { BarraMarcas } from "./marcas-prenda";
@@ -364,22 +365,12 @@ export function Mostrador({
           >
             {dm.imprimirEtiquetas}
           </a>
-          <a
-            href={url("recibo")}
-            target="_blank"
-            rel="noopener"
-            className={clasesBoton("secundario", "grande", true)}
-          >
+          <BotonRecibo ordenId={creada.id} tipo="recibo">
             {dm.imprimirRecibo}
-          </a>
-          <a
-            href={url("interna")}
-            target="_blank"
-            rel="noopener"
-            className={clasesBoton("fantasma", "normal", true)}
-          >
+          </BotonRecibo>
+          <BotonRecibo ordenId={creada.id} tipo="interna" variante="fantasma" tamano="normal">
             {dm.imprimirInterna}
-          </a>
+          </BotonRecibo>
           <Link href={`/app/ordenes/${creada.id}`} className={clasesBoton("fantasma", "normal", true)}>
             {dm.verOrden}
           </Link>
@@ -387,6 +378,9 @@ export function Mostrador({
         <Boton tamano="grande" variante="exito" className="mt-6" onClick={reiniciar}>
           + {dm.nuevaOrden}
         </Boton>
+        <Link href="/app/ajustes/impresoras" className="mt-4 text-[14px] font-semibold text-tinta underline">
+          {d.impresion.impresoras.configurar}
+        </Link>
       </div>
     );
   }

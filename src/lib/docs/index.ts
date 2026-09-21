@@ -46,6 +46,7 @@ export function textoPlano(bloques: Bloque[]): string {
       if (b.t === "pasos" || b.t === "lista") return b.items.map(limpiar).join(" ");
       if (b.t === "figura") return limpiar(b.pie);
       if (b.t === "captura") return b.pie ? limpiar(b.pie) : "";
+      if (b.t === "codigo") return b.etiqueta ?? "";
       return limpiar(b.texto);
     })
     .join(" ");

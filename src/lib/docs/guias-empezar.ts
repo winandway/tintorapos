@@ -351,7 +351,69 @@ export const GUIAS_EMPEZAR: Guia[] = [
             "**Rollo de recibos (80 mm)**: sale por la misma impresora del recibo, para salir del paso.",
           ],
         },
-        { t: "h2", texto: "Configurar la impresión" },
+        { t: "h2", texto: "Conectar la impresora de recibos (de un toque, sin ventanas)" },
+        {
+          t: "p",
+          texto:
+            "La forma buena de imprimir el recibo es **conectar la impresora directo a Tintora POS**. No pasa por la ventana de imprimir del navegador ni por los programas del sistema: tocas **Imprimir recibo** y sale el papel.",
+        },
+        {
+          t: "pasos",
+          items: [
+            "En la computadora del mostrador, abre Tintora POS en **Chrome** o **Edge**.",
+            "Entra a **Ajustes → Impresoras**.",
+            "Toca **Conectar impresora USB**. Sale una lista con lo que está enchufado: elige tu impresora y toca **Conectar**.",
+            "Toca **Imprimir una prueba**. Si sale el papel con los acentos bien y un código QR abajo, quedó lista.",
+            "Elige el **ancho del papel** (80 mm o 58 mm) y, si tienes cajón de dinero enchufado a la impresora, marca que se abra con el recibo.",
+          ],
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "Se conecta **una vez por computadora**. La tablet del mostrador tiene su impresora; tu celular no, y está bien: desde ahí no imprimes.",
+        },
+        { t: "h2", texto: "Según tu equipo" },
+        {
+          t: "lista",
+          items: [
+            "**Mac, Chromebook, Linux o tablet Android:** conexión directa por USB. Es el camino más limpio.",
+            "**Windows:** el programa de la impresora acapara el USB y no deja que nadie más le hable. Tienes dos salidas: conectarla por **puerto serie (COM)** si tu impresora lo trae, o usar el **modo silencioso de Chrome** que está aquí abajo.",
+            "**iPad o iPhone:** el sistema no deja que una página hable directo con la impresora. Se imprime por **AirPrint**, con la ventana de imprimir.",
+          ],
+        },
+        { t: "h2", texto: "Windows: que el recibo salga sin la ventana de imprimir" },
+        {
+          t: "pasos",
+          items: [
+            "En Windows, pon tu impresora de recibos como **predeterminada** (Configuración → Bluetooth y dispositivos → Impresoras y escáneres).",
+            "Imprime un recibo una vez con la ventana normal: elige tu impresora en **Destino**, márgenes en **Ninguno**, escala **100 %**. Chrome lo recuerda.",
+            "Haz clic derecho en el escritorio → **Nuevo → Acceso directo**, y pega este destino:",
+          ],
+        },
+        {
+          t: "codigo",
+          etiqueta: "Va en la casilla «Escriba la ubicación del elemento»",
+          texto:
+            '"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --kiosk-printing https://tintorapos.com/app',
+        },
+        {
+          t: "p",
+          texto:
+            "Ponle de nombre **Tintora POS** y abre el sistema SIEMPRE desde ese acceso directo. Desde ahí, al tocar imprimir, el papel sale solo, sin ventana.",
+        },
+        { t: "h2", texto: "Mi impresora está prendida y no imprime" },
+        {
+          t: "pasos",
+          items: [
+            "En la ventana de imprimir, mira la casilla **Destino**. Si dice **Guardar como PDF**, ahí está el problema: tócala, elige **Ver más…** y selecciona tu impresora. Chrome se acuerda para la próxima.",
+            "Si tu impresora **no aparece** en esa lista, la computadora no la tiene instalada. Instala el programa del fabricante (en Mac: Ajustes → Impresoras y escáneres → agregar).",
+            "Si en **Ajustes → Impresoras** dice que *el sistema tiene tomada la impresora*, estás en Windows: usa el puerto serie o el modo silencioso de arriba.",
+            "Si sale **papel en blanco o letras raras**, esa impresora no habla el idioma de las de recibos (ESC/POS). Suele pasar con las de etiquetas: esas van por la ventana de imprimir.",
+            "Si por puerto serie sale basura, cambia la **velocidad del puerto**: lo más común es 9600 o 115200.",
+          ],
+        },
+        { t: "h2", texto: "Imprimir con la ventana del navegador (el respaldo)" },
         {
           t: "pasos",
           items: [
@@ -366,7 +428,7 @@ export const GUIAS_EMPEZAR: Guia[] = [
           tono: "consejo",
           texto: "Chrome recuerda la última impresora que usaste, así que solo lo configuras la primera vez.",
         },
-        { t: "h2", texto: "Según tu equipo" },
+        { t: "h2", texto: "Para que aparezca en la ventana de imprimir" },
         {
           t: "lista",
           items: [
@@ -435,7 +497,69 @@ export const GUIAS_EMPEZAR: Guia[] = [
             "**Receipt roll (80 mm)**: comes out of the same receipt printer, to get by for now.",
           ],
         },
-        { t: "h2", texto: "Set up printing" },
+        { t: "h2", texto: "Connect the receipt printer (one tap, no windows)" },
+        {
+          t: "p",
+          texto:
+            "The right way to print a receipt is to **connect the printer straight to Tintora POS**. It skips the browser's print window and the system's printer software: you tap **Print receipt** and the paper comes out.",
+        },
+        {
+          t: "pasos",
+          items: [
+            "On the counter computer, open Tintora POS in **Chrome** or **Edge**.",
+            "Go to **Settings → Printers**.",
+            "Tap **Connect USB printer**. You'll see a list of what's plugged in: pick your printer and tap **Connect**.",
+            "Tap **Print a test**. If the paper comes out with a QR code at the bottom, you're set.",
+            "Pick the **paper width** (80 mm or 58 mm) and, if a cash drawer is plugged into the printer, check that it opens with the receipt.",
+          ],
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "You connect it **once per computer**. The counter tablet has its printer; your phone doesn't, and that's fine: you don't print from there.",
+        },
+        { t: "h2", texto: "Depending on your device" },
+        {
+          t: "lista",
+          items: [
+            "**Mac, Chromebook, Linux or Android tablet:** direct USB connection. It's the cleanest path.",
+            "**Windows:** the printer's own software holds the USB and won't let anyone else talk to it. Two ways out: connect it by **serial port (COM)** if your printer has one, or use **Chrome's silent mode** right below.",
+            "**iPad or iPhone:** the system doesn't let a page talk straight to the printer. You print through **AirPrint**, with the print window.",
+          ],
+        },
+        { t: "h2", texto: "Windows: print the receipt without the print window" },
+        {
+          t: "pasos",
+          items: [
+            "In Windows, set your receipt printer as the **default** (Settings → Bluetooth & devices → Printers & scanners).",
+            "Print one receipt with the normal window: pick your printer under **Destination**, margins **None**, scale **100%**. Chrome remembers.",
+            "Right-click the desktop → **New → Shortcut**, and paste this target:",
+          ],
+        },
+        {
+          t: "codigo",
+          etiqueta: "Goes in the “Type the location of the item” box",
+          texto:
+            '"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --kiosk-printing https://tintorapos.com/app',
+        },
+        {
+          t: "p",
+          texto:
+            "Name it **Tintora POS** and ALWAYS open the system from that shortcut. From there, tapping print sends the paper out by itself, no window.",
+        },
+        { t: "h2", texto: "My printer is on and nothing prints" },
+        {
+          t: "pasos",
+          items: [
+            "In the print window, look at the **Destination** box. If it says **Save as PDF**, that's the problem: tap it, choose **See more…** and select your printer. Chrome remembers it next time.",
+            "If your printer **isn't on that list**, the computer doesn't have it installed. Install the manufacturer's software (on Mac: Settings → Printers & Scanners → add).",
+            "If **Settings → Printers** says *the system is holding the printer*, you're on Windows: use the serial port or the silent mode above.",
+            "If **blank paper or strange letters** come out, that printer doesn't speak the receipt-printer language (ESC/POS). It usually happens with label printers: those go through the print window.",
+            "If garbage comes out over the serial port, change the **port speed**: 9600 or 115200 are the most common.",
+          ],
+        },
+        { t: "h2", texto: "Printing with the browser window (the fallback)" },
         {
           t: "pasos",
           items: [
@@ -450,7 +574,7 @@ export const GUIAS_EMPEZAR: Guia[] = [
           tono: "consejo",
           texto: "Chrome remembers the last printer you used, so you only need to set this up once.",
         },
-        { t: "h2", texto: "Depending on your device" },
+        { t: "h2", texto: "So it shows up in the print window" },
         {
           t: "lista",
           items: [

@@ -5,7 +5,8 @@ import { exigirSesion } from "@/server/pagina";
 import { type Permiso, usuarioPuede } from "@/server/permisos";
 
 const SECCIONES: {
-  clave: "tienda" | "precios" | "empleados" | "dispositivos" | "avisos" | "seguridad" | "datos";
+  clave:
+    "tienda" | "precios" | "empleados" | "dispositivos" | "impresoras" | "avisos" | "seguridad" | "datos";
   permiso: Permiso | null;
   color: string;
 }[] = [
@@ -13,6 +14,8 @@ const SECCIONES: {
   { clave: "precios", permiso: "ajustes.catalogo", color: "bg-dia-3" },
   { clave: "empleados", permiso: "empleados.gestionar", color: "bg-dia-4" },
   { clave: "dispositivos", permiso: "dispositivos.gestionar", color: "bg-dia-2" },
+  // Entra quien atiende el mostrador: la impresora es del equipo, no de la cuenta.
+  { clave: "impresoras", permiso: "ordenes.ver", color: "bg-dia-1" },
   { clave: "avisos", permiso: "ajustes.avisos", color: "bg-dia-5" },
   { clave: "seguridad", permiso: null, color: "bg-dia-6" },
   { clave: "datos", permiso: "datos.exportar", color: "bg-dia-0" },

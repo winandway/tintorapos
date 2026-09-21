@@ -16,6 +16,7 @@ import { nuevoId } from "@/lib/codigos";
 import { aCentavos } from "@/lib/dinero";
 import { textoError } from "@/lib/errores-cliente";
 import { fmt, formatoDinero, formatoFecha, textoBilingue } from "@/lib/i18n";
+import { imprimirReciboDirecto } from "@/lib/impresion/imprimir";
 import { useIdioma } from "@/lib/i18n/cliente";
 import { redimensionarFoto } from "@/lib/imagen";
 import { registrarPago } from "@/lib/operaciones";
@@ -114,8 +115,21 @@ export function DetalleOrden({
   const dinero = (n: number) => formatoDinero(n, moneda, idioma);
   const fecha = (n: number) => formatoFecha(n, idioma, zona, { dateStyle: "medium", timeStyle: "short" });
   const abierta = ["recibida", "en_proceso", "lista"].includes(o.estado);
-  const imprimir = (tipo: string): void => {
+  const abrirVentana = (tipo: string): void => {
     window.open(`/app/ordenes/${o.id}/imprimir?tipo=${tipo}`, "_blank", "noopener");
+  };
+  /**
+   * El recibo y la copia interna salen directo por la impresora conectada en
+   * este equipo, si la hay; si no, o si falla, por la ventana de siempre.
+   */
+  const imprimir = (tipo: string): void => {
+    if (tipo !== "recibo" && tipo !== "interna") return abrirVentana(tipo);
+    imprimirReciboDirecto(o.id, tipo)
+      .then((salio) => (salio ? avisar(d.impresion.impresoras.directoOk) : abrirVentana(tipo)))
+      .catch(() => {
+        avisar(d.impresion.impresoras.directoFallo);
+        abrirVentana(tipo);
+      });
   };
 
   async function accion<T>(fn: (autorizacion?: { usuarioId: string; pin: string }) => Promise<T>) {

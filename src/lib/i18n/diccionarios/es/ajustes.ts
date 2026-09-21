@@ -9,6 +9,10 @@ export const ajustes = {
       titulo: "Dispositivos",
       texto: "Tablets y celulares de la tienda. Desactiva uno perdido.",
     },
+    impresoras: {
+      titulo: "Impresoras",
+      texto: "Conecta la impresora de recibos de este equipo y pruébala.",
+    },
     avisos: { titulo: "Avisos a clientes", texto: "Mensajes por SMS y correo cuando la ropa está lista." },
     seguridad: { titulo: "Seguridad", texto: "Verificación en dos pasos y registro de actividad." },
     datos: { titulo: "Tus datos", texto: "Exporta todo y revisa los respaldos diarios." },

@@ -38,4 +38,54 @@ export const impresion = {
   queImpresora: "Las etiquetas van en la impresora de etiquetas; el recibo, en la de recibos de 80 mm.",
   sinEtiquetera:
     "¿No tienes impresora de etiquetas? Elige «Hoja carta» e imprime en la impresora normal con hojas de etiquetas adhesivas.",
+  impresoras: {
+    titulo: "Impresoras",
+    texto: "Conecta la impresora de recibos de ESTA computadora y prueba que imprime.",
+    esteEquipo: "Este equipo",
+    conectada: "Impresora conectada",
+    ninguna:
+      "Todavía no hay impresora conectada en este equipo. Los recibos salen por la ventana de imprimir del navegador.",
+    porNavegador: "Por la ventana de imprimir del navegador",
+    directa: "Conexión directa: imprime de un toque, sin ventanas.",
+    conectarUsb: "Conectar impresora USB",
+    conectarSerie: "Conectar por puerto serie (COM)",
+    probar: "Imprimir una prueba",
+    probando: "Imprimiendo…",
+    pruebaOk: "Se mandó a la impresora. Si salió el papel, quedó lista.",
+    desconectar: "Desconectar",
+    confirmarDesconectar: "¿Desconectar la impresora de este equipo?",
+    confirmarDesconectarTexto: "Los recibos volverán a salir por la ventana de imprimir del navegador.",
+    papel: "Ancho del papel",
+    papel80: "80 mm (lo normal)",
+    papel72: "80 mm con letra ancha",
+    papel58: "58 mm",
+    cortar: "Cortar el papel al terminar",
+    cajon: "Abrir el cajón de dinero al imprimir el recibo",
+    velocidad: "Velocidad del puerto",
+    velocidadAyuda: "Si sale basura o no sale nada, prueba otra. Lo más común es 9600 o 115200.",
+    noSoporta:
+      "Este navegador no puede hablar directo con la impresora. Usa Chrome o Edge en una computadora, o sigue por la ventana de imprimir.",
+    enIpad:
+      "En iPad y iPhone el sistema no deja que una página hable directo con la impresora. Se imprime por AirPrint, con la ventana de imprimir.",
+    enWindows:
+      "En Windows, el programa de la impresora acapara el USB. Conéctala por puerto serie (COM), o usa el modo silencioso de Chrome que explicamos en la guía.",
+    verGuia: "Ver la guía de impresoras",
+    reciboPrueba: "PRUEBA DE IMPRESIÓN",
+    reciboPruebaTexto:
+      "Si lees esto con sus acentos (áéíóú ñ ¿?) y abajo sale un código QR, tu impresora quedó conectada.",
+    errores: {
+      sin_soporte: "Este navegador no sabe hablar directo con la impresora. Usa Chrome o Edge.",
+      cancelado: "No elegiste ninguna impresora.",
+      sin_impresora:
+        "No encuentro la impresora. Revisa que esté prendida y conectada, y vuelve a conectarla aquí.",
+      ocupada:
+        "El sistema tiene tomada la impresora (suele pasar en Windows). Conéctala por puerto serie, o usa la ventana de imprimir.",
+      sin_salida: "Ese aparato no acepta comandos de impresión. ¿Seguro que es la impresora de recibos?",
+      desconectada: "La impresora se desconectó a mitad. Revisa el cable y vuelve a intentarlo.",
+      desconocido: "La impresora no respondió. Apágala, préndela y vuelve a intentarlo.",
+    },
+    directoOk: "Recibo enviado a la impresora.",
+    directoFallo: "No salió por la impresora conectada. Te abrimos la ventana de imprimir.",
+    configurar: "Impresora",
+  },
 };

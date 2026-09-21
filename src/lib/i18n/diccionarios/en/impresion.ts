@@ -41,4 +41,52 @@ export const impresion: Forma<typeof base> = {
   queImpresora: "Labels go to the label printer; the receipt goes to the 80 mm receipt printer.",
   sinEtiquetera:
     "No label printer? Pick “Letter sheet” and print on a regular printer with adhesive label sheets.",
+  impresoras: {
+    titulo: "Printers",
+    texto: "Connect THIS computer's receipt printer and make sure it prints.",
+    esteEquipo: "This device",
+    conectada: "Printer connected",
+    ninguna: "No printer is connected on this device yet. Receipts go through the browser's print window.",
+    porNavegador: "Through the browser's print window",
+    directa: "Direct connection: prints in one tap, no windows.",
+    conectarUsb: "Connect USB printer",
+    conectarSerie: "Connect by serial port (COM)",
+    probar: "Print a test",
+    probando: "Printing…",
+    pruebaOk: "Sent to the printer. If the paper came out, you're all set.",
+    desconectar: "Disconnect",
+    confirmarDesconectar: "Disconnect the printer from this device?",
+    confirmarDesconectarTexto: "Receipts will go back to the browser's print window.",
+    papel: "Paper width",
+    papel80: "80 mm (the usual)",
+    papel72: "80 mm with wide type",
+    papel58: "58 mm",
+    cortar: "Cut the paper when done",
+    cajon: "Open the cash drawer when the receipt prints",
+    velocidad: "Port speed",
+    velocidadAyuda: "If garbage or nothing comes out, try another one. 9600 or 115200 are the most common.",
+    noSoporta:
+      "This browser can't talk straight to the printer. Use Chrome or Edge on a computer, or keep using the print window.",
+    enIpad:
+      "On iPad and iPhone the system doesn't let a page talk straight to the printer. You print through AirPrint, with the print window.",
+    enWindows:
+      "On Windows the printer's own software holds the USB. Connect it by serial port (COM), or use Chrome's silent mode as explained in the guide.",
+    verGuia: "See the printers guide",
+    reciboPrueba: "PRINT TEST",
+    reciboPruebaTexto: "If you can read this and a QR code shows up below, your printer is connected.",
+    errores: {
+      sin_soporte: "This browser can't talk straight to the printer. Use Chrome or Edge.",
+      cancelado: "You didn't pick a printer.",
+      sin_impresora:
+        "I can't find the printer. Check that it's on and plugged in, then connect it here again.",
+      ocupada:
+        "The system is holding the printer (common on Windows). Connect it by serial port, or use the print window.",
+      sin_salida: "That device doesn't take print commands. Are you sure it's the receipt printer?",
+      desconectada: "The printer dropped off midway. Check the cable and try again.",
+      desconocido: "The printer didn't answer. Turn it off and on, then try again.",
+    },
+    directoOk: "Receipt sent to the printer.",
+    directoFallo: "It didn't come out of the connected printer. We opened the print window for you.",
+    configurar: "Printer",
+  },
 };

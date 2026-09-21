@@ -691,6 +691,51 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
 - **Candado:** `tests/integracion/ajustes.test.ts` («la tienda elige cuándo
   cobra»), comprobado en rojo.
 
+### B39. La impresora «estaba conectada y no imprimía», y había demasiados saltos
+
+- **Cómo se veía:** Richard tenía la impresora de recibos prendida y enchufada.
+  Tocaba «Imprimir recibo» y: se abría otra pantalla, después la ventana de
+  imprimir de Chrome, con **Destino: Guardar como PDF**. La impresora «no se
+  detectaba con nada». Sus palabras: *«hay muchos saltos para llegar a la
+  impresora… quiero arreglar esto de raíz»*.
+- **Causa real:** solo existía el camino más débil —la ventana de imprimir del
+  navegador—, que depende del driver del sistema, pide confirmar cada vez y
+  recuerda «Guardar como PDF» si fue lo último que se usó.
+- **Cómo lo hacen los POS en la nube (investigado):** cuatro caminos. (1) La
+  ventana del navegador; (2) **conexión directa por WebUSB o Web Serial con
+  comandos ESC/POS**, sin ventana ni drivers; (3) un agente instalado en la
+  tienda; (4) que la impresora llame al servidor (Star CloudPRNT). Se construyó
+  el (2), que no obliga a instalar nada, y el (1) quedó de respaldo.
+- **Lo que se hizo:**
+  - `src/lib/impresion/escpos.ts`: codificador ESC/POS propio (acentos en la
+    página 850, negrita, tamaños, columnas, **QR dibujado por la impresora**,
+    corte y cajón de dinero).
+  - `src/lib/impresion/recibo.ts`: el recibo en líneas, una sola vez, y su paso
+    a bytes. `GET /datos/ordenes/[id]/recibo` lo entrega.
+  - `src/lib/impresion/conexion.ts`: WebUSB y Web Serial, con el permiso y la
+    elección guardados POR EQUIPO. Los fallos se traducen a algo que se le pueda
+    decir al cajero («el sistema tiene tomada la impresora»).
+  - **Ajustes → Impresoras**: detecta qué soporta este equipo, conecta, imprime
+    una prueba y dice si salió.
+  - `BotonRecibo`: «Imprimir recibo» manda directo con ESE toque. Si no hay
+    impresora directa, o si falla, abre el camino de siempre: el cliente nunca se
+    queda sin recibo.
+- **Límites conocidos (no son fallos, son del sistema operativo):** en
+  **Windows** el driver de la impresora acapara el USB → se usa puerto serie
+  (COM) o el modo silencioso de Chrome (`--kiosk-printing`, documentado con su
+  comando exacto). En **iPad/iPhone** no existe ni WebUSB ni Web Serial → AirPrint
+  por la ventana. Las **etiqueteras** (Zebra ZPL, TSPL) hablan otro idioma: las
+  etiquetas siguen por la ventana del navegador.
+- **Candados:** `tests/unit/escpos.test.ts` (bytes uno por uno),
+  `tests/ui/impresora.test.tsx` (impresora simulada: salida «bulk», trozos de
+  4 KB, fallos traducidos) y `tests/integracion/recibo-directo.test.ts`. Los
+  tres comprobados en rojo.
+- **Ojo de seguridad:** la ruta nueva del recibo respeta la MISMA regla que la
+  pantalla de imprimir (`puedeImprimirRecibo`): pasados 15 minutos, el recibo
+  del cliente pide gerente. Una ruta nueva no puede ser la puerta de atrás.
+- **Lo que NO está probado:** con una impresora física. Aquí no hay ninguna. Lo
+  prueba Richard con el botón «Imprimir una prueba».
+
 ## C. Candados de publicación
 
 ### C1. El paquete que se publica es el que se prueba

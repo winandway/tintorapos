@@ -10,11 +10,10 @@ import { ErrorApp } from "@/server/errores";
 import { verOrden } from "@/server/ordenes/consultas";
 import { exigirSesion } from "@/server/pagina";
 import { leerTienda } from "@/server/ajustes/tienda";
+import { puedeImprimirRecibo } from "@/server/impresion";
 import { ahoraMs } from "@/lib/fechas";
 
 export const metadata: Metadata = { title: "Imprimir · Print", robots: { index: false } };
-
-const VENTANA_SIN_AUTORIZACION = 15 * 60_000;
 
 export default async function PaginaImprimir({
   params,
@@ -60,17 +59,8 @@ export default async function PaginaImprimir({
   const interna = tipo === "interna";
   // Reimprimir el recibo del cliente pide autorización: solo se libra en los primeros
   // 15 minutos de la orden o si hay una reimpresión autorizada reciente.
-  if (!interna) {
-    const reciente = orden.creadaEn > ahoraMs() - VENTANA_SIN_AUTORIZACION;
-    const autorizada = await db
-      .prepare(
-        "select id from auditoria where tintoreria_id = ? and entidad_id = ? and accion = 'orden.reimpresion_recibo' and creado_en > ? limit 1",
-      )
-      .bind(sesion.tintoreria.id, orden.id, ahoraMs() - VENTANA_SIN_AUTORIZACION)
-      .first();
-    if (!reciente && !autorizada) {
-      return <ReciboBloqueado ordenId={orden.id} mensaje={diccionario(idiomaPersonal).impresion.bloqueada} />;
-    }
+  if (!interna && !(await puedeImprimirRecibo(db, sesion, orden, ahoraMs()))) {
+    return <ReciboBloqueado ordenId={orden.id} mensaje={diccionario(idiomaPersonal).impresion.bloqueada} />;
   }
   const idioma = interna ? idiomaPersonal : orden.cliente.idioma;
   const enlace = `${vars.APP_URL}/t/${orden.codigoPublico}`;

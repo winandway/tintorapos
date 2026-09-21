@@ -1,6 +1,7 @@
 import type { Bloque } from "@/lib/docs";
 import { diccionario, type Idioma } from "@/lib/i18n";
 import { Captura } from "@/components/sitio/captura";
+import { BloqueCodigo } from "./bloque-codigo";
 import { Figura } from "./figuras";
 import { TextoRico } from "./texto-rico";
 
@@ -67,6 +68,8 @@ export function Bloques({ bloques, idioma }: { bloques: Bloque[]; idioma: Idioma
             );
           case "figura":
             return <Figura key={i} nombre={b.figura} pie={b.pie} idioma={idioma} />;
+          case "codigo":
+            return <BloqueCodigo key={i} texto={b.texto} etiqueta={b.etiqueta} />;
           case "captura":
             return (
               <figure key={i} className="mt-6">

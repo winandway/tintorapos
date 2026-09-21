@@ -109,6 +109,10 @@ probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
 - Preferencias de tienda que no tienen columna: tabla `preferencias_tienda`
   (clave/valor). El esquema se aplica en cada publicación y NO admite `ALTER
   TABLE`.
+- **Impresión:** el recibo sale DIRECTO por la impresora conectada al equipo
+  (WebUSB / Web Serial + ESC/POS, `src/lib/impresion/`), sin la ventana del
+  navegador. La ventana queda de respaldo y para las etiquetas. Todo botón de
+  imprimir recibo usa `BotonRecibo` o `imprimirReciboDirecto`.
 - **Ningún formulario pierde lo escrito:** todos usan `useBorrador`
   (`src/lib/use-borrador.ts`). Guarda solo mientras se escribe, lo devuelve al
   volver con la línea `AvisoBorrador`, se borra al guardar y al cerrar sesión, y

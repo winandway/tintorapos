@@ -21,7 +21,8 @@ function bloquesAMarkdown(bloques: Bloque[]): string[] {
     else if (b.t === "lista") salida.push(...b.items.map((x) => `- ${x}`), "");
     else if (b.t === "nota")
       salida.push(`> **${b.tono === "consejo" ? "Consejo" : "Importante"}:** ${b.texto}`, "");
-    else salida.push(`_${b.pie}_`, "");
+    else if (b.t === "codigo") salida.push("```", b.texto, "```", "");
+    else if (b.pie) salida.push(`_${b.pie}_`, "");
   }
   return salida;
 }
