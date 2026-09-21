@@ -6,8 +6,18 @@ export const avisos = {
   noConfigurado: "Sin configurar",
   noConfiguradoTexto:
     "Todavía no se pueden enviar mensajes por este canal. Los avisos quedan registrados como «omitidos».",
+  recibo: {
+    titulo: "Recibo digital por correo",
+    texto:
+      "Al crear la orden, al cliente le llega por correo su recibo: las prendas, el total, lo que pagó, cuándo estará lista y un botón para ver el estado. Sale solo si el cliente tiene correo en su ficha.",
+    nota: "No cuesta nada y no depende del aviso de abajo.",
+  },
   tipos: {
-    recibida: { titulo: "Orden recibida", texto: "Cuando el cliente deja su ropa." },
+    recibida: {
+      titulo: "Aviso de orden recibida",
+      texto:
+        "Un mensaje corto cuando el cliente deja su ropa, por SMS y por correo. El recibo digital va aparte.",
+    },
     lista: { titulo: "Orden lista", texto: "Cuando todas las prendas están listas." },
     recordatorio: {
       titulo: "Recordatorio",

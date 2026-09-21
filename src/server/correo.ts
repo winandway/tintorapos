@@ -42,6 +42,20 @@ export interface Correo {
   asunto: string;
   texto: string;
   html?: string;
+  /** El nombre que ve el cliente como remitente (el de SU tintorería). Sin esto, «Tintora POS». */
+  remitente?: string | null;
+  /** A dónde le llega la respuesta del cliente (el correo de la tienda). Sin esto, soporte. */
+  responderA?: string | null;
+}
+
+/** Un nombre de remitente no puede traer saltos de línea ni comillas: rompen la cabecera. */
+export function nombreRemitente(nombre: string | null | undefined): string {
+  const limpio = (nombre ?? "")
+    .replace(/[\r\n"<>]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 60);
+  return limpio || "Tintora POS";
 }
 
 export type ResultadoCorreo =
@@ -94,9 +108,9 @@ async function enviarSinAnotar(vars: Variables, c: Correo): Promise<ResultadoCor
       body: JSON.stringify({
         sitio: vars.YADOMINIOS_SITIO ?? SITIO_POR_DEFECTO,
         token: vars.YADOMINIOS_TOKEN,
-        from: { address: vars.EMAIL_FROM, name: "Tintora POS" },
+        from: { address: vars.EMAIL_FROM, name: nombreRemitente(c.remitente) },
         to: [{ address: c.para }],
-        ...(vars.SUPPORT_EMAIL ? { reply_to: vars.SUPPORT_EMAIL } : {}),
+        ...(c.responderA || vars.SUPPORT_EMAIL ? { reply_to: c.responderA || vars.SUPPORT_EMAIL } : {}),
         subject: c.asunto,
         text: c.texto,
         ...(c.html ? { html: c.html } : {}),

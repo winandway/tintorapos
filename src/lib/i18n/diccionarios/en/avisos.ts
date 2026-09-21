@@ -9,8 +9,18 @@ export const avisos: Forma<typeof base> = {
   noConfigurado: "Not set up",
   noConfiguradoTexto:
     "Messages can't be sent through this channel yet. Notifications are logged as “skipped.”",
+  recibo: {
+    titulo: "Digital receipt by email",
+    texto:
+      "When you create the order, the customer gets their receipt by email: the items, the total, what they paid, when it will be ready and a button to check the status. It only goes out if the customer has an email on file.",
+    nota: "It's free and doesn't depend on the notification below.",
+  },
   tipos: {
-    recibida: { titulo: "Order received", texto: "When the customer drops off their clothes." },
+    recibida: {
+      titulo: "Order received notification",
+      texto:
+        "A short message when the customer drops off their clothes, by text and email. The digital receipt is separate.",
+    },
     lista: { titulo: "Order ready", texto: "When every item is ready." },
     recordatorio: {
       titulo: "Reminder",

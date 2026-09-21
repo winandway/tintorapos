@@ -39,7 +39,7 @@ export const GUIAS_EMPEZAR: Guia[] = [
           items: [
             "Entra a **Ajustes → Prendas y precios**.",
             "Escribe el precio de cada prenda en cada servicio. Lo que dejes vacío se escribe a mano en el mostrador.",
-            "Para el lavado por libra, llena el **Precio por libra**.",
+            "Para el lavado por peso, llena el **Precio por kilo** (o **por libra**). La unidad la eliges en **Ajustes → Tienda → La ropa por peso se cobra en**: kilos o libras. De fábrica sale en libras en EE.UU. y Puerto Rico, y en kilos en el resto del mundo.",
             "Toca **Guardar precios**.",
           ],
         },
@@ -105,7 +105,7 @@ export const GUIAS_EMPEZAR: Guia[] = [
           items: [
             "Go to **Settings → Items & prices**.",
             "Enter the price of each garment for each service. Anything left blank can be typed in at the counter.",
-            "For wash & fold, fill in the **Price per pound**.",
+            "For wash & fold, fill in the **Price per pound** (or **per kilo**). You pick the unit under **Settings → Store → By-weight laundry is charged in**: pounds or kilos. It defaults to pounds in the U.S. and Puerto Rico, and kilos everywhere else.",
             "Tap **Save prices**.",
           ],
         },
@@ -434,11 +434,12 @@ export const GUIAS_EMPEZAR: Guia[] = [
         {
           t: "lista",
           items: [
-            "**Térmica directa, de 203 puntos por pulgada, con USB**, que acepte rollos de 2 a 4 pulgadas de ancho. Es la más común y la más económica.",
+            "**De transferencia térmica (la que lleva cinta), de 203 puntos por pulgada y con USB.** Con **cinta de resina** la letra aguanta el solvente, el lavado y la plancha. Una térmica directa (sin cinta) es más barata y sirve para probar, pero su impresión se borra con el calor.",
+            "Modelos que se consiguen fácil en Latinoamérica: **TSC TE200** (habla TSPL) y **Zebra ZD220 o ZD230 de transferencia térmica** (hablan ZPL).",
             "**Que hable TSPL o ZPL.** Casi todas las Rollo, Munbyn, Polono, iDPRT, TSC y Xprinter hablan TSPL; las Zebra hablan ZPL. Las dos sirven.",
             "**Evita las que solo funcionan con su propia app del celular** (muchas pequeñas por Bluetooth, de «etiquetas para la casa»): no aceptan órdenes de otro programa.",
             "**Dymo y Brother QL** usan un idioma propio. Funcionan con Tintora POS, pero por la **ventana del navegador**, no directo.",
-            "Compra con ella el papel correcto: tags para grapar o etiquetas **para tintorería**, que resisten el solvente y el calor.",
+            "Compra con ella el papel correcto: **cinta de resina** y tags para grapar o etiquetas **para tintorería**, que resisten el solvente y el calor.",
           ],
         },
         { t: "h2", texto: "Según tu equipo" },
@@ -648,11 +649,12 @@ export const GUIAS_EMPEZAR: Guia[] = [
         {
           t: "lista",
           items: [
-            "**Direct thermal, 203 dpi, with USB**, that takes rolls 2 to 4 inches wide. It's the most common and the most affordable kind.",
+            "**Thermal transfer (the kind that uses a ribbon), 203 dpi, with USB.** With a **resin ribbon** the print stands up to solvent, washing and pressing. A direct thermal printer (no ribbon) is cheaper and fine for testing, but its print fades with heat.",
+            "Easy-to-find models: **TSC TE200** (speaks TSPL) and **Zebra ZD220 or ZD230 thermal transfer** (speak ZPL).",
             "**It should speak TSPL or ZPL.** Nearly all Rollo, Munbyn, Polono, iDPRT, TSC and Xprinter models speak TSPL; Zebra printers speak ZPL. Both work.",
             "**Avoid the ones that only work with their own phone app** (many small Bluetooth “home label” printers): they don't take commands from other software.",
             "**Dymo and Brother QL** use their own language. They work with Tintora POS, but through the **browser window**, not directly.",
-            "Buy the right paper with it: staple tags or **dry-cleaning** labels that stand up to solvent and heat.",
+            "Buy the right supplies with it: a **resin ribbon** and staple tags or **dry-cleaning** labels that stand up to solvent and heat.",
           ],
         },
         { t: "h2", texto: "Depending on your device" },

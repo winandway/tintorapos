@@ -34,6 +34,10 @@ export const ajustes: Forma<typeof base> = {
     impuestoAyuda: "Rules vary by state and city. Confirm with your accountant. Enter 0 if it doesn't apply.",
     recargo: "Rush service surcharge (%)",
     descuentoMax: "Max discount without manager approval (%)",
+    unidadPeso: "By-weight laundry is charged in",
+    unidadPesoAyuda:
+      "It's the unit shown at the counter, on the order and on the receipt. The price you set is per that unit.",
+    unidadesPeso: { lb: "Pounds (lb)", kg: "Kilos (kg)" },
     cobro: "When do you charge?",
     cobroAyuda: "This decides how the counter screen starts. You can still change it on any order.",
     politicaCobro: {
@@ -57,7 +61,7 @@ export const ajustes: Forma<typeof base> = {
   },
   precios: {
     ayuda: "Enter the price for each item. Anything left blank is typed in at the counter.",
-    porLibra: "Price per pound",
+    porPeso: { lb: "Price per pound", kg: "Price per kilo" },
     agregarPrenda: "Add item",
     agregarServicio: "Add service",
     editarPrenda: "Edit item",
@@ -66,7 +70,7 @@ export const ajustes: Forma<typeof base> = {
     nombreEn: "Name in English",
     unidad: "Charged per",
     pieza: "Piece",
-    libra: "Pound",
+    peso: { lb: "Pound", kg: "Kilo" },
     aplicaImpuesto: "Charge tax",
     diasEntrega: "Days to have it ready (blank = store default)",
     inactiva: "Hidden",

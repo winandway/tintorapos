@@ -40,6 +40,7 @@ import { EtiquetasLocales, type DatosEtiquetasLocales } from "./etiquetas-locale
 import { IconoPrenda } from "./icono-prenda";
 import { BarraMarcas } from "./marcas-prenda";
 import { SelectorCliente, type ClienteElegido } from "./selector-cliente";
+import type { UnidadPeso } from "@/lib/peso";
 
 interface Catalogo {
   prendas: (PrendaCarrito & { activo: boolean; orden: number })[];
@@ -55,6 +56,8 @@ export interface DatosTienda {
   reglas: ReglasPrecio;
   /** Cómo arranca el cobro: al entregar (lo tradicional) o al recibir la ropa. */
   politicaCobro: "entrega" | "recepcion";
+  /** En qué se pesa la ropa en esta tienda. */
+  unidadPeso: UnidadPeso;
 }
 
 type ModoPago = "recoger" | "completo" | "abono";
@@ -434,7 +437,7 @@ export function Mostrador({
                   <div className="flex flex-wrap items-end gap-3">
                     <CampoTexto
                       className="w-40"
-                      etiqueta={dm.libras}
+                      etiqueta={dm.peso[tienda.unidadPeso]}
                       inputMode="decimal"
                       value={libras}
                       onChange={(e) => setLibras(e.target.value.replace(/[^\d.,]/g, ""))}
@@ -450,7 +453,9 @@ export function Mostrador({
                     </Boton>
                     <p className="pb-3 text-[14px] text-gris">
                       {precios.has(`${servicio.id}|`)
-                        ? fmt(dm.precioPorLibra, { precio: dinero(precios.get(`${servicio.id}|`)!) })
+                        ? fmt(dm.precioPorPeso[tienda.unidadPeso], {
+                            precio: dinero(precios.get(`${servicio.id}|`)!),
+                          })
                         : dm.sinPrecio}
                     </p>
                   </div>
@@ -552,6 +557,7 @@ export function Mostrador({
                     abierto={abierto === g.clave}
                     alAbrir={() => setAbierto(abierto === g.clave ? null : g.clave)}
                     dinero={dinero}
+                    unidadPeso={tienda.unidadPeso}
                     fotos={fotos}
                     alMas={() =>
                       despachar({
@@ -852,6 +858,7 @@ function LineaGrupo(p: {
   abierto: boolean;
   alAbrir: () => void;
   dinero: (n: number) => string;
+  unidadPeso: UnidadPeso;
   fotos: Map<string, Blob>;
   alMas: () => void;
   alMenos: () => void;
@@ -889,7 +896,7 @@ function LineaGrupo(p: {
             {p.servicio && !libra
               ? `${textoBilingue(idioma, p.servicio.nombreEs, p.servicio.nombreEn)} · `
               : ""}
-            {libra ? `${g.cantidadTotal} lb × ` : ""}
+            {libra ? `${g.cantidadTotal} ${p.unidadPeso} × ` : ""}
             {p.dinero(g.precioUnitCents)}
             {g.precioManual ? " ✎" : ""}
           </span>

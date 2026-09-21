@@ -12,6 +12,7 @@ import { aCentavos, aTextoEditable } from "@/lib/dinero";
 import { camposDe, textoCampo, textoError } from "@/lib/errores-cliente";
 import { fmt, textoBilingue } from "@/lib/i18n";
 import { useIdioma } from "@/lib/i18n/cliente";
+import type { UnidadPeso } from "@/lib/peso";
 
 interface Prenda {
   id: string;
@@ -34,7 +35,7 @@ interface Catalogo {
 type Editando =
   { tipo: "prenda"; datos: Partial<Prenda> } | { tipo: "servicio"; datos: Partial<Servicio> } | null;
 
-export function EditorPrecios({ moneda }: { moneda: string }) {
+export function EditorPrecios({ moneda, unidadPeso }: { moneda: string; unidadPeso: UnidadPeso }) {
   const { d, idioma } = useIdioma();
   const avisar = useAvisar();
   const { datos: cat, error: errorCarga, recargar } = useDatos<Catalogo>("/datos/catalogo");
@@ -147,7 +148,7 @@ export function EditorPrecios({ moneda }: { moneda: string }) {
             <div>
               <h2 className="text-[17px] font-bold">{nombre(servicio)}</h2>
               <p className="text-[13px] text-gris">
-                {servicio.unidad === "libra" ? d.ajustes.precios.libra : d.ajustes.precios.pieza}
+                {servicio.unidad === "libra" ? d.ajustes.precios.peso[unidadPeso] : d.ajustes.precios.pieza}
                 {servicio.aplicaImpuesto ? ` · ${d.ajustes.precios.aplicaImpuesto}` : ""}
                 {servicio.activo ? "" : ` · ${d.ajustes.precios.inactiva}`}
               </p>
@@ -175,7 +176,7 @@ export function EditorPrecios({ moneda }: { moneda: string }) {
           {servicio.unidad === "libra" ? (
             <div className="p-5">
               <FilaPrecio
-                etiqueta={d.ajustes.precios.porLibra}
+                etiqueta={d.ajustes.precios.porPeso[unidadPeso]}
                 simbolo={simbolo}
                 valor={valor("")}
                 invalido={invalidos.includes(clave(""))}
@@ -252,6 +253,7 @@ export function EditorPrecios({ moneda }: { moneda: string }) {
 
       <ModalCatalogo
         editando={editando}
+        unidadPeso={unidadPeso}
         alCerrar={() => setEditando(null)}
         alGuardar={async () => {
           setEditando(null);
@@ -297,10 +299,12 @@ function FilaPrecio({
 
 function ModalCatalogo({
   editando,
+  unidadPeso,
   alCerrar,
   alGuardar,
 }: {
   editando: Editando;
+  unidadPeso: UnidadPeso;
   alCerrar: () => void;
   alGuardar: () => Promise<void>;
 }) {
@@ -409,7 +413,7 @@ function ModalCatalogo({
               onChange={(e) => setDatos({ ...datos, unidad: e.target.value })}
               opciones={[
                 { valor: "pieza", texto: dp.pieza },
-                { valor: "libra", texto: dp.libra },
+                { valor: "libra", texto: dp.peso[unidadPeso] },
               ]}
             />
             <CampoTexto

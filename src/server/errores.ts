@@ -28,6 +28,8 @@ export const CODIGOS_ERROR = [
   "cuenta_suspendida",
   "prueba_terminada",
   "demo_lleno",
+  "demo_sin_correos",
+  "cliente_sin_correo",
   "gasto_de_compra",
   "estado_invalido",
   "monto_invalido",

@@ -17,7 +17,9 @@ export const POST = ruta({
       await limpiarDemos(c.env, c.ahora);
       if ((await demosVivas(c.db)) >= MAX_DEMOS_VIVAS) throw new ErrorApp(503, "demo_lleno");
     }
-    const d = await crearDemo(c.db, c.idioma, c.ahora);
+    const d = await crearDemo(c.db, c.idioma, c.ahora, {
+      paisVisitante: c.req.headers.get("cf-ipcountry"),
+    });
     const token = await crearSesion(
       c.db,
       {

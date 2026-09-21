@@ -630,3 +630,16 @@ CREATE TABLE IF NOT EXISTS preferencias_tienda (
   actualizado_en INTEGER NOT NULL,
   PRIMARY KEY (tintoreria_id, clave)
 );
+
+-- Fuera de EE.UU. y Puerto Rico la ropa se pesa en kilos: el servicio de fábrica
+-- «Lavado por libra» pasa a llamarse «Lavado por kilo». SOLO si el dueño no le
+-- cambió el nombre y no eligió libras a propósito. Se puede repetir sin daño.
+UPDATE catalogo_servicios
+SET nombre_es = 'Lavado por kilo', nombre_en = 'Wash & fold (per kg)'
+WHERE unidad = 'libra'
+  AND nombre_es = 'Lavado por libra'
+  AND IFNULL(nombre_en, '') = 'Wash & fold (per lb)'
+  AND tintoreria_id IN (SELECT id FROM tintorerias WHERE pais NOT IN ('US', 'PR') AND plan <> 'demo')
+  AND tintoreria_id NOT IN (
+    SELECT tintoreria_id FROM preferencias_tienda WHERE clave = 'unidad_peso' AND valor = 'lb'
+  );

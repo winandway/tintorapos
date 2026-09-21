@@ -31,6 +31,10 @@ export const errores: Record<CodigoError, string> = {
     "Tu prueba gratis terminó. Puedes ver y exportar todo lo tuyo; para seguir trabajando, escríbenos y activamos tu plan.",
   gasto_de_compra: "Este gasto salió de una compra a un proveedor. Cámbialo o bórralo desde la compra.",
   demo_lleno: "Ahora mismo hay demasiadas demostraciones abiertas. Vuelve a intentarlo en unos minutos.",
+  demo_sin_correos:
+    "La demostración no le escribe a nadie. En tu cuenta de verdad, el recibo le llega al cliente por correo.",
+  cliente_sin_correo:
+    "Este cliente no tiene correo en su ficha. Agrégalo en Clientes y vuelve a enviar el recibo.",
   estado_invalido: "La orden no puede pasar a ese estado.",
   monto_invalido: "El monto no es válido.",
   pago_excede: "El pago es mayor que el saldo pendiente.",

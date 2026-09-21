@@ -7,8 +7,10 @@ import { ErrorApp } from "@/server/errores";
 /** Tablas que forman los datos de una tintorería, en orden de dependencias (para restaurar). */
 export const TABLAS_RESPALDO = [
   "tintorerias",
+  "preferencias_tienda",
   "sucursales",
   "usuarios",
+  "permisos_usuario",
   "dispositivos",
   "clientes",
   "catalogo_prendas",

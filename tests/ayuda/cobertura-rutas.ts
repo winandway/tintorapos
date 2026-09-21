@@ -427,6 +427,10 @@ export const COBERTURA: Record<string, Cobertura> = {
     casos: (e) => [{ metodo: "GET", params: { id: e.a.ids.ordenId ?? "" } }],
   },
   "/datos/ordenes/[id]/recibo": { casos: (e) => [{ metodo: "GET", params: { id: e.a.ids.ordenId ?? "" } }] },
+  // B no puede mandarle un recibo al cliente de A usando la orden de A.
+  "/datos/ordenes/[id]/recibo-correo": {
+    casos: (e) => [{ metodo: "POST", params: { id: e.a.ids.ordenId ?? "" }, cuerpo: {} }],
+  },
   "/datos/salud": { publica: "canario sin datos de ninguna tintorería" },
   "/datos/empleados": {
     casos: () => [

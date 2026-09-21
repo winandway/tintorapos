@@ -109,6 +109,17 @@ probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
 - Preferencias de tienda que no tienen columna: tabla `preferencias_tienda`
   (clave/valor). El esquema se aplica en cada publicación y NO admite `ALTER
   TABLE`.
+- **Peso:** la ropa por peso se cobra en la unidad de la tienda (`lb`/`kg`,
+  `src/lib/peso.ts`, preferencia `unidad_peso`). Por dentro la unidad del servicio
+  sigue siendo `libra`; NUNCA se escribe «lb» o «libra» a mano en una pantalla:
+  sale de `unidadPeso` (CANDADOS B42).
+- **Recibo digital por correo:** sale solo al crear la orden
+  (`plantillas.reciboCorreo`, encendido de fábrica), en HTML armado al mandar
+  desde `lineasRecibo` (`src/lib/impresion/recibo-html.ts`,
+  `src/server/avisos/correo-html.ts`). Todo correo a un cliente lleva el nombre de
+  la tienda como remitente y su correo como respuesta (CANDADOS B41).
+- **Tabla nueva con `tintoreria_id`:** va en `TABLAS_RESPALDO`, en `TABLAS_DEMO` y
+  en la huella del escenario; `tests/integracion/esquema.test.ts` lo exige.
 - **Impresión:** recibo y etiquetas salen DIRECTO por la impresora conectada al
   equipo (WebUSB / Web Serial, `src/lib/impresion/`), sin la ventana del
   navegador, que queda de respaldo. Cada equipo guarda **dos puestos**: `recibos`

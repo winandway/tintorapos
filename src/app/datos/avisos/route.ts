@@ -1,4 +1,4 @@
-import { configuracionAvisos } from "@/server/avisos/plantillas";
+import { configuracionAvisos, reciboPorCorreo } from "@/server/avisos/plantillas";
 import { twilioConfigurado } from "@/server/avisos/twilio";
 import { correoConfigurado } from "@/server/correo";
 import { ruta } from "@/server/ruta";
@@ -29,6 +29,7 @@ export const GET = ruta({
         correo: correoConfigurado(c.vars),
       },
       plantillas: configuracionAvisos(plantillas),
+      reciboCorreo: reciboPorCorreo(plantillas),
       avisos: lista?.results ?? [],
     };
   },

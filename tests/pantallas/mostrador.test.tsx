@@ -25,6 +25,7 @@ const TIENDA = {
   pais: "US",
   diasEntrega: 2,
   politicaCobro: "entrega" as const,
+  unidadPeso: "lb" as const,
   reglas: { impuestoBps: 0, recargoUrgenteBps: 5000, descuentoMaxBps: 1000 },
 };
 
@@ -81,7 +82,7 @@ describe("mostrador: nueva orden (contra el servidor real)", () => {
 
     // Por libra.
     await u.click(within(prendas).getByRole("tab", { name: "Lavado por libra" }));
-    await u.type(within(prendas).getByLabelText(dm.libras), "4");
+    await u.type(within(prendas).getByLabelText(dm.peso.lb), "4");
     await u.click(within(prendas).getByRole("button", { name: `+ ${dm.agregarLibras}` }));
     expect(screen.getByTestId("total-orden")).toHaveTextContent("$31.46");
 

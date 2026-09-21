@@ -28,7 +28,10 @@ export const impresion: Forma<typeof base> = {
   bloqueada: "Reprinting the receipt needs a manager's approval.",
   autorizar: "Approve and print",
   metodos: { efectivo: "Cash", tarjeta_externa: "Card", otro: "Other" },
-  lb: "lb",
+  correo: {
+    boton: "Check my order status",
+    pie: "You got this email because you dropped off your clothes at {tienda}. Questions? Just reply to this message.",
+  },
   formato: "Label size",
   formatoAyuda: "Remembered on this computer.",
   formatos: {

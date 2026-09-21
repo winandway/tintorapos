@@ -19,6 +19,7 @@ export const SLUG_EN: Record<string, string> = {
   contabilidad: "accounting",
   "insumos-y-compras": "supplies-and-purchases",
   avisos: "text-notifications",
+  "recibo-por-correo": "digital-receipt-by-email",
   "pagina-del-cliente": "customer-status-page",
   "dos-pasos": "two-step-verification",
   exportar: "export-your-data",

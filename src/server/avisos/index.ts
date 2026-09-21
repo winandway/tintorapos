@@ -3,7 +3,14 @@ import { formatoFecha } from "@/lib/i18n";
 import type { Variables } from "@/env";
 import { correoConfigurado, enviarCorreo } from "@/server/correo";
 import { PLAN_DEMO } from "@/server/demo";
-import { componerAviso, configuracionAvisos, type TipoAviso } from "./plantillas";
+import { contenidoCorreo } from "./correo-html";
+import {
+  asuntoRecibo,
+  componerAviso,
+  configuracionAvisos,
+  reciboPorCorreo,
+  type TipoAviso,
+} from "./plantillas";
 import { enviarSms } from "./twilio";
 
 export const MAX_INTENTOS = 5;
@@ -12,6 +19,11 @@ interface DatosEncolar {
   tintoreriaId: string;
   ordenId: string;
   tipo: TipoAviso;
+  /**
+   * «Enviar recibo por correo» desde la orden: sale SOLO el correo, aunque el
+   * aviso esté apagado, porque alguien lo pidió en el mostrador.
+   */
+  reciboAPedido?: boolean;
 }
 
 /**
@@ -56,7 +68,10 @@ export async function encolarAvisos(
   // Candado del demo: una tintorería de demostración no le escribe a nadie.
   if (f.plan === PLAN_DEMO) return [];
   const conf = configuracionAvisos(f.plantillas)[d.tipo];
-  if (!conf.activo) return [];
+  // El recibo digital por correo va aparte del aviso «recibida»: nace encendido
+  // (el aviso, que también sale por SMS, nace apagado).
+  const recibo = d.tipo === "recibida" && (d.reciboAPedido || reciboPorCorreo(f.plantillas));
+  if (!conf.activo && !recibo) return [];
   const cuerpo = componerAviso(conf[f.idioma], {
     tienda: f.tienda,
     nombre: f.nombre.split(/\s+/)[0] ?? f.nombre,
@@ -97,8 +112,16 @@ export async function encolarAvisos(
         ),
     );
   };
-  if (f.acepta_sms && f.telefono && !f.sms_baja_en) agregar("sms", f.telefono, null);
-  if (f.acepta_correo && f.correo) agregar("correo", f.correo, `${f.tienda} · #${f.numero}`);
+  if (conf.activo && !d.reciboAPedido && f.acepta_sms && f.telefono && !f.sms_baja_en)
+    agregar("sms", f.telefono, null);
+  // A pedido en el mostrador basta con que el cliente tenga correo; solo, además
+  // tiene que haber aceptado que le escriban.
+  if (f.correo && (d.reciboAPedido || f.acepta_correo))
+    agregar(
+      "correo",
+      f.correo,
+      d.tipo === "recibida" ? asuntoRecibo(f.idioma, f.tienda, f.numero) : `${f.tienda} · #${f.numero}`,
+    );
   if (sentencias.length) await db.batch(sentencias);
   return ids;
 }
@@ -106,6 +129,9 @@ export async function encolarAvisos(
 interface FilaAviso {
   id: string;
   tintoreria_id: string;
+  orden_id: string | null;
+  tipo: string;
+  idioma: string;
   canal: "sms" | "correo";
   destino: string;
   asunto: string | null;
@@ -135,13 +161,13 @@ export async function procesarCola(
   const consulta = opciones.ids?.length
     ? db
         .prepare(
-          `select id, tintoreria_id, canal, destino, asunto, cuerpo, intentos from avisos /* sistema: avisos recién creados */
+          `select id, tintoreria_id, orden_id, tipo, idioma, canal, destino, asunto, cuerpo, intentos from avisos /* sistema: avisos recién creados */
            where estado = 'pendiente' and id in (${opciones.ids.map(() => "?").join(",")})`,
         )
         .bind(...opciones.ids.slice(0, 50))
     : db
         .prepare(
-          `select id, tintoreria_id, canal, destino, asunto, cuerpo, intentos from avisos /* sistema: cola de todas las tintorerías */
+          `select id, tintoreria_id, orden_id, tipo, idioma, canal, destino, asunto, cuerpo, intentos from avisos /* sistema: cola de todas las tintorerías */
            where estado = 'pendiente' and programado_en <= ? order by programado_en limit ?`,
         )
         .bind(ahora, Math.min(200, opciones.limite ?? 100));
@@ -164,12 +190,13 @@ export async function procesarCola(
     } else if (!correoConfigurado(vars)) {
       resultado = { ok: false, error: "no_configurado", reintentar: false };
     } else {
+      const contenido = await contenidoCorreo(db, vars.APP_URL, a, ahora);
       const c = await enviarCorreo(
         vars,
         {
           para: a.destino,
           asunto: a.asunto ?? "Tintora POS",
-          texto: a.cuerpo,
+          ...contenido,
         },
         db,
       );

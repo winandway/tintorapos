@@ -13,6 +13,7 @@
  */
 import { codigoEtiqueta, codigoPublico, nuevoId } from "@/lib/codigos";
 import type { Idioma } from "@/lib/i18n/idiomas";
+import { SERVICIO_POR_PESO, unidadPesoDePais } from "@/lib/peso";
 import { PRENDAS_ESTANDAR, SERVICIOS_ESTANDAR } from "@/server/catalogo/estandar";
 import { INSUMOS_ESTANDAR } from "@/server/contabilidad/categorias";
 
@@ -87,7 +88,15 @@ export async function demosVivas(db: D1Database): Promise<number> {
  * Crea la tintorería de demostración con todo adentro. Devuelve los
  * identificadores para abrir la sesión.
  */
-export async function crearDemo(db: D1Database, idioma: Idioma, ahora = Date.now()): Promise<Demo> {
+export async function crearDemo(
+  db: D1Database,
+  idioma: Idioma,
+  ahora = Date.now(),
+  opciones: { paisVisitante?: string | null } = {},
+): Promise<Demo> {
+  // La tienda del demo es de EE.UU., pero quien la abre desde otro país pesa en
+  // kilos: se le enseña como la usaría.
+  const peso = opciones.paisVisitante ? unidadPesoDePais(opciones.paisVisitante) : "lb";
   const tintoreriaId = nuevoId();
   const sucursalId = nuevoId();
   const usuarioId = nuevoId();
@@ -125,7 +134,19 @@ export async function crearDemo(db: D1Database, idioma: Idioma, ahora = Date.now
       .bind(usuarioId, tintoreriaId, idioma === "en" ? "Demo owner" : "Dueño del demo", ahora, ahora),
   );
 
-  const servicios = SERVICIOS_ESTANDAR.map((x, i) => ({ ...x, id: nuevoId(), orden: i }));
+  s.push(
+    db
+      .prepare(
+        "insert into preferencias_tienda (tintoreria_id, clave, valor, actualizado_en) values (?, 'unidad_peso', ?, ?)",
+      )
+      .bind(tintoreriaId, peso, ahora),
+  );
+  const servicios = SERVICIOS_ESTANDAR.map((x, i) => ({
+    ...x,
+    ...(x.unidad === "libra" ? SERVICIO_POR_PESO[peso] : {}),
+    id: nuevoId(),
+    orden: i,
+  }));
   const prendas = PRENDAS_ESTANDAR.map((x, i) => ({ ...x, id: nuevoId(), orden: i }));
   for (const x of servicios)
     s.push(
@@ -464,7 +485,7 @@ export async function crearDemo(db: D1Database, idioma: Idioma, ahora = Date.now
 }
 
 /** Las tablas con `tintoreria_id`, en orden de borrado (hijas antes que madres). */
-const TABLAS_DEMO = [
+export const TABLAS_DEMO = [
   "operaciones_sync",
   "respaldos",
   "gastos",
@@ -494,6 +515,7 @@ const TABLAS_DEMO = [
   "permisos_usuario",
   "usuarios",
   "sucursales",
+  "preferencias_tienda",
 ];
 
 /**

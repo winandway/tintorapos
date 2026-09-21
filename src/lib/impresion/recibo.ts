@@ -4,6 +4,7 @@
  * diccionario que el recibo de pantalla, para que los dos digan lo mismo.
  */
 import { diccionario, fmt, formatoDinero, formatoFecha, textoBilingue, type Idioma } from "@/lib/i18n";
+import { cantidadConPeso, resolverUnidadPeso } from "@/lib/peso";
 import type { DatosTienda } from "@/server/ajustes/tienda";
 import type { Orden, PrendaOrden } from "@/server/ordenes/consultas";
 import { EscPos } from "./escpos";
@@ -38,6 +39,7 @@ export function lineasRecibo(
   const dinero = (n: number) => formatoDinero(n, tienda.moneda, idioma, tienda.pais);
   const fecha = (n: number) =>
     formatoFecha(n, idioma, tienda.zonaHoraria, { dateStyle: "medium", timeStyle: "short" }, tienda.pais);
+  const peso = resolverUnidadPeso(tienda.unidadPeso, tienda.pais);
   const l: LineaRecibo[] = [];
   const centro = (texto: string, extra: Partial<Extract<LineaRecibo, { t: "texto" }>> = {}) =>
     l.push({ t: "texto", texto, alinear: "centro", ...extra });
@@ -63,7 +65,7 @@ export function lineasRecibo(
   l.push({ t: "separador" });
 
   for (const { p, cantidad, total } of agrupar(orden.prendas)) {
-    const cuanto = p.unidad === "libra" ? `${cantidad}${di.lb}` : `${cantidad}x`;
+    const cuanto = p.unidad === "libra" ? cantidadConPeso(cantidad, peso) : `${cantidad}x`;
     l.push({
       t: "columnas",
       izq: `${cuanto} ${textoBilingue(idioma, p.prendaEs, p.prendaEn)}`,

@@ -2,6 +2,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { dividirSentencias } from "../../scripts/sql-utils.mjs";
 import { crearEntorno, type EntornoPrueba } from "../ayuda/entorno";
+import { TABLAS_DEMO } from "@/server/demo";
+import { TABLAS_RESPALDO } from "@/server/respaldos";
 
 describe("esquema de la base", () => {
   let e: EntornoPrueba;
@@ -39,6 +41,44 @@ describe("esquema de la base", () => {
         cols.results.map((c) => c.name),
         `la tabla ${name} no tiene tintoreria_id`,
       ).toContain("tintoreria_id");
+    }
+  });
+
+  /**
+   * CANDADO DE TABLAS OLVIDADAS. `preferencias_tienda` nació sin entrar en los
+   * respaldos ni en la limpieza del demo, y nadie se enteró: un demo que guardara
+   * sus ajustes ya no se podía borrar (llave foránea) y un respaldo restaurado
+   * perdía las preferencias. Toda tabla con `tintoreria_id` tiene que estar en
+   * las dos listas, o en la lista corta de abajo con su porqué.
+   */
+  it("toda tabla de una tintorería se respalda y se borra con el demo", async () => {
+    const { results } = await e.env.DB.prepare(
+      "select name from sqlite_master where type = 'table' and name not like 'sqlite_%' and name not like '_cf_%'",
+    ).all<{ name: string }>();
+    const conTintoreria: string[] = [];
+    for (const { name } of results) {
+      const cols = await e.env.DB.prepare(`pragma table_info(${name})`).all<{ name: string }>();
+      if (cols.results.some((c) => c.name === "tintoreria_id")) conTintoreria.push(name);
+    }
+    // No viajan en el respaldo: son pasajeras (sesiones, enlaces, códigos de un
+    // solo uso, la cola de sincronización) o son el propio registro de respaldos.
+    const sinRespaldo = new Set([
+      "sesiones",
+      "enlaces_dispositivo",
+      "tokens_recuperacion",
+      "verificacion_correo",
+      "operaciones_sync",
+      "respaldos",
+    ]);
+    // Los billetes son de Windoce: apuntan a la tienda sin llave foránea y tienen
+    // que sobrevivirla (el historial de soporte no se borra con un demo).
+    const deWindoce = new Set(["tickets"]);
+    const respaldadas = new Set<string>(TABLAS_RESPALDO);
+    const delDemo = new Set<string>(TABLAS_DEMO);
+    for (const tabla of conTintoreria.filter((t) => !deWindoce.has(t))) {
+      expect(delDemo.has(tabla), `la limpieza del demo olvida la tabla ${tabla}`).toBe(true);
+      if (!sinRespaldo.has(tabla))
+        expect(respaldadas.has(tabla), `el respaldo olvida la tabla ${tabla}`).toBe(true);
     }
   });
 

@@ -25,7 +25,10 @@ export const impresion = {
   bloqueada: "Reimprimir el recibo necesita la autorización de un gerente.",
   autorizar: "Autorizar e imprimir",
   metodos: { efectivo: "Efectivo", tarjeta_externa: "Tarjeta", otro: "Otro" },
-  lb: "lb",
+  correo: {
+    boton: "Ver el estado de mi orden",
+    pie: "Recibiste este correo porque dejaste tu ropa en {tienda}. Si tienes una duda, responde a este mensaje.",
+  },
   formato: "Tamaño de la etiqueta",
   formatoAyuda: "Se recuerda en esta computadora.",
   formatos: {

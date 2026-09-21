@@ -30,6 +30,10 @@ export const errores: Record<CodigoError, string> = {
     "Your free trial has ended. You can still see and export everything of yours; to keep working, write to us and we'll turn your plan on.",
   gasto_de_compra: "This expense came from a supplier purchase. Change or delete it from the purchase.",
   demo_lleno: "There are too many demos open right now. Please try again in a few minutes.",
+  demo_sin_correos:
+    "The demo doesn't email anyone. In your real account, the receipt goes to the customer by email.",
+  cliente_sin_correo:
+    "This customer has no email on file. Add it under Customers and send the receipt again.",
   estado_invalido: "The order can't move to that status.",
   monto_invalido: "That amount isn't valid.",
   pago_excede: "The payment is more than the balance due.",

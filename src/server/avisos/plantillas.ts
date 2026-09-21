@@ -29,9 +29,31 @@ export const esquemaPlantillas = z.object({
   recibida: esquemaPlantilla.optional(),
   lista: esquemaPlantilla.optional(),
   recordatorio: esquemaPlantilla.optional(),
+  /**
+   * El recibo digital por correo al crear la orden. Va aparte del aviso
+   * «recibida» (que también sale por SMS y por eso nace apagado): el recibo por
+   * correo no cuesta y el cliente lo espera, así que nace ENCENDIDO.
+   */
+  reciboCorreo: z.boolean().optional(),
 });
 
 export type Plantillas = z.infer<typeof esquemaPlantillas>;
+
+/** ¿Se manda el recibo digital por correo al crear la orden? De fábrica, sí. */
+export function reciboPorCorreo(guardado: string | null | undefined): boolean {
+  try {
+    return esquemaPlantillas.parse(JSON.parse(guardado || "{}")).reciboCorreo ?? true;
+  } catch {
+    return true;
+  }
+}
+
+/** El asunto del correo con el recibo: que se entienda en la bandeja qué es y de quién. */
+export function asuntoRecibo(idioma: Idioma, tienda: string, numero: number | string): string {
+  return idioma === "en"
+    ? `Your receipt · Order #${numero} · ${tienda}`
+    : `Tu recibo · Orden #${numero} · ${tienda}`;
+}
 
 /** Configuración efectiva: lo que guardó el dueño o, si no, el texto de fábrica. «Recibida» empieza apagado. */
 export function configuracionAvisos(guardado: string | null | undefined) {

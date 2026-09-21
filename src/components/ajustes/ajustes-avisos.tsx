@@ -22,6 +22,7 @@ interface Conf {
 interface Datos {
   canales: { sms: boolean; correo: boolean };
   plantillas: Record<Tipo, Conf>;
+  reciboCorreo: boolean;
   avisos: {
     id: string;
     tipo: string;
@@ -42,6 +43,7 @@ export function AjustesAvisos({ tienda, zona }: { tienda: string; zona: string }
   const avisar = useAvisar();
   const { datos, error, recargar } = useDatos<Datos>("/datos/avisos");
   const [conf, setConf] = useState<Record<Tipo, Conf> | null>(null);
+  const [recibo, setRecibo] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [destino, setDestino] = useState("");
   const [probando, setProbando] = useState(false);
@@ -50,8 +52,10 @@ export function AjustesAvisos({ tienda, zona }: { tienda: string; zona: string }
 
   useEffect(() => {
     // Copia editable de lo que llegó del servidor.
+    if (!datos) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (datos) setConf(datos.plantillas);
+    setConf(datos.plantillas);
+    setRecibo(datos.reciboCorreo);
   }, [datos]);
 
   if (!datos || !conf)
@@ -67,9 +71,12 @@ export function AjustesAvisos({ tienda, zona }: { tienda: string; zona: string }
     try {
       await pedir("/datos/avisos/plantillas", {
         metodo: "PUT",
-        cuerpo: Object.fromEntries(
-          TIPOS.map((t) => [t, { activo: conf[t].activo, es: conf[t].es, en: conf[t].en }]),
-        ),
+        cuerpo: {
+          ...Object.fromEntries(
+            TIPOS.map((t) => [t, { activo: conf[t].activo, es: conf[t].es, en: conf[t].en }]),
+          ),
+          reciboCorreo: recibo,
+        },
       });
       avisar(d.comun.guardado);
       recargar();
@@ -135,6 +142,26 @@ export function AjustesAvisos({ tienda, zona }: { tienda: string; zona: string }
         {(!datos.canales.sms || !datos.canales.correo) && (
           <p className="mt-3 text-[13px] text-gris">{da.noConfiguradoTexto}</p>
         )}
+      </Tarjeta>
+
+      <Tarjeta>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-[17px] font-bold">{da.recibo.titulo}</h2>
+            <p className="text-[14px] text-gris">{da.recibo.texto}</p>
+            <p className="mt-1 text-[13px] text-gris">{da.recibo.nota}</p>
+          </div>
+          <label className="flex shrink-0 items-center gap-2 text-[15px] font-semibold">
+            <input
+              type="checkbox"
+              className="size-6 accent-tinta"
+              checked={recibo}
+              onChange={(e) => setRecibo(e.target.checked)}
+              data-testid="recibo-correo"
+            />
+            {da.activo}
+          </label>
+        </div>
       </Tarjeta>
 
       {TIPOS.map((t) => (

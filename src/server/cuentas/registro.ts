@@ -2,6 +2,7 @@ import { nuevoId } from "@/lib/codigos";
 import type { Idioma } from "@/lib/i18n/idiomas";
 import { sentenciaAuditoria } from "@/server/auditoria";
 import { hashClave } from "@/server/auth/claves";
+import { SERVICIO_POR_PESO, unidadPesoDePais } from "@/lib/peso";
 import { PRENDAS_ESTANDAR, SERVICIOS_ESTANDAR } from "@/server/catalogo/estandar";
 import { ErrorApp } from "@/server/errores";
 
@@ -77,14 +78,17 @@ export async function registrarTintoreria(
       )
       .bind(usuarioId, tintoreriaId, d.nombre, d.correo, claveHash, ahora, ahora, ahora),
   ];
+  // Fuera de EE.UU. la ropa se pesa en kilos: el servicio de fábrica nace así.
+  const porPeso = SERVICIO_POR_PESO[unidadPesoDePais(d.pais)];
   SERVICIOS_ESTANDAR.forEach((s, i) => {
+    const nombre = s.unidad === "libra" ? porPeso : s;
     sentencias.push(
       db
         .prepare(
           `insert into catalogo_servicios (id, tintoreria_id, nombre_es, nombre_en, unidad, aplica_impuesto, orden, creado_en)
            values (?, ?, ?, ?, ?, ?, ?, ?)`,
         )
-        .bind(nuevoId(), tintoreriaId, s.es, s.en, s.unidad, s.impuesto ? 1 : 0, i, ahora),
+        .bind(nuevoId(), tintoreriaId, nombre.es, nombre.en, s.unidad, s.impuesto ? 1 : 0, i, ahora),
     );
   });
   PRENDAS_ESTANDAR.forEach((p, i) => {

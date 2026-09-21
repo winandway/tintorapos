@@ -1,4 +1,5 @@
 import { diccionario, fmt, formatoDinero, formatoFecha, textoBilingue, type Idioma } from "@/lib/i18n";
+import { cantidadConPeso } from "@/lib/peso";
 import type { DatosTienda } from "@/server/ajustes/tienda";
 import type { Orden, PrendaOrden } from "@/server/ordenes/consultas";
 
@@ -77,7 +78,9 @@ export function Recibo({
         <tbody>
           {agrupar(orden.prendas).map(({ p, cantidad, total }) => (
             <tr key={`${p.prendaEs}${p.servicioEs}${p.precioUnitCents}`} className="align-top">
-              <td className="w-8 pt-1">{p.unidad === "libra" ? `${cantidad}${di.lb}` : `${cantidad}×`}</td>
+              <td className="w-8 pt-1">
+                {p.unidad === "libra" ? cantidadConPeso(cantidad, orden.unidadPeso) : `${cantidad}×`}
+              </td>
               <td className="pt-1">
                 {textoBilingue(idioma, p.prendaEs, p.prendaEn)}
                 <span className="block text-[8.5pt]">

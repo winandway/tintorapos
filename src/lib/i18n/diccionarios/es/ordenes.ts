@@ -39,6 +39,17 @@ export const ordenes = {
   etiquetas: "Etiquetas",
   recibo: "Recibo",
   interna: "Copia interna",
+  enviarRecibo: "Enviar recibo por correo",
+  reciboEnviado: "Recibo enviado a {correo}.",
+  reciboCorreo: {
+    titulo: "Recibo por correo",
+    enviado: "Enviado a {correo}",
+    pendiente: "Saliendo hacia {correo}…",
+    fallido: "No se pudo enviar a {correo}",
+    omitido: "No salió: el correo de la plataforma no está configurado",
+    sinCorreo: "Este cliente no tiene correo: no recibió el recibo digital.",
+    noEnviado: "Todavía no se le ha enviado. Tócalo en los tres puntos: «Enviar recibo por correo».",
+  },
   anular: "Anular orden",
   confirmarAnular: "¿Anular la orden #{numero}?",
   confirmarAnularTexto:

@@ -71,7 +71,7 @@ describe("ajustes (contra el servidor real)", () => {
 
   it("prendas y precios: pone un precio, agrega un servicio y oculta una prenda", async () => {
     const u = userEvent.setup();
-    montar(<EditorPrecios moneda="USD" />);
+    montar(<EditorPrecios moneda="USD" unidadPeso="lb" />);
     const blusa = await screen.findByRole("textbox", { name: /^Blusa/ });
     await u.type(blusa, "6.5");
     expect(screen.getByText("1 precios sin guardar")).toBeInTheDocument();

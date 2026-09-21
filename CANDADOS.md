@@ -783,6 +783,83 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   «misma impresora de recibos» es para probar y salir del paso, y la pantalla y
   la guía lo dicen. No quitar ese aviso.
 
+### B41. Al cliente no le llegaba «la factura digital» por correo
+
+- **Cómo se veía:** Richard creaba órdenes y a su cliente no le llegaba nada al
+  correo. Sus palabras: *«los mail no llegan o no envía la factura digital al
+  cliente»*.
+- **Causa real:** no era el dominio (DKIM `cf-bounce._domainkey`, SPF del rebote
+  y DMARC comprobados el 21 sep 2026; el canario decía `correo: ok`). Era el
+  producto: al crear la orden lo único que podía salir era el aviso «recibida»,
+  que **nace apagado** (comparte interruptor con el SMS, que cuesta), y que
+  encendido era **una línea de texto**, no un recibo, a nombre de «Tintora POS».
+- **Lo que se hizo:**
+  - `src/lib/impresion/recibo-html.ts`: el recibo digital en HTML de correo
+    (tablas, estilos en línea, sin imágenes ni código) y en texto, salidos de las
+    MISMAS líneas que el papel (`lineasRecibo`). Donde el papel lleva el QR, el
+    correo lleva el botón. Todo texto pasa por `escaparHtml`.
+  - `plantillas.reciboCorreo` (dentro del JSON `tintorerias.plantillas`):
+    **encendido de fábrica**, con su interruptor en Ajustes → Avisos. Va aparte
+    del aviso «recibida», que sigue apagado.
+  - `src/server/avisos/correo-html.ts`: el HTML se arma AL MANDAR (la tabla
+    `avisos` guarda solo texto y no admite columnas nuevas). Remitente = nombre
+    de la tienda; respuesta = correo de la tienda. Los avisos «lista» y
+    «recordatorio» también salen con HTML y botón.
+  - `POST /datos/ordenes/[id]/recibo-correo`: «Enviar recibo por correo» desde
+    los tres puntos de la orden. Solo al correo de la ficha del cliente, con tope
+    de 5 por hora por orden, y responde si salió.
+  - La orden trae `avisos` y muestra **Recibo por correo: enviado / falló (con
+    el porqué) / el cliente no tiene correo**. El mostrador avisa si el cliente
+    elegido no tiene correo.
+- **Candados:** `tests/integracion/recibo-correo.test.ts` (sale solo sin tocar
+  ajustes, remitente y respuesta de la tienda, apagado/a pedido, consentimiento,
+  sin correo, rebote visible, tope) y `tests/unit/recibo-html.test.ts` (contenido,
+  escape de HTML, enlaces solo http(s), versión en texto). Comprobados en rojo:
+  `reciboCorreo ?? false` y `escaparHtml` sin escapar.
+- **Cómo se comprueba en vivo:** crear una orden a un cliente con correo y mirar
+  la línea «Recibo por correo» dentro de la orden; el historial está en Ajustes →
+  Avisos → Últimos avisos.
+- **NO tocar:** el recibo automático respeta `acepta_correo`; el enviado a pedido
+  no (lo pidió el cliente en el mostrador). El demo no le escribe a nadie.
+- **Ojo de escala:** el plan Galaxia incluye 300 correos al día para TODAS las
+  tintorerías juntas. Con muchas tiendas activas hay que subir de plan o
+  autorizar correos extra en YaDominios (decisión de Richard).
+
+### B42. No se podía cobrar por kilo
+
+- **Cómo se veía:** todo el sistema decía «libra»: el servicio de fábrica, el
+  mostrador, la orden, el recibo. Richard (Colombia): *«le falta la facturación
+  por kilo»*.
+- **Causa real:** la unidad de peso estaba escrita a mano en cada pantalla.
+- **Lo que se hizo:** `src/lib/peso.ts` + preferencia `unidad_peso` (`lb`/`kg`) en
+  `preferencias_tienda`. De fábrica sale del país (libras en EE.UU. y Puerto
+  Rico; kilos en el resto) y se cambia en Ajustes → Tienda. Por dentro el
+  servicio por peso se sigue llamando `libra` (la base tiene un CHECK y el
+  esquema no admite cambios): lo que cambia es la unidad que se VE y se cobra.
+  El precio es por esa unidad; no se convierte nada. La tienda nueva de fuera de
+  EE.UU. nace con «Lavado por kilo»; al cambiar de unidad, el servicio de fábrica
+  cambia de nombre SOLO si el dueño no le puso el suyo. `schema.sql` renombra una
+  vez el servicio de fábrica de las tiendas existentes de fuera de EE.UU.
+  (sentencia que se puede repetir). El demo enseña kilos a quien lo abre desde
+  fuera de EE.UU. (`cf-ipcountry`).
+- **Candados:** `tests/unit/peso.test.ts` y dos casos en
+  `tests/integracion/ajustes.test.ts`. En rojo con `unidadPesoDePais` fijo en `lb`.
+- **Límite conocido:** la unidad es de la tienda, no de cada orden: si una tienda
+  cambia de libras a kilos, sus órdenes viejas se leen en kilos.
+
+### B43. Una tabla con `tintoreria_id` se quedó fuera de los respaldos y del demo
+
+- **Cómo se veía:** no se veía (por eso es grave). `preferencias_tienda` (B38)
+  nació sin entrar en `TABLAS_RESPALDO` ni en `TABLAS_DEMO`: un demo que guardara
+  sus ajustes ya no se podía borrar (llave foránea) y un respaldo restaurado
+  perdía las preferencias. `permisos_usuario` tampoco se respaldaba.
+- **Lo que se hizo:** las dos tablas entraron en el respaldo; `preferencias_tienda`
+  en la limpieza del demo y en la huella del escenario de aislamiento.
+- **Candado:** `tests/integracion/esquema.test.ts` → «toda tabla de una
+  tintorería se respalda y se borra con el demo». Lee las tablas de la base y
+  exige que cada una con `tintoreria_id` esté en las dos listas o en la lista
+  corta de exentas, con su porqué. En rojo al quitar `preferencias_tienda`.
+
 ## C. Candados de publicación
 
 ### C1. El paquete que se publica es el que se prueba

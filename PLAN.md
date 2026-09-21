@@ -1,22 +1,31 @@
-# Plan: las etiquetas también salen directo, y se pueden probar hoy
+# Plan: recibo digital por correo y cobro por kilo
 
-> Piloto automático (20 sep 2026). El recibo ya sale directo por la impresora
-> conectada (probado por Richard con su impresora). Falta lo mismo para las
-> etiquetas: hoy solo se conecta UNA impresora y las etiquetas siguen saliendo
-> por la ventana del navegador con «Guardar como PDF».
+> Piloto automático (21 sep 2026). Richard reportó: (1) al cliente no le llega
+> el correo con su recibo digital; (2) falta cobrar por kilo (Colombia no usa
+> libras); (3) el nombre de su tienda quedó mal escrito.
 >
-> Investigado: las etiqueteras no hablan ESC/POS. Hablan **TSPL** (Rollo,
-> Munbyn, Polono, iDPRT, TSC, Xprinter: casi todas las económicas) o **ZPL**
-> (Zebra). Y una térmica de recibos también puede sacar etiquetas de papel.
+> Diagnóstico: el aviso «orden recibida» viene APAGADO de fábrica y, encendido,
+> es una sola línea de texto, no un recibo. El dominio sí está bien configurado
+> para enviar (DKIM, SPF del rebote y DMARC comprobados). El peso está clavado
+> en libras en todas las pantallas y en el papel.
 
-- [x] H1. Codificadores de etiqueta: TSPL, ZPL y ESC/POS (para sacar las
-      etiquetas por la impresora de recibos). QR nativo en los tres.
-- [x] H2. Ruta con los datos de las etiquetas de una orden.
-- [x] H3. Dos impresoras por equipo: la de recibos y la de etiquetas, cada una
-      con su conexión, y la opción «usar la misma de recibos».
-- [x] H4. Pantalla Impresoras con las dos tarjetas, lenguaje, tamaño y prueba.
-- [x] H5. «Imprimir etiquetas» directo, con un toque, igual que el recibo.
-- [x] H6. Candados y pruebas (comprobados en rojo).
-- [x] H7. Guía de Docs: qué etiquetera comprar, cómo conectarla y cómo probar
-      sin tener una.
-- [x] H8. `npm run verify`, punta a punta, paquete, publicar y comprobar en vivo.
+- [x] J1. Unidad de peso por tienda (`lb` / `kg`): preferencia `unidad_peso`, de
+      fábrica según el país (EE.UU. y Puerto Rico en libras; el resto en kilos),
+      editable en Ajustes → Tienda.
+- [x] J2. Mostrador, orden, recibo de pantalla, recibo directo (ESC/POS), editor
+      de precios y catálogo hablan en la unidad de la tienda.
+- [x] J3. Tienda nueva fuera de EE.UU.: el servicio de fábrica nace como «Lavado
+      por kilo».
+- [x] J4. Recibo digital en HTML, salido de las MISMAS líneas que el recibo de
+      papel (`lineasRecibo`), con botón para ver la orden.
+- [x] J5. El recibo por correo sale SOLO al crear la orden (encendido de fábrica,
+      con su interruptor en Ajustes → Avisos). El SMS de «recibida» sigue apagado.
+      Remitente con el nombre de la tienda y respuesta al correo de la tienda.
+- [x] J6. En la orden: «Enviar recibo por correo» y el estado del envío a la
+      vista (enviado, en cola o falló, con el porqué). En el mostrador: aviso
+      discreto si el cliente no tiene correo.
+- [x] J7. Candados y pruebas comprobadas en rojo; CANDADOS, guías de Docs
+      (avisos y precios por peso), CLAUDE.md y PENDIENTES.
+- [x] J8. `npm run verify`, punta a punta, paquete, publicar y comprobar en vivo.
+- [x] J9. Nombre de la tienda: comprobar que se puede corregir y no hay fallo;
+      dejar la pregunta del nombre exacto en el bloque final.

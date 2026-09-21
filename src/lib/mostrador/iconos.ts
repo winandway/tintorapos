@@ -68,7 +68,10 @@ const CLAVES: [ClaveIcono, string[]][] = [
   ["zapatos", ["zapato", "shoe", "bota", "boot", "sneaker", "tenis", "calzado", "sandalia"]],
   ["bolso", ["bolso", "bolsa", "bag", "cartera", "purse", "handbag", "mochila", "backpack", "maleta"]],
   ["gorra", ["gorra", "cap", "sombrero", "hat", "bufanda", "scarf", "guante", "glove"]],
-  ["canasta", ["libra", "pound", "lb", "granel", "wash & fold", "wash and fold", "carga", "load"]],
+  [
+    "canasta",
+    ["libra", "pound", "lb", "kilo", "kg", "granel", "wash & fold", "wash and fold", "carga", "load"],
+  ],
 ];
 
 const LETRA = /[a-z0-9]/;

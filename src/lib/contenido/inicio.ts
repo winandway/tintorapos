@@ -145,7 +145,8 @@ const es: ContenidoInicio = {
       {
         icono: "precio",
         titulo: "Precios a tu manera",
-        texto: "Por pieza o por libra, con recargo por urgencia, descuentos e impuesto configurable.",
+        texto:
+          "Por pieza o por peso (kilos o libras), con recargo por urgencia, descuentos e impuesto configurable.",
       },
       {
         icono: "escaner",
@@ -393,7 +394,8 @@ const en: ContenidoInicio = {
       {
         icono: "precio",
         titulo: "Your prices, your way",
-        texto: "Per piece or by the pound, with rush fees, discounts and configurable sales tax.",
+        texto:
+          "Per piece or by weight (pounds or kilos), with rush fees, discounts and configurable sales tax.",
       },
       {
         icono: "escaner",

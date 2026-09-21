@@ -105,6 +105,139 @@ export const GUIAS_CLIENTES: Guia[] = [
     },
   },
   {
+    slug: "recibo-por-correo",
+    seccion: "clientes",
+    icono: "mensaje",
+    es: {
+      titulo: "El recibo digital por correo",
+      resumen:
+        "Al crear la orden, al cliente le llega su recibo por correo. Cómo funciona, cómo reenviarlo y qué revisar si no llega.",
+      bloques: [
+        {
+          t: "p",
+          texto:
+            "Cuando creas una orden, Tintora POS le manda al cliente **su recibo por correo**, solo: las prendas, el total, lo que pagó, el saldo, cuándo estará lista y un botón para ver el estado de su orden. Es el mismo recibo que sale en papel. Viene **encendido de fábrica** y no cuesta nada.",
+        },
+        { t: "captura", captura: "reciboCorreo" },
+        { t: "h2", texto: "Lo único que hace falta: el correo del cliente" },
+        {
+          t: "pasos",
+          items: [
+            "Al crear el cliente (o en su ficha, en **Clientes**), escribe su **correo**. Al escribirlo se marca sola la casilla de que acepta recibir correos.",
+            "Crea la orden como siempre. El recibo sale en ese momento.",
+            "Si el cliente no tiene correo, el mostrador te lo avisa debajo de su nombre: *Sin correo en su ficha: no le llegará el recibo digital*.",
+          ],
+        },
+        {
+          t: "p",
+          texto:
+            "El cliente ve el correo **a nombre de tu tienda**, y si responde, la respuesta te llega al correo que pusiste en **Ajustes → Tu tienda**.",
+        },
+        { t: "h2", texto: "Reenviarlo" },
+        {
+          t: "pasos",
+          items: [
+            "Abre la orden.",
+            "Toca los **tres puntos** de arriba a la derecha y elige **Enviar recibo por correo**.",
+            "En pantalla te dice si salió. Se manda al correo que el cliente tiene en su ficha.",
+          ],
+        },
+        { t: "h2", texto: "Saber si le llegó" },
+        {
+          t: "p",
+          texto:
+            "Dentro de la orden, debajo del nombre del cliente, está la línea **Recibo por correo**: *Enviado a…*, *Saliendo hacia…*, *No se pudo enviar…* (con el motivo) o *Este cliente no tiene correo*. El historial completo está en **Ajustes → Avisos a clientes → Últimos avisos**.",
+        },
+        { t: "h2", texto: "Si no le llega" },
+        {
+          t: "lista",
+          items: [
+            "**La orden dice que el cliente no tiene correo:** agrégalo en su ficha y reenvía el recibo.",
+            "**Dice *Enviado* y el cliente no lo ve:** que revise **Spam** o **Promociones**, y que el correo esté bien escrito (un punto o una letra de más y se va a otra persona).",
+            "**Dice *No se pudo enviar*:** al lado sale el motivo. Si habla de *rebote*, esa dirección no existe o está llena.",
+            "**Dice que el correo de la plataforma no está configurado:** escríbenos desde [Contacto](/contacto).",
+          ],
+        },
+        { t: "h2", texto: "Apagarlo" },
+        {
+          t: "p",
+          texto:
+            "En **Ajustes → Avisos a clientes**, quita la palomita de **Recibo digital por correo** y guarda. Aun apagado, puedes mandarlo a pedido desde la orden.",
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "El recibo digital va aparte de los [avisos por SMS](/docs/avisos): el aviso de *orden recibida* viene apagado porque los SMS tienen costo; el recibo por correo no.",
+        },
+      ],
+    },
+    en: {
+      titulo: "The digital receipt by email",
+      resumen:
+        "When you create an order, the customer gets their receipt by email. How it works, how to resend it and what to check if it doesn’t arrive.",
+      bloques: [
+        {
+          t: "p",
+          texto:
+            "When you create an order, Tintora POS emails the customer **their receipt**, automatically: the items, the total, what they paid, the balance, when it will be ready and a button to check the order status. It’s the same receipt that prints on paper. It’s **on by default** and costs nothing.",
+        },
+        { t: "captura", captura: "reciboCorreo" },
+        { t: "h2", texto: "All it needs: the customer’s email" },
+        {
+          t: "pasos",
+          items: [
+            "When you create the customer (or on their profile, under **Customers**), enter their **email**. Typing it checks the box that says they agree to get emails.",
+            "Create the order as usual. The receipt goes out right then.",
+            "If the customer has no email, the counter tells you under their name: *No email on file: they won’t get the digital receipt*.",
+          ],
+        },
+        {
+          t: "p",
+          texto:
+            "The customer sees the email **under your store’s name**, and if they reply, the reply goes to the email you set under **Settings → Your store**.",
+        },
+        { t: "h2", texto: "Resend it" },
+        {
+          t: "pasos",
+          items: [
+            "Open the order.",
+            "Tap the **three dots** at the top right and choose **Email the receipt**.",
+            "The screen tells you whether it went out. It goes to the email on the customer’s profile.",
+          ],
+        },
+        { t: "h2", texto: "Know whether it arrived" },
+        {
+          t: "p",
+          texto:
+            "Inside the order, under the customer’s name, there’s a **Receipt by email** line: *Sent to…*, *On its way to…*, *Couldn’t send…* (with the reason) or *This customer has no email*. The full history is under **Settings → Customer notifications → Recent notifications**.",
+        },
+        { t: "h2", texto: "If it doesn’t arrive" },
+        {
+          t: "lista",
+          items: [
+            "**The order says the customer has no email:** add it to their profile and resend the receipt.",
+            "**It says *Sent* and the customer can’t find it:** have them check **Spam** or **Promotions**, and make sure the address is spelled right (one extra dot or letter sends it to someone else).",
+            "**It says *Couldn’t send*:** the reason is right next to it. If it mentions a *bounce*, that address doesn’t exist or the mailbox is full.",
+            "**It says the platform’s email isn’t set up:** reach us through [Contact](/contacto).",
+          ],
+        },
+        { t: "h2", texto: "Turn it off" },
+        {
+          t: "p",
+          texto:
+            "Under **Settings → Customer notifications**, uncheck **Digital receipt by email** and save. Even when it’s off, you can still send it on request from the order.",
+        },
+        {
+          t: "nota",
+          tono: "consejo",
+          texto:
+            "The digital receipt is separate from [text notifications](/docs/avisos): the *order received* notification ships turned off because texts cost money; the emailed receipt doesn’t.",
+        },
+      ],
+    },
+  },
+  {
     slug: "pagina-del-cliente",
     seccion: "clientes",
     icono: "enlace",

@@ -44,7 +44,23 @@ interface Orden {
   origen: string;
   creadaPor: string | null;
   anuladaMotivo: string | null;
-  cliente: { id: string; nombre: string; apellido: string | null; telefono: string | null };
+  cliente: {
+    id: string;
+    nombre: string;
+    apellido: string | null;
+    telefono: string | null;
+    correo: string | null;
+    aceptaCorreo: boolean;
+  };
+  unidadPeso: "lb" | "kg";
+  avisos: {
+    tipo: string;
+    canal: string;
+    destino: string;
+    estado: "pendiente" | "enviado" | "fallido" | "omitido";
+    error: string | null;
+    creadoEn: number;
+  }[];
   prendas: {
     id: string;
     prendaEs: string;
@@ -140,6 +156,28 @@ export function DetalleOrden({
       });
   };
 
+  /** El recibo digital, a pedido. Dice si salió o por qué no: nunca se queda callado. */
+  async function enviarRecibo() {
+    setErrorAccion(null);
+    const correo = o.cliente.correo ?? "";
+    try {
+      const r = await pedir<{ estado: string; error: string | null }>(
+        `/datos/ordenes/${o.id}/recibo-correo`,
+        { cuerpo: {} },
+      );
+      if (r.estado === "enviado") avisar(fmt(dor.reciboEnviado, { correo }));
+      else
+        setErrorAccion(
+          r.estado === "omitido"
+            ? dor.reciboCorreo.omitido
+            : `${fmt(dor.reciboCorreo.fallido, { correo })}${r.error ? ` · ${r.error}` : ""}`,
+        );
+      recargar();
+    } catch (e) {
+      setErrorAccion(textoError(d, e));
+    }
+  }
+
   async function accion<T>(fn: (autorizacion?: { usuarioId: string; pin: string }) => Promise<T>) {
     setErrorAccion(null);
     try {
@@ -211,6 +249,7 @@ export function DetalleOrden({
                     }),
                 },
                 { texto: `${dor.imprimir}: ${dor.interna}`, alElegir: () => imprimir("interna") },
+                { texto: dor.enviarRecibo, alElegir: enviarRecibo },
                 {
                   texto: dor.abandonar,
                   oculta: o.estado !== "lista" || !puede("ordenes.entregar"),
@@ -262,7 +301,7 @@ export function DetalleOrden({
                   <div className="flex items-start gap-3">
                     <span className="min-w-0 flex-1">
                       <span className="block font-semibold">
-                        {p.unidad === "libra" ? `${p.cantidad} lb · ` : ""}
+                        {p.unidad === "libra" ? `${p.cantidad} ${o.unidadPeso} · ` : ""}
                         {nombrePieza(p)}
                       </span>
                       <span className="block text-[13px] text-gris">
@@ -382,6 +421,7 @@ export function DetalleOrden({
               {o.cliente.nombre} {o.cliente.apellido ?? ""}
             </Link>
             <p className="text-[14px] text-gris">{o.cliente.telefono}</p>
+            <EstadoRecibo orden={o} textos={dor.reciboCorreo} />
             <p className="mt-3 text-[13px] text-gris">
               {fmt(dor.creadaPor, { nombre: o.creadaPor ?? "—" })} · {fecha(o.creadaEn)}
               {o.origen === "sin_conexion" ? ` · ${dor.sinConexion}` : ""}
@@ -652,5 +692,36 @@ function ModalMotivo({
         autoFocus
       />
     </Modal>
+  );
+}
+
+/** Si al cliente le llegó su recibo digital, y si no, por qué. Siempre a la vista. */
+function EstadoRecibo({
+  orden,
+  textos,
+}: {
+  orden: Pick<Orden, "avisos" | "cliente">;
+  textos: Record<
+    "titulo" | "enviado" | "pendiente" | "fallido" | "omitido" | "sinCorreo" | "noEnviado",
+    string
+  >;
+}) {
+  const ultimo = orden.avisos.find((a) => a.canal === "correo" && a.tipo === "recibida");
+  const tono = !ultimo
+    ? "text-gris"
+    : ultimo.estado === "enviado"
+      ? "text-ok"
+      : ultimo.estado === "pendiente"
+        ? "text-gris"
+        : "text-peligro";
+  const texto = !orden.cliente.correo
+    ? textos.sinCorreo
+    : !ultimo
+      ? textos.noEnviado
+      : `${fmt(textos[ultimo.estado], { correo: ultimo.destino })}${ultimo.estado === "fallido" && ultimo.error ? ` · ${ultimo.error}` : ""}`;
+  return (
+    <p className={`mt-2 text-[13px] ${tono}`} data-testid="estado-recibo-correo">
+      <b>{textos.titulo}:</b> {texto}
+    </p>
   );
 }

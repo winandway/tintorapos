@@ -54,6 +54,20 @@ export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario>
       )
       .bind(t.id, servicio!.id, prenda!.id, Date.now())
       .run();
+    // Una preferencia y un permiso propios: también tienen que respaldarse,
+    // borrarse con el demo y quedar aislados.
+    await db.batch([
+      db
+        .prepare(
+          "insert into preferencias_tienda (tintoreria_id, clave, valor, actualizado_en) values (?, 'marca_del_escenario', '1', ?)",
+        )
+        .bind(t.id, Date.now()),
+      db
+        .prepare(
+          "insert into permisos_usuario (usuario_id, tintoreria_id, permisos, actualizado_en, actualizado_por) values (?, ?, '{}', ?, ?)",
+        )
+        .bind(empleadoId, t.id, Date.now(), t.duenoId),
+    ]);
     const clienteId = nuevoId();
     await db
       .prepare(
@@ -158,8 +172,10 @@ export async function escenarioAislamiento(e: EntornoPrueba): Promise<Escenario>
 
 const TABLAS = [
   "tintorerias:id",
+  "preferencias_tienda",
   "sucursales",
   "usuarios",
+  "permisos_usuario",
   "dispositivos",
   "clientes",
   "catalogo_prendas",

@@ -30,6 +30,7 @@ interface Tienda {
   descuentoMaxBps: number;
   diasEntrega: number;
   politicaCobro: "entrega" | "recepcion";
+  unidadPeso: "lb" | "kg";
   diasRecordatorio: number;
   maxRecordatorios: number;
   diasAbandono: number;
@@ -253,6 +254,18 @@ export function FormTienda() {
             onChange={(e) => setPct({ ...pct, descuento: e.target.value })}
             error={c("descuentoMaxBps")}
             className="sm:col-span-2"
+          />
+          <CampoSelector
+            etiqueta={dt.unidadPeso}
+            ayuda={dt.unidadPesoAyuda}
+            value={t.unidadPeso}
+            onChange={(e) => setT({ ...t, unidadPeso: e.target.value as "lb" | "kg" })}
+            opciones={[
+              { valor: "kg", texto: dt.unidadesPeso.kg },
+              { valor: "lb", texto: dt.unidadesPeso.lb },
+            ]}
+            className="sm:col-span-3"
+            data-testid="unidad-peso"
           />
         </div>
       </Tarjeta>

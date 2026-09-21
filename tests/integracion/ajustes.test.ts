@@ -99,7 +99,7 @@ describe("ajustes: tienda, catálogo, precios y empleados", () => {
 
     // Y la de otra tintorería no se toca.
     const otra = await e.env.DB.prepare(
-      "select count(*) as n from preferencias_tienda where tintoreria_id = ?",
+      "select count(*) as n from preferencias_tienda where tintoreria_id = ? and clave = 'politica_cobro'",
     )
       .bind(esc.b.id)
       .first<{ n: number }>();
@@ -109,6 +109,98 @@ describe("ajustes: tienda, catálogo, precios y empleados", () => {
       metodo: "PUT",
       cuerpo: { ...r.datos.tienda, politicaCobro: "entrega" },
     });
+  });
+
+  /**
+   * CANDADO DEL COBRO POR KILO. Richard (Colombia) reportó que «le falta la
+   * facturación por kilo»: todo el sistema decía «libra». La unidad es de cada
+   * tienda, sale de su país si nadie la eligió, y el precio es por ESA unidad.
+   */
+  it("la ropa por peso se cobra en kilos o en libras, según la tienda", async () => {
+    // La tienda del escenario es de EE.UU.: nace en libras.
+    const r = await dueno.llamar<{ tienda: Record<string, unknown> }>(leerTienda);
+    expect(r.datos.tienda.unidadPeso).toBe("lb");
+    const nombres = async (id: string) =>
+      (
+        await e.env.DB.prepare(
+          "select nombre_es, nombre_en from catalogo_servicios where tintoreria_id = ? and unidad = 'libra' order by orden",
+        )
+          .bind(id)
+          .all<{ nombre_es: string; nombre_en: string }>()
+      ).results;
+    expect(await nombres(esc.a.id)).toEqual([
+      { nombre_es: "Lavado por libra", nombre_en: "Wash & fold (per lb)" },
+    ]);
+
+    // Pasa a kilos: el servicio de fábrica cambia de nombre con ella.
+    expect(
+      (await dueno.llamar(guardarTienda, { metodo: "PUT", cuerpo: { ...r.datos.tienda, unidadPeso: "kg" } }))
+        .estado,
+    ).toBe(200);
+    expect(
+      (await dueno.llamar<{ tienda: Record<string, unknown> }>(leerTienda)).datos.tienda.unidadPeso,
+    ).toBe("kg");
+    expect(await nombres(esc.a.id)).toEqual([
+      { nombre_es: "Lavado por kilo", nombre_en: "Wash & fold (per kg)" },
+    ]);
+    // La otra tintorería ni se entera.
+    expect(await nombres(esc.b.id)).toEqual([
+      { nombre_es: "Lavado por libra", nombre_en: "Wash & fold (per lb)" },
+    ]);
+
+    // Guardar otra cosa SIN mandar la unidad no la cambia sola.
+    const sinUnidad: Record<string, unknown> = { ...r.datos.tienda, ciudad: "Medellín" };
+    delete sinUnidad.unidadPeso;
+    await dueno.llamar(guardarTienda, { metodo: "PUT", cuerpo: sinUnidad });
+    expect(
+      (await dueno.llamar<{ tienda: Record<string, unknown> }>(leerTienda)).datos.tienda.unidadPeso,
+    ).toBe("kg");
+
+    // Un nombre que puso el dueño NO se toca al cambiar de unidad.
+    await e.env.DB.prepare(
+      "update catalogo_servicios set nombre_es = 'Ropa al peso' where tintoreria_id = ? and unidad = 'libra'",
+    )
+      .bind(esc.a.id)
+      .run();
+    await dueno.llamar(guardarTienda, { metodo: "PUT", cuerpo: { ...r.datos.tienda, unidadPeso: "lb" } });
+    expect((await nombres(esc.a.id))[0]?.nombre_es).toBe("Ropa al peso");
+
+    // Una unidad inventada se rechaza.
+    const mala = await dueno.llamar<Err>(guardarTienda, {
+      metodo: "PUT",
+      cuerpo: { ...r.datos.tienda, unidadPeso: "arrobas" },
+    });
+    expect(mala.estado).toBe(400);
+
+    // Se deja como estaba para las demás pruebas.
+    await e.env.DB.prepare(
+      "update catalogo_servicios set nombre_es = 'Lavado por libra', nombre_en = 'Wash & fold (per lb)' where tintoreria_id = ? and unidad = 'libra'",
+    )
+      .bind(esc.a.id)
+      .run();
+    await dueno.llamar(guardarTienda, { metodo: "PUT", cuerpo: { ...r.datos.tienda, unidadPeso: "lb" } });
+  });
+
+  it("una tienda de fuera de EE.UU. nace en kilos, con su «Lavado por kilo»", async () => {
+    const { registrarTintoreria } = await import("@/server/cuentas/registro");
+    const { leerTienda: leer } = await import("@/server/ajustes/tienda");
+    const co = await registrarTintoreria(e.env.DB, {
+      negocio: "Tienda de kilos",
+      nombre: "Dueña de kilos",
+      correo: "kilos@ejemplo.com",
+      clave: "Clave-Segura-2026",
+      zonaHoraria: "America/Bogota",
+      idioma: "es",
+      pais: "CO",
+      moneda: "COP",
+    });
+    expect((await leer(e.env.DB, co.tintoreriaId)).unidadPeso).toBe("kg");
+    const s = await e.env.DB.prepare(
+      "select nombre_es from catalogo_servicios where tintoreria_id = ? and unidad = 'libra'",
+    )
+      .bind(co.tintoreriaId)
+      .first<{ nombre_es: string }>();
+    expect(s?.nombre_es).toBe("Lavado por kilo");
   });
 
   it("catálogo: crear, editar, desactivar y precios por pieza y por libra", async () => {

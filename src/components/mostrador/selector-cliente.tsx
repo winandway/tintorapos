@@ -14,6 +14,8 @@ export interface ClienteElegido {
   nombre: string;
   apellido: string | null;
   telefono: string | null;
+  /** `null` = se sabe que no tiene; sin definir = no se sabe (búsqueda sin conexión). */
+  correo?: string | null;
   idioma: "es" | "en";
   ordenesAbiertas: number;
   saldoCents: number;
@@ -86,6 +88,11 @@ export function SelectorCliente({
             {cliente.nombre} {cliente.apellido ?? ""}
           </p>
           <p className="text-[14px] text-gris">{formatoTelefono(cliente.telefono) || "—"}</p>
+          {cliente.correo === null && !cliente.nuevo?.correo && (
+            <p className="text-[13px] text-gris" data-testid="cliente-sin-correo">
+              {dm.sinCorreo}
+            </p>
+          )}
           {cliente.ordenesAbiertas > 0 && (
             <p className="text-[13px] font-semibold text-tinta">
               {fmt(dm.ordenesAbiertas, { n: cliente.ordenesAbiertas })}

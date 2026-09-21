@@ -1,4 +1,5 @@
 import { extraerCodigo } from "@/lib/codigos";
+import { resolverUnidadPeso, type UnidadPeso } from "@/lib/peso";
 import { diaSemana } from "@/lib/fechas";
 import { noEncontrado } from "@/server/errores";
 
@@ -59,7 +60,12 @@ export interface Orden {
     telefono: string | null;
     idioma: "es" | "en";
     preferencias: string;
+    /** Para saber si se le puede mandar el recibo digital. */
+    correo: string | null;
+    aceptaCorreo: boolean;
   };
+  /** En qué pesa la ropa esta tienda: libras o kilos. */
+  unidadPeso: UnidadPeso;
   prendas: PrendaOrden[];
   pagos: {
     id: string;
@@ -80,6 +86,15 @@ export interface Orden {
     creadoEn: number;
   }[];
   fotos: { id: string; prendaId: string | null }[];
+  /** Lo que se le mandó al cliente por esta orden (el recibo por correo, los avisos), lo último primero. */
+  avisos: {
+    tipo: string;
+    canal: "sms" | "correo";
+    destino: string;
+    estado: "pendiente" | "enviado" | "fallido" | "omitido";
+    error: string | null;
+    creadoEn: number;
+  }[];
 }
 
 interface FilaOrden {
@@ -112,7 +127,11 @@ interface FilaOrden {
   c_telefono: string | null;
   c_idioma: "es" | "en";
   c_preferencias: string;
+  c_correo: string | null;
+  c_acepta_correo: number;
   zona: string;
+  t_pais: string;
+  unidad_peso: string | null;
 }
 
 export function estaAtrasada(estado: string, fechaPromesa: number, ahora = Date.now()): boolean {
@@ -125,11 +144,14 @@ export async function verOrden(
   id: string,
   ahora = Date.now(),
 ): Promise<Orden> {
-  const [o, p, pg, h, f] = await db.batch([
+  const [o, p, pg, h, f, av] = await db.batch([
     db
       .prepare(
         `select o.*, u.nombre as creada_por_nombre, c.nombre as c_nombre, c.apellido as c_apellido, c.telefono as c_telefono,
-           c.idioma as c_idioma, c.preferencias as c_preferencias, t.zona_horaria as zona
+           c.idioma as c_idioma, c.preferencias as c_preferencias, c.correo as c_correo,
+           c.acepta_correo as c_acepta_correo, t.zona_horaria as zona, t.pais as t_pais,
+           (select pr.valor from preferencias_tienda pr
+             where pr.tintoreria_id = o.tintoreria_id and pr.clave = 'unidad_peso') as unidad_peso
          from ordenes o
          join clientes c on c.id = o.cliente_id and c.tintoreria_id = o.tintoreria_id
          join tintorerias t on t.id = o.tintoreria_id
@@ -156,6 +178,12 @@ export async function verOrden(
       .bind(tintoreriaId, id),
     db
       .prepare("select id, prenda_id from fotos where tintoreria_id = ? and orden_id = ? order by creado_en")
+      .bind(tintoreriaId, id),
+    db
+      .prepare(
+        `select tipo, canal, destino, estado, error, creado_en from avisos
+         where tintoreria_id = ? and orden_id = ? order by creado_en desc limit 10`,
+      )
       .bind(tintoreriaId, id),
   ]);
   const fila = (o?.results as FilaOrden[] | undefined)?.[0];
@@ -212,7 +240,10 @@ export async function verOrden(
       telefono: fila.c_telefono,
       idioma: fila.c_idioma,
       preferencias: fila.c_preferencias,
+      correo: fila.c_correo,
+      aceptaCorreo: fila.c_acepta_correo === 1,
     },
+    unidadPeso: resolverUnidadPeso(fila.unidad_peso, fila.t_pais),
     prendas: ((p?.results ?? []) as FP[]).map((x) => ({
       id: x.id,
       prendaEs: x.prenda_es,
@@ -272,6 +303,23 @@ export async function verOrden(
     fotos: ((f?.results ?? []) as { id: string; prenda_id: string | null }[]).map((x) => ({
       id: x.id,
       prendaId: x.prenda_id,
+    })),
+    avisos: (
+      (av?.results ?? []) as {
+        tipo: string;
+        canal: "sms" | "correo";
+        destino: string;
+        estado: "pendiente" | "enviado" | "fallido" | "omitido";
+        error: string | null;
+        creado_en: number;
+      }[]
+    ).map((x) => ({
+      tipo: x.tipo,
+      canal: x.canal,
+      destino: x.destino,
+      estado: x.estado,
+      error: x.error,
+      creadoEn: x.creado_en,
     })),
   };
 }

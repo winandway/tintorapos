@@ -72,6 +72,20 @@ export const CAPTURAS = {
       en: "How a connected label printer draws the tag (2 × 1 inches).",
     },
   },
+  reciboCorreo: {
+    archivo: "/capturas/recibo-correo.webp",
+    ancho: 440,
+    alto: 900,
+    marco: "celular",
+    alt: {
+      es: "Correo con el recibo digital de una lavandería: el nombre de la tienda, el número de orden en grande, cuándo estará lista, las prendas (una de ellas cobrada por kilo), el total, el saldo y el botón «Ver el estado de mi orden».",
+      en: "Email with a laundry's digital receipt: the store name, the order number in large type, when it will be ready, the items (one charged by weight), the total, the balance and the “Check my order status” button.",
+    },
+    pie: {
+      es: "El recibo digital, tal como le llega al cliente.",
+      en: "The digital receipt, as the customer gets it.",
+    },
+  },
   mostrador: {
     archivo: "/capturas/mostrador.webp",
     ancho: 1440,

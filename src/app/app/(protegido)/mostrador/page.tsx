@@ -4,7 +4,7 @@ import { Aviso } from "@/components/ui/aviso";
 import { clasesBoton } from "@/components/ui/boton";
 import { obtenerTextos } from "@/lib/i18n/servidor";
 import { rutaPagina } from "@/lib/rutas-publicas";
-import { politicaCobro } from "@/server/ajustes/tienda";
+import { politicaCobro, unidadPeso } from "@/server/ajustes/tienda";
 import { exigirSesion } from "@/server/pagina";
 import { pruebaTerminada } from "@/server/prueba";
 
@@ -18,6 +18,7 @@ export default async function PaginaMostrador({
   const t = sesion.tintoreria;
   const { idioma, d } = await obtenerTextos();
   const cobro = await politicaCobro(db, t.id);
+  const peso = await unidadPeso(db, t.id);
   // Con la prueba vencida no se reciben órdenes nuevas: se dice claro, no se
   // deja que el botón falle al final.
   if (pruebaTerminada(t))
@@ -44,6 +45,7 @@ export default async function PaginaMostrador({
         pais: t.pais,
         diasEntrega: t.diasEntrega,
         politicaCobro: cobro,
+        unidadPeso: peso,
         reglas: {
           impuestoBps: t.impuestoBps,
           recargoUrgenteBps: t.recargoUrgenteBps,

@@ -34,6 +34,10 @@ export const ajustes = {
     impuestoAyuda: "Las reglas cambian por estado y ciudad. Confírmalo con tu contador. Pon 0 si no aplica.",
     recargo: "Recargo por servicio urgente (%)",
     descuentoMax: "Descuento máximo sin autorización de gerente (%)",
+    unidadPeso: "La ropa por peso se cobra en",
+    unidadPesoAyuda:
+      "Es la unidad que sale en el mostrador, en la orden y en el recibo. El precio que pongas es por esa unidad.",
+    unidadesPeso: { lb: "Libras (lb)", kg: "Kilos (kg)" },
     cobro: "¿Cuándo cobras?",
     cobroAyuda: "Esto decide cómo arranca la pantalla del mostrador. Siempre puedes cambiarlo en cada orden.",
     politicaCobro: {
@@ -56,7 +60,7 @@ export const ajustes = {
   },
   precios: {
     ayuda: "Escribe el precio de cada prenda. Lo que dejes vacío se escribe a mano en el mostrador.",
-    porLibra: "Precio por libra",
+    porPeso: { lb: "Precio por libra", kg: "Precio por kilo" },
     agregarPrenda: "Agregar prenda",
     agregarServicio: "Agregar servicio",
     editarPrenda: "Editar prenda",
@@ -65,7 +69,7 @@ export const ajustes = {
     nombreEn: "Nombre en inglés",
     unidad: "Se cobra por",
     pieza: "Pieza",
-    libra: "Libra",
+    peso: { lb: "Libra", kg: "Kilo" },
     aplicaImpuesto: "Cobra impuesto",
     diasEntrega: "Días para entregar (vacío = los de la tienda)",
     inactiva: "Oculta",

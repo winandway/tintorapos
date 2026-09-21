@@ -21,14 +21,22 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
    de descubrimiento del informe de agentes.
 4. 👤 **Claves de Turnstile** (escudo anti-robots de Cloudflare).
    **Destranca:** protección de entrar, registrarse y recuperar contraseña.
-5. 👤 **Probar las etiquetas en papel.** Hoy, sin comprar nada: Ajustes →
+5. 👤 **El nombre de tu tienda quedó mal escrito.** Yo no puedo entrar a tu cuenta
+   (no escribo contraseñas). Se corrige en **Ajustes → Tienda → Nombre de la
+   tienda → Guardar cambios**: cambia al instante en el menú, el recibo, las
+   etiquetas y los correos. **Destranca:** que tus clientes vean el nombre bien.
+6. 👤 **Probar el recibo por correo en tu tienda:** crea una orden a un cliente
+   con TU correo y mira si llega. Dentro de la orden, la línea «Recibo por
+   correo» dice si salió o por qué no. **Destranca:** poder decir que el recibo
+   digital está probado en vivo con un correo de verdad.
+7. 👤 **Probar las etiquetas en papel.** Hoy, sin comprar nada: Ajustes →
    Impresoras → tarjeta «Impresora de etiquetas» → «En la misma impresora de
    recibos» → «Imprimir una etiqueta de prueba». Y cuando tengas una etiquetera
-   (de las que hablan TSPL: Rollo, Munbyn, Polono, iDPRT…), el mismo botón en
+   (recomendada para Colombia: TSC TE200, de transferencia térmica), el mismo botón en
    «En una etiquetera conectada». **Destranca:** poder decir que la etiquetera
    directa está probada en papel (hoy solo lo está contra el manual; la de Zebra,
    contra un emulador).
-6. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU. **Va al final**: los
+8. 👤 **Registro A2P 10DLC en Twilio** para SMS en EE.UU. **Va al final**: los
    avisos van por correo. **Destranca:** avisos por SMS reales.
 
 ## Fila de la IA (🤖), en orden
@@ -49,6 +57,12 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 - Búsqueda de marca «Tintora» en USPTO antes de comprar el dominio.
 
 ## Hecho (✅)
+
+- ✅ 2026-09-21 · **Recibo digital por correo**: sale solo al crear la orden, con
+  las prendas, el total y el botón a la orden, a nombre de la tienda; se reenvía
+  desde la orden y la orden dice si salió. **Cobro por kilo**: cada tienda elige
+  kilos o libras (de fábrica, por país). Y quedó cerrado un hueco: una tabla que
+  no entraba en los respaldos ni en la limpieza del demo.
 
 - ✅ 2026-09-20 · **Dos impresoras por equipo y etiquetas de un toque**: la de
   recibos y la de etiquetas se conectan cada una en su tarjeta; las etiquetas

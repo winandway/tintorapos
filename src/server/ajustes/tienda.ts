@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { zonaValida } from "@/lib/fechas";
+import { resolverUnidadPeso, SERVICIO_POR_PESO, UNIDADES_PESO, type UnidadPeso } from "@/lib/peso";
 import { sentenciaAuditoria } from "@/server/auditoria";
 import type { Sesion } from "@/server/auth/sesiones";
 import { esquemaMoneda } from "@/server/cuentas/validaciones";
@@ -47,9 +48,16 @@ export const esquemaTienda = z.object({
    * cobran por adelantado en el mostrador.
    */
   politicaCobro: z.enum(["entrega", "recepcion"]).default("entrega"),
+  /**
+   * En qué se pesa la ropa: libras o kilos. Si no viene, se queda la que había
+   * (de fábrica sale del país: libras en EE.UU. y Puerto Rico, kilos en el resto).
+   */
+  unidadPeso: z.enum(UNIDADES_PESO).optional(),
 });
 
 export type DatosTienda = z.infer<typeof esquemaTienda>;
+/** La tienda como sale de la base: ahí la unidad de peso siempre está resuelta. */
+export type TiendaLeida = DatosTienda & { unidadPeso: UnidadPeso };
 
 interface FilaTienda {
   nombre: string;
@@ -75,6 +83,7 @@ interface FilaTienda {
 
 /** Preferencias que no tienen columna propia (ver `preferencias_tienda`). */
 export const CLAVE_POLITICA_COBRO = "politica_cobro";
+export const CLAVE_UNIDAD_PESO = "unidad_peso";
 
 async function leerPreferencia(db: D1Database, tintoreriaId: string, clave: string): Promise<string | null> {
   const f = await db
@@ -94,7 +103,20 @@ export async function politicaCobro(
     : "entrega";
 }
 
-export async function leerTienda(db: D1Database, tintoreriaId: string): Promise<DatosTienda> {
+/** Solo la unidad de peso (para las pantallas que no necesitan el resto). */
+export async function unidadPeso(db: D1Database, tintoreriaId: string): Promise<UnidadPeso> {
+  const f = await db
+    .prepare(
+      `select t.pais, p.valor from tintorerias t
+       left join preferencias_tienda p on p.tintoreria_id = t.id and p.clave = ?
+       where t.id = ?`,
+    )
+    .bind(CLAVE_UNIDAD_PESO, tintoreriaId)
+    .first<{ pais: string; valor: string | null }>();
+  return resolverUnidadPeso(f?.valor, f?.pais);
+}
+
+export async function leerTienda(db: D1Database, tintoreriaId: string): Promise<TiendaLeida> {
   const f = await db
     .prepare(
       `select nombre, telefono, correo, direccion, ciudad, estado_region, codigo_postal, pais, zona_horaria, moneda, idioma,
@@ -106,6 +128,7 @@ export async function leerTienda(db: D1Database, tintoreriaId: string): Promise<
     .first<FilaTienda>();
   if (!f) throw new Error("Tintorería inexistente");
   const politica = await leerPreferencia(db, tintoreriaId, CLAVE_POLITICA_COBRO);
+  const peso = await leerPreferencia(db, tintoreriaId, CLAVE_UNIDAD_PESO);
   return {
     nombre: f.nombre,
     telefono: f.telefono,
@@ -127,6 +150,7 @@ export async function leerTienda(db: D1Database, tintoreriaId: string): Promise<
     diasAbandono: f.dias_abandono,
     bloqueoInactividadMin: f.bloqueo_inactividad_min,
     politicaCobro: politica === "recepcion" ? "recepcion" : "entrega",
+    unidadPeso: resolverUnidadPeso(peso, f.pais),
   };
 }
 
@@ -137,19 +161,43 @@ export async function guardarTienda(
   ahora = Date.now(),
 ): Promise<void> {
   const antes = await leerTienda(db, s.tintoreria.id);
+  // Sin unidad en lo que llega, se queda la que había: nunca se cambia sola.
+  datos = { ...datos, unidadPeso: datos.unidadPeso ?? antes.unidadPeso };
+  const peso = datos.unidadPeso ?? antes.unidadPeso;
   const cambios = (Object.keys(datos) as (keyof DatosTienda)[]).filter(
     (k) => (datos[k] ?? null) !== (antes[k] ?? null),
   );
   if (!cambios.length) return;
-  await db.batch([
-    // La política de cobro vive en `preferencias_tienda`: el schema se aplica en
-    // cada publicación y no se le pueden agregar columnas a `tintorerias`.
+  const preferencia = (clave: string, valor: string) =>
     db
       .prepare(
         `insert into preferencias_tienda (tintoreria_id, clave, valor, actualizado_en) values (?, ?, ?, ?)
          on conflict (tintoreria_id, clave) do update set valor = excluded.valor, actualizado_en = excluded.actualizado_en`,
       )
-      .bind(s.tintoreria.id, CLAVE_POLITICA_COBRO, datos.politicaCobro, ahora),
+      .bind(s.tintoreria.id, clave, valor, ahora);
+  await db.batch([
+    preferencia(CLAVE_UNIDAD_PESO, peso),
+    // El servicio de fábrica cambia de nombre con la unidad («Lavado por libra» ↔
+    // «Lavado por kilo»), pero SOLO si el dueño no le puso su propio nombre.
+    ...(peso !== antes.unidadPeso
+      ? [
+          db
+            .prepare(
+              `update catalogo_servicios set nombre_es = ?, nombre_en = ?
+               where tintoreria_id = ? and unidad = 'libra' and nombre_es = ? and ifnull(nombre_en, '') = ?`,
+            )
+            .bind(
+              SERVICIO_POR_PESO[peso].es,
+              SERVICIO_POR_PESO[peso].en,
+              s.tintoreria.id,
+              SERVICIO_POR_PESO[antes.unidadPeso].es,
+              SERVICIO_POR_PESO[antes.unidadPeso].en,
+            ),
+        ]
+      : []),
+    // La política de cobro y la unidad de peso viven en `preferencias_tienda`: el
+    // schema se aplica en cada publicación y no admite columnas nuevas.
+    preferencia(CLAVE_POLITICA_COBRO, datos.politicaCobro),
     db
       .prepare(
         `update tintorerias set nombre = ?, telefono = ?, correo = ?, direccion = ?, ciudad = ?, estado_region = ?,

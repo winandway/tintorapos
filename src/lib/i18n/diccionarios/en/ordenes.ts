@@ -42,6 +42,17 @@ export const ordenes: Forma<typeof base> = {
   etiquetas: "Tags",
   recibo: "Receipt",
   interna: "Store copy",
+  enviarRecibo: "Email the receipt",
+  reciboEnviado: "Receipt sent to {correo}.",
+  reciboCorreo: {
+    titulo: "Receipt by email",
+    enviado: "Sent to {correo}",
+    pendiente: "On its way to {correo}…",
+    fallido: "Couldn't send to {correo}",
+    omitido: "Not sent: the platform's email isn't set up",
+    sinCorreo: "This customer has no email: they didn't get the digital receipt.",
+    noEnviado: "Not sent yet. Use the three dots: “Email the receipt”.",
+  },
   anular: "Void order",
   confirmarAnular: "Void order #{numero}?",
   confirmarAnularTexto:
