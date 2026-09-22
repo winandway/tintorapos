@@ -275,7 +275,7 @@ export const GUIAS_MOSTRADOR: Guia[] = [
         {
           t: "lista",
           items: [
-            "**Efectivo**: necesita la caja abierta y se suma al efectivo esperado del cierre.",
+            "**Efectivo**: necesita la caja abierta y se suma al efectivo esperado del cierre. Si la caja está cerrada, al tocar entregar se abre ahí mismo (escribes el dinero inicial del cajón) y la entrega sigue; si no tienes permiso de abrir caja, te lo dice para que la abra un cajero o gerente, o cobras con tarjeta u otro.",
             "**Tarjeta**: cobras en tu terminal de siempre y aquí registras el pago, con los últimos 4 dígitos o el número de aprobación como referencia.",
             "**Otro**: transferencias, pagos por app u otros medios.",
           ],
@@ -317,7 +317,7 @@ export const GUIAS_MOSTRADOR: Guia[] = [
         {
           t: "lista",
           items: [
-            "**Cash**: requires an open register and counts toward the expected cash at closing.",
+            "**Cash**: requires an open register and counts toward the expected cash at closing. If the register is closed, tapping hand over opens it right there (you enter the drawer's starting cash) and the pickup goes ahead; if you can't open the register, it tells you so a cashier or manager can open it, or you take card or other.",
             "**Card**: charge it on your usual terminal and record the payment here, with the last 4 digits or the approval number as the reference.",
             "**Other**: bank transfers, payment apps or any other method.",
           ],
@@ -374,7 +374,7 @@ export const GUIAS_MOSTRADOR: Guia[] = [
         {
           t: "p",
           texto:
-            "Los cambios se suben solos, en el orden en que se hicieron y sin duplicados. El indicador muestra cuántos quedan por subir.",
+            "Los cambios se suben solos, en el orden en que se hicieron y sin duplicados. El indicador muestra cuántos quedan por subir. Y suben en cuanto vuelve la conexión, no cada tanto: si el envío de un cambio se cae a mitad con internet, el sistema lo reintenta una vez y, si vuelve a fallar, lo guarda y lo sube solo enseguida.",
         },
         {
           t: "p",
@@ -427,7 +427,7 @@ export const GUIAS_MOSTRADOR: Guia[] = [
         {
           t: "p",
           texto:
-            "Changes upload on their own, in the order they were made, with no duplicates. The indicator shows how many are left.",
+            "Changes upload on their own, in the order they were made, with no duplicates. The indicator shows how many are left. And they upload as soon as the connection is back, not every so often: if sending a change fails halfway while online, the system retries once and, if it fails again, saves it and uploads it right away on its own.",
         },
         {
           t: "p",

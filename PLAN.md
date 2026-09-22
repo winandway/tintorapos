@@ -1,31 +1,33 @@
-# Plan: recibo digital por correo y cobro por kilo
+# Plan: que lo que se hace en un equipo se vea en los demás, y que nada quede «hecho» sin estarlo
 
-> Piloto automático (21 sep 2026). Richard reportó: (1) al cliente no le llega
-> el correo con su recibo digital; (2) falta cobrar por kilo (Colombia no usa
-> libras); (3) el nombre de su tienda quedó mal escrito.
->
-> Diagnóstico: el aviso «orden recibida» viene APAGADO de fábrica y, encendido,
-> es una sola línea de texto, no un recibo. El dominio sí está bien configurado
-> para enviar (DKIM, SPF del rebote y DMARC comprobados). El peso está clavado
-> en libras en todas las pantallas y en el papel.
+> Emergencia (22 sep 2026). Richard: «las actualizaciones no se están
+> actualizando; por más que damos salida y procesamos no pasa nada».
+> Comprobado en vivo con el demo: el servidor sí guarda y responde (marcar
+> «Lista» actualiza la orden, la lista y la página del cliente). Lo que falla
+> está en el celular: pantallas que no se refrescan solas, un botón de
+> entregar que se apaga sin decir por qué (y se apaga por error para quien no
+> puede abrir caja), y un modo «sin conexión» que puede dar por hecho lo que no
+> llegó. Y no hay forma de ver desde afuera qué falló en un teléfono.
 
-- [x] J1. Unidad de peso por tienda (`lb` / `kg`): preferencia `unidad_peso`, de
-      fábrica según el país (EE.UU. y Puerto Rico en libras; el resto en kilos),
-      editable en Ajustes → Tienda.
-- [x] J2. Mostrador, orden, recibo de pantalla, recibo directo (ESC/POS), editor
-      de precios y catálogo hablan en la unidad de la tienda.
-- [x] J3. Tienda nueva fuera de EE.UU.: el servicio de fábrica nace como «Lavado
-      por kilo».
-- [x] J4. Recibo digital en HTML, salido de las MISMAS líneas que el recibo de
-      papel (`lineasRecibo`), con botón para ver la orden.
-- [x] J5. El recibo por correo sale SOLO al crear la orden (encendido de fábrica,
-      con su interruptor en Ajustes → Avisos). El SMS de «recibida» sigue apagado.
-      Remitente con el nombre de la tienda y respuesta al correo de la tienda.
-- [x] J6. En la orden: «Enviar recibo por correo» y el estado del envío a la
-      vista (enviado, en cola o falló, con el porqué). En el mostrador: aviso
-      discreto si el cliente no tiene correo.
-- [x] J7. Candados y pruebas comprobadas en rojo; CANDADOS, guías de Docs
-      (avisos y precios por peso), CLAUDE.md y PENDIENTES.
-- [x] J8. `npm run verify`, punta a punta, paquete, publicar y comprobar en vivo.
-- [x] J9. Nombre de la tienda: comprobar que se puede corregir y no hay fallo;
-      dejar la pregunta del nombre exacto en el bloque final.
+- [x] K1. La página del cliente (/t/…) se actualiza sola mientras está abierta
+      (cada 30 s y al volver a la pestaña), sin recargar.
+- [x] K2. Las pantallas de la tienda (producción, entregar, órdenes, orden,
+      inicio) se refrescan al volver a la pestaña, cada minuto y después de
+      subir la cola.
+- [x] K3. Entregar: el botón NUNCA se apaga. Con efectivo y caja cerrada, abre
+      la caja ahí mismo (si puede) o explica qué hacer. El estado de la caja
+      sale de una ruta ligera que no exige el permiso de abrir caja (hoy un
+      repartidor veía «caja cerrada» aunque estuviera abierta).
+- [x] K4. Cola honesta: si el envío falla con internet, se reintenta una vez;
+      si vuelve a fallar, queda en la cola PERO la pantalla lo dice en ámbar
+      («guardado en este equipo, subiendo…»), nunca en verde; la tarjeta se
+      actualiza igual; la cola se sube de inmediato y al terminar se refrescan
+      las pantallas.
+- [x] K5. Diagnóstico: cada fallo de red o de servidor en el teléfono se
+      reporta (sin datos personales) y se ve en /datos/salud, para saber desde
+      afuera qué pasa en un equipo.
+- [x] K6. Pruebas comprobadas en rojo: reintento y cola, ruta de diagnóstico,
+      estado de caja para quien no abre caja, página del cliente en vivo.
+- [x] K7. Guías (sin conexión, entrega, página del cliente), CANDADOS B44,
+      CLAUDE.md y PENDIENTES.
+- [x] K8. verify, punta a punta, paquete, publicar y comprobar en vivo.

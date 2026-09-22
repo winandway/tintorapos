@@ -860,6 +860,65 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
   exige que cada una con `tintoreria_id` esté en las dos listas o en la lista
   corta de exentas, con su porqué. En rojo al quitar `preferencias_tienda`.
 
+### B44. «Damos salida y procesamos y no pasa nada»: lo hecho en un equipo no se veía en los demás
+
+- **Cómo se veía (22 sep 2026):** Richard, con su tienda de prueba, procesaba y
+  entregaba desde el iPhone y en el celular del cliente (Android) la página
+  seguía diciendo «Recibimos tu ropa»; en la app instalada, la orden seguía
+  «Recibida» y el botón «Entregar igual» estaba gris y no respondía.
+- **Comprobado en vivo con el demo:** el servidor SÍ guarda y responde (marcar
+  «Lista» actualizó la orden, la lista y la página del cliente). Lo que fallaba
+  estaba en el teléfono, y eran varias cosas juntas:
+  1. **La página del cliente era una foto fija.** Nunca volvía a preguntar: hasta
+     recargar, decía lo mismo.
+  2. **Las pantallas de la tienda tampoco se refrescaban solas.** Lo que hacía un
+     equipo, el otro no lo veía hasta tocar algo.
+  3. **El botón de entregar se apagaba** (`disabled`) con efectivo y caja cerrada,
+     sin más aviso que un recuadro arriba. Y se apagaba POR ERROR para quien no
+     tiene permiso de abrir caja: la pantalla preguntaba a `/datos/caja` (exige
+     `caja.abrir`), recibía 403 y lo tomaba como «cerrada».
+  4. **El modo sin conexión daba por hecho lo que no llegó.** Si el envío se caía a
+     mitad (en iOS pasa: «Load failed»), se encolaba en silencio, la pantalla decía
+     «Orden entregada» en verde, y la subida esperaba al reloj de 30 s.
+  5. **Nada de eso se veía desde afuera.** Un teléfono que no puede guardar era
+     invisible para el canario.
+- **Lo que se hizo:**
+  - `src/components/publico/estado-orden.tsx`: la página del cliente vuelve a
+    preguntar cada 30 s mientras está a la vista, y al volver a la pestaña o a la
+    app (`/datos/publico/orden/[codigo]`).
+  - `useDatos(url, { enVivo: true })`: se refresca al volver a la pestaña
+    (`visibilitychange`, `focus`, `pageshow`), cada minuto y cuando la cola termina
+    de subir (`EVENTO_SINCRONIZADO`). Lo usan producción, entregar, órdenes, la
+    orden, el mostrador (caja).
+  - `GET /datos/caja/estado` (permiso `pagos.cobrar`): `{abierta, puedeAbrir}`.
+    Entregar y mostrador lo usan; solo se da por cerrada cuando el servidor lo
+    dijo. Si no cargó, decide el servidor al cobrar (`turno_cerrado`).
+  - Entregar: el botón NUNCA se apaga. Con caja cerrada y permiso, se abre la caja
+    en un modal (fondo inicial) y la entrega sigue; sin permiso, se explica.
+  - `intentar()` en `src/lib/operaciones.ts`: con internet, si el envío se cae se
+    reintenta UNA vez; si vuelve a caer, a la cola, `sincronizar()` de inmediato y
+    respuesta marcada `enCola`. Producción y entregar lo dicen en ÁMBAR y la
+    tarjeta cambia igual. `EstadoConexion` sube en cuanto algo entra a la cola.
+  - Diagnóstico remoto: `src/lib/diagnostico.ts` manda por `sendBeacon` (camino
+    distinto a fetch) un parte sin datos personales cuando un cambio no sale o el
+    servidor lo rechaza → `POST /datos/diagnostico` (público, sin CSRF, tope por
+    IP) → `sistema.fallos_cliente` → `/datos/salud` pieza `clientes` (en rojo con
+    3 o más en 24 h; el detalle solo con `RELOJ_SECRETO`).
+- **Candados:** `tests/ui/cola-honesta.test.tsx` (reintento, cola, subida
+  inmediata, sin internet directo a la cola, error del servidor no se encola),
+  `tests/ui/publico-en-vivo.test.tsx`, `tests/integracion/diagnostico.test.ts`
+  (parte limpio, tope, canario, repartidor ve la caja), y en
+  `tests/pantallas/produccion-entrega.test.tsx` la entrega sin conexión sale en
+  ámbar y la caja cerrada se abre desde el botón. Comprobados en rojo.
+- **Cómo se comprueba en vivo:** abrir el demo en dos pestañas; marcar «Lista»
+  en una y ver que la otra (y la página del cliente) cambian solas en menos de un
+  minuto. `/datos/salud` → `clientes`.
+- **Lo que sigue sin saberse:** el motivo exacto por el que en el iPhone de
+  Richard no llegaban los cambios (no hay iPhone aquí y el simulador no está
+  instalado). Por eso el diagnóstico: la próxima vez, `/datos/salud` lo dice.
+- **NO tocar:** `intentar()` solo reintenta si el navegador no pudo ni mandar
+  (`estado 0`); un error del servidor nunca se reintenta ni se encola.
+
 ## C. Candados de publicación
 
 ### C1. El paquete que se publica es el que se prueba

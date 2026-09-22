@@ -25,4 +25,6 @@ export const publico: Forma<typeof base> = {
   noExisteTexto: "Check that the link is complete, or call the store.",
   demasiadas: "Too many lookups in a row. Wait a minute and try again.",
   gestionadoCon: "Powered by Tintora POS",
+  enVivo: "This page updates on its own.",
+  actualizada: "Updated at {hora}",
 };

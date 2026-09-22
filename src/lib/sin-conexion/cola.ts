@@ -3,9 +3,15 @@ import { nuevoId } from "@/lib/codigos";
 import { agregarOperacion, operaciones, quitarOperacion, type OperacionLocal } from "./almacen";
 
 export const EVENTO_COLA = "tintora:cola";
+/** Se dispara cuando la cola subió algo: las pantallas se refrescan con lo que el servidor ya tiene. */
+export const EVENTO_SINCRONIZADO = "tintora:sincronizado";
 
 function avisarCambio() {
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(EVENTO_COLA));
+}
+
+function avisarSubida() {
+  if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(EVENTO_SINCRONIZADO));
 }
 
 export async function encolar(
@@ -86,6 +92,7 @@ export function sincronizar(): Promise<ResultadoSincronizacion> {
     } finally {
       enCurso = null;
       avisarCambio();
+      if (r.subidas > 0) avisarSubida();
     }
     return r;
   })();

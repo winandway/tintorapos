@@ -36,15 +36,20 @@ export function EstadoConexion({ copiaLocal }: { copiaLocal: boolean }) {
     const refrescar = () => {
       if (copiaLocal && navigator.onLine) refrescarDatosSinConexion().catch(() => {});
     };
+    // En cuanto algo entra a la cola se intenta subir, sin esperar al reloj.
+    const alCambiarCola = () => {
+      void actualizar();
+      void subir().then(actualizar);
+    };
     void actualizar();
     void subir().then(refrescar);
-    window.addEventListener(EVENTO_COLA, actualizar);
+    window.addEventListener(EVENTO_COLA, alCambiarCola);
     window.addEventListener("online", subir);
     const reloj = setInterval(subir, 30_000);
     const relojCopia = setInterval(refrescar, 5 * 60_000);
     return () => {
       vivo = false;
-      window.removeEventListener(EVENTO_COLA, actualizar);
+      window.removeEventListener(EVENTO_COLA, alCambiarCola);
       window.removeEventListener("online", subir);
       clearInterval(reloj);
       clearInterval(relojCopia);

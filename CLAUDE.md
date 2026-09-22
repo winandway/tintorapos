@@ -118,6 +118,12 @@ probado en producción el 17 sep 2026 (ver `VERIFICAR-PAGOS.md`).
   desde `lineasRecibo` (`src/lib/impresion/recibo-html.ts`,
   `src/server/avisos/correo-html.ts`). Todo correo a un cliente lleva el nombre de
   la tienda como remitente y su correo como respuesta (CANDADOS B41).
+- **Pantallas en vivo y cola honesta (B44):** toda pantalla que muestre estado de
+  órdenes o caja usa `useDatos(url, { enVivo: true })`; ningún botón de acción se
+  deja `disabled` sin decir por qué (mejor tocar y explicar); una respuesta con
+  `enCola` se muestra en ámbar, nunca en verde. El estado de la caja para quien
+  cobra sale de `/datos/caja/estado`, no de `/datos/caja`. Fallos del navegador:
+  `reportarFallo` → `/datos/diagnostico` → `/datos/salud` (`clientes`).
 - **Tabla nueva con `tintoreria_id`:** va en `TABLAS_RESPALDO`, en `TABLAS_DEMO` y
   en la huella del escenario; `tests/integracion/esquema.test.ts` lo exige.
 - **Impresión:** recibo y etiquetas salen DIRECTO por la impresora conectada al

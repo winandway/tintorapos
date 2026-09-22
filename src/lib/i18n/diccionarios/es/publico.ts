@@ -22,4 +22,6 @@ export const publico = {
   noExisteTexto: "Revisa que el enlace esté completo o llama a la tienda.",
   demasiadas: "Demasiadas consultas seguidas. Espera un minuto y vuelve a intentarlo.",
   gestionadoCon: "Gestionado con Tintora POS",
+  enVivo: "Esta página se actualiza sola.",
+  actualizada: "Actualizada a las {hora}",
 };

@@ -37,7 +37,7 @@ export function ListaOrdenes({ moneda, zona, montos }: { moneda: string; zona: s
   const [antes, setAntes] = useState<number | null>(null);
   const consulta = useDeferredValue(q);
   const url = `/datos/ordenes?estado=${filtro}&q=${encodeURIComponent(consulta)}${antes ? `&antes=${antes}` : ""}`;
-  const { datos, error } = useDatos<{ ordenes: OrdenLista[] }>(url);
+  const { datos, error } = useDatos<{ ordenes: OrdenLista[] }>(url, { enVivo: true });
   const dinero = (n: number) => formatoDinero(n, moneda, idioma);
 
   return (

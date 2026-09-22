@@ -6,11 +6,14 @@ import { EtiquetaEstado } from "@/components/ordenes/etiqueta-estado";
 import { Aviso } from "@/components/ui/aviso";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo";
+import { CampoDinero } from "@/components/ui/campo-dinero";
 import { CampoEscaneo } from "@/components/ui/campo-escaneo";
 import { EncabezadoPagina } from "@/components/ui/encabezado";
+import { Modal } from "@/components/ui/modal";
 import { Ticket } from "@/components/ui/ticket";
 import { ErrorApi, pedir } from "@/lib/api";
 import { extraerCodigo, nuevoId } from "@/lib/codigos";
+import { aCentavos } from "@/lib/dinero";
 import { ahoraMs } from "@/lib/fechas";
 import { buscarOrdenLocal, datosSinConexion } from "@/lib/sin-conexion/cache";
 import { ordenVistaLocal } from "@/lib/sin-conexion/vistas";
@@ -64,8 +67,15 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
   const [referencia, setReferencia] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  const [hecha, setHecha] = useState<number | null>(null);
-  const caja = useDatos<{ turno: unknown }>("/datos/caja", { cache: true });
+  const [hecha, setHecha] = useState<{ numero: number; enCola: boolean } | null>(null);
+  const [abriendoCaja, setAbriendoCaja] = useState(false);
+  const [fondo, setFondo] = useState("");
+  const [errorCaja, setErrorCaja] = useState<string | null>(null);
+  // Estado de la caja para quien cobra, tenga o no permiso de abrirla (B44).
+  const caja = useDatos<{ abierta: boolean; puedeAbrir: boolean }>("/datos/caja/estado", {
+    cache: true,
+    enVivo: true,
+  });
   const enLinea = useEnLinea();
   const dinero = (n: number) => formatoDinero(n, moneda, idioma);
 
@@ -132,12 +142,30 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
     [abrirOrden, d],
   );
 
-  async function entregar(forzar: boolean) {
+  const noLista = orden ? orden.prendas.some((p) => p.estado !== "lista" && p.estado !== "anulada") : false;
+  const ubicaciones = orden ? [...new Set(orden.prendas.map((p) => p.ubicacion).filter(Boolean))] : [];
+  // Solo se da por cerrada cuando el servidor lo dijo: si el estado no cargó, decide el servidor al cobrar.
+  const cajaCerrada =
+    enLinea && metodo === "efectivo" && caja.datos?.abierta === false && (orden?.saldoCents ?? 0) > 0;
+
+  /**
+   * El botón de entregar NUNCA se apaga. Con efectivo y la caja cerrada, se
+   * abre la caja aquí mismo (si puede) o se explica qué hacer: un botón gris
+   * que no responde es «le doy y no pasa nada» (22 sep 2026).
+   */
+  async function entregar(forzar: boolean, cajaReciénAbierta = false) {
     if (!orden) return;
+    if (cajaCerrada && !cajaReciénAbierta) {
+      if (caja.datos?.puedeAbrir) {
+        setErrorCaja(null);
+        setAbriendoCaja(true);
+      } else setError(de.pideCaja);
+      return;
+    }
     setOcupado(true);
     setError(null);
     try {
-      await entregarOrden(orden.id, {
+      const r = await entregarOrden(orden.id, {
         ...(forzar ? { forzar: true } : {}),
         ...(orden.saldoCents > 0
           ? {
@@ -150,10 +178,19 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
             }
           : {}),
       });
-      setHecha(orden.numero);
+      setHecha({ numero: orden.numero, enCola: Boolean(r.enCola) });
       setOrden(null);
       setReferencia("");
     } catch (e) {
+      if (e instanceof ErrorApi && e.codigo === "turno_cerrado") {
+        // La pantalla creía que había caja; el servidor manda. Se ofrece abrirla.
+        caja.recargar();
+        if (caja.datos?.puedeAbrir !== false) {
+          setErrorCaja(null);
+          setAbriendoCaja(true);
+        } else setError(de.pideCaja);
+        return;
+      }
       setError(textoError(d, e));
       if (e instanceof ErrorApi && e.codigo === "estado_invalido") setError(de.noLista);
     } finally {
@@ -161,9 +198,29 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
     }
   }
 
-  const noLista = orden ? orden.prendas.some((p) => p.estado !== "lista" && p.estado !== "anulada") : false;
-  const ubicaciones = orden ? [...new Set(orden.prendas.map((p) => p.ubicacion).filter(Boolean))] : [];
-  const cajaCerrada = enLinea && metodo === "efectivo" && !caja.datos?.turno && (orden?.saldoCents ?? 0) > 0;
+  async function abrirCajaYSeguir() {
+    const cents = aCentavos(fondo || "0");
+    if (cents === null) return setErrorCaja(d.errores.monto_invalido);
+    setOcupado(true);
+    setErrorCaja(null);
+    try {
+      await pedir("/datos/caja", { cuerpo: { fondoCents: cents } });
+    } catch (e) {
+      // Si otro la abrió mientras tanto, perfecto: se sigue.
+      if (!(e instanceof ErrorApi && e.codigo === "turno_abierto")) {
+        setErrorCaja(textoError(d, e));
+        setOcupado(false);
+        return;
+      }
+    }
+    setAbriendoCaja(false);
+    setFondo("");
+    caja.setDatos({ abierta: true, puedeAbrir: true });
+    caja.recargar();
+    setOcupado(false);
+    // El cierre de arriba todavía cree que la caja está cerrada: se le dice que ya no.
+    await entregar(noLista, true);
+  }
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -174,7 +231,14 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
           {error}
         </Aviso>
       )}
-      {hecha !== null && <Aviso tono="ok" className="mt-3" titulo={fmt(de.entregada, { numero: hecha })} />}
+      {hecha !== null &&
+        (hecha.enCola ? (
+          <Aviso tono="alerta" className="mt-3">
+            {fmt(de.guardadaEnEquipo, { numero: hecha.numero })}
+          </Aviso>
+        ) : (
+          <Aviso tono="ok" className="mt-3" titulo={fmt(de.entregada, { numero: hecha.numero })} />
+        ))}
       {candidatas && (
         <section className="mt-4">
           {candidatas.length === 0 ? (
@@ -281,14 +345,7 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
             </div>
           )}
           {noLista && <Aviso tono="alerta">{de.noLista}</Aviso>}
-          <Boton
-            ancho
-            tamano="grande"
-            variante="exito"
-            cargando={ocupado}
-            disabled={cajaCerrada}
-            onClick={() => entregar(noLista)}
-          >
+          <Boton ancho tamano="grande" variante="exito" cargando={ocupado} onClick={() => entregar(noLista)}>
             {noLista
               ? de.entregarIgual
               : orden.saldoCents > 0
@@ -297,6 +354,37 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
           </Boton>
         </section>
       )}
+      <Modal
+        abierto={abriendoCaja}
+        alCerrar={() => setAbriendoCaja(false)}
+        titulo={de.cajaCerradaTitulo}
+        pie={
+          <>
+            <Boton variante="secundario" onClick={() => setAbriendoCaja(false)}>
+              {d.comun.cancelar}
+            </Boton>
+            <Boton variante="exito" cargando={ocupado} onClick={abrirCajaYSeguir}>
+              {de.abrirYSeguir}
+            </Boton>
+          </>
+        }
+      >
+        <p className="mb-4 text-[15px] text-gris">{de.cajaCerradaTexto}</p>
+        {errorCaja && (
+          <Aviso tono="error" className="mb-3">
+            {errorCaja}
+          </Aviso>
+        )}
+        <CampoDinero
+          etiqueta={d.caja.fondo}
+          moneda={moneda}
+          valor={fondo}
+          alCambiar={setFondo}
+          grande
+          placeholder="0.00"
+          autoFocus
+        />
+      </Modal>
     </div>
   );
 }

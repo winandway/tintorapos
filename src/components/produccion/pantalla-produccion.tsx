@@ -64,7 +64,10 @@ export function PantallaProduccion({ zona }: { zona: string }) {
   const [rapido, setRapido] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  const lista = useDatos<{ ordenes: OrdenLista[] }>("/datos/ordenes?estado=abiertas", { cache: true });
+  const lista = useDatos<{ ordenes: OrdenLista[] }>("/datos/ordenes?estado=abiertas", {
+    cache: true,
+    enVivo: true,
+  });
 
   const mover = useCallback(
     async (o: OrdenVista, estado: "recibida" | "en_proceso" | "lista", soloPieza: string | null) => {
@@ -75,16 +78,26 @@ export function PantallaProduccion({ zona }: { zona: string }) {
           ...(soloPieza ? { prendaIds: [soloPieza] } : {}),
           ...(ubicacion.trim() ? { ubicacion: ubicacion.trim() } : {}),
         });
-        avisar(
-          fmt(dp.movida, {
-            numero: o.numero,
-            estado: d.ordenes.estados[r.estadoNuevo as keyof typeof d.ordenes.estados] ?? r.estadoNuevo,
-          }),
-        );
+        const textoEstado =
+          d.ordenes.estados[r.estadoNuevo as keyof typeof d.ordenes.estados] ?? r.estadoNuevo;
         if (r.enCola) {
+          // No llegó al servidor: se dice en ámbar, nunca en verde, y la tarjeta
+          // cambia igual para que se vea que el toque sí se registró.
+          avisar(fmt(dp.guardadoEnEquipo, { numero: o.numero, estado: textoEstado }), "alerta");
           const local = ordenVistaLocal(await datosSinConexion(), o.id, zona, ahoraMs());
-          if (local) setOrden(local);
+          setOrden(
+            local ?? {
+              ...o,
+              estado: r.estadoNuevo,
+              prendas: o.prendas.map((p) =>
+                !soloPieza || p.id === soloPieza
+                  ? { ...p, estado, ubicacion: ubicacion.trim() || p.ubicacion }
+                  : p,
+              ),
+            },
+          );
         } else {
+          avisar(fmt(dp.movida, { numero: o.numero, estado: textoEstado }));
           const fresca = await pedir<{ orden: OrdenVista }>(`/datos/ordenes/${o.id}`);
           setOrden(fresca.orden);
         }
@@ -95,7 +108,7 @@ export function PantallaProduccion({ zona }: { zona: string }) {
         setOcupado(false);
       }
     },
-    [ubicacion, avisar, dp.movida, d, lista, zona],
+    [ubicacion, avisar, dp.movida, dp.guardadoEnEquipo, d, lista, zona],
   );
 
   const leer = useCallback(

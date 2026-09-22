@@ -2,6 +2,7 @@ import type { Variables } from "@/env";
 import { faltantesProduccion } from "@/env";
 import { twilioConfigurado } from "@/server/avisos/twilio";
 import { CLAVE_ULTIMO_CORREO, correoConfigurado } from "@/server/correo";
+import { FALLOS_PARA_ALARMA, leerFallosCliente, resumirFallos } from "@/server/diagnostico";
 import { leerSistema } from "@/server/sistema";
 
 export type EstadoPieza = "ok" | "error" | "no_configurado";
@@ -107,6 +108,22 @@ export async function revisarSalud(env: CloudflareEnv, vars: Variables, ahora = 
       (fallidos?.n ?? 0) > 20
         ? { estado: "error", detalle: `${fallidos?.n} avisos fallidos en 24 h` }
         : { estado: "ok" };
+
+    // Lo que falló EN LOS TELÉFONOS (cambios que no salieron o que el servidor
+    // rechazó): sin esto, un mostrador que no puede guardar es invisible desde aquí.
+    const fallos = resumirFallos(await leerFallosCliente(env.DB, ahora));
+    piezas.clientes =
+      fallos.cantidad >= FALLOS_PARA_ALARMA
+        ? {
+            estado: "error",
+            detalle: `${fallos.cantidad} en 24 h: ${fallos.ultimos.join(" | ")}`.slice(0, 900),
+          }
+        : fallos.cantidad > 0
+          ? {
+              estado: "ok",
+              detalle: `${fallos.cantidad} en 24 h: ${fallos.ultimos.join(" | ")}`.slice(0, 900),
+            }
+          : { estado: "ok" };
   }
   const estado = Object.values(piezas).some((p) => p.estado === "error") ? "error" : "ok";
   return { estado, piezas, revisadoEn: ahora };

@@ -14,7 +14,7 @@ import { PantallaProduccion } from "@/components/produccion/pantalla-produccion"
 import { borrarTodo } from "@/lib/sin-conexion/almacen";
 import { refrescarDatosSinConexion } from "@/lib/sin-conexion/cache";
 import { sincronizar } from "@/lib/sin-conexion/cola";
-import { abrirTurno } from "@/server/caja";
+import { abrirTurno, cerrarTurno } from "@/server/caja";
 import { cambiarEstado } from "@/server/ordenes/estados";
 import { crearEntorno, type EntornoPrueba } from "../ayuda/entorno";
 import { crearDispositivo } from "../ayuda/fabrica";
@@ -136,7 +136,7 @@ describe("producción y entrega (contra el servidor real)", () => {
     expect(await screen.findByText(`Orden #${incompleta.numero} entregada`)).toBeInTheDocument();
   });
 
-  it("entrega sin conexión: busca en la copia local y entrega; se sube al volver", async () => {
+  it("entrega sin conexión: busca en la copia local y entrega; lo dice en ámbar, no en verde; se sube al volver", async () => {
     const u = userEvent.setup();
     const orden = await esc.nuevaOrden();
     await cambiarEstado(e.env.DB, esc.sesion, orden.id, { estado: "lista" });
@@ -145,9 +145,41 @@ describe("producción y entrega (contra el servidor real)", () => {
     puente.sinConexion(true);
     await escanear(u, de.buscar, String(orden.numero));
     await u.click(await screen.findByRole("button", { name: "Cobrar $12.50 y entregar" }));
-    expect(await screen.findByText(`Orden #${orden.numero} entregada`)).toBeInTheDocument();
+    // CANDADO B44: lo que no llegó al servidor no se da por hecho.
+    expect(
+      await screen.findByText((t) =>
+        t.startsWith(`La orden #${orden.numero} quedó registrada como entregada en este equipo`),
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(`Orden #${orden.numero} entregada`)).not.toBeInTheDocument();
+    expect(await estadoDe(orden.id)).toBe("lista");
     puente.sinConexion(false);
     await sincronizar();
     expect(await estadoDe(orden.id)).toBe("entregada");
+  });
+
+  it("entrega con efectivo y la caja cerrada: el botón no se apaga, abre la caja ahí mismo y entrega", async () => {
+    const u = userEvent.setup();
+    await cerrarTurno(e.env.DB, esc.sesion, 0, null);
+    const orden = await esc.nuevaOrden();
+    await cambiarEstado(e.env.DB, esc.sesion, orden.id, { estado: "lista" });
+    montar(<PantallaEntrega moneda="USD" zona={ZONA} />);
+    await escanear(u, de.buscar, String(orden.numero));
+    expect(await screen.findByText(d.mostrador.cajaCerrada, { exact: false })).toBeInTheDocument();
+    const boton = await screen.findByRole("button", { name: "Cobrar $12.50 y entregar" });
+    expect(boton).toBeEnabled();
+    await u.click(boton);
+    const modal = await screen.findByRole("dialog");
+    expect(within(modal).getByText(de.cajaCerradaTitulo)).toBeInTheDocument();
+    await u.type(within(modal).getByLabelText(d.caja.fondo), "20");
+    await u.click(within(modal).getByRole("button", { name: de.abrirYSeguir }));
+    expect(await screen.findByText(`Orden #${orden.numero} entregada`)).toBeInTheDocument();
+    expect(await estadoDe(orden.id)).toBe("entregada");
+    const turno = await e.env.DB.prepare(
+      "select fondo_cents from turnos_caja where tintoreria_id = ? and estado = 'abierto'",
+    )
+      .bind(esc.tintoreriaId)
+      .first<{ fondo_cents: number }>();
+    expect(turno?.fondo_cents).toBe(2000);
   });
 });

@@ -58,6 +58,12 @@ repite la lista 👤 al final de cada respuesta hasta que se resuelva.
 
 ## Hecho (✅)
 
+- ✅ 2026-09-22 · **Lo que se hace en un equipo se ve en los demás**: la página
+  del cliente y las pantallas de la tienda se actualizan solas; el botón de
+  entregar ya no se apaga (abre la caja ahí mismo); lo que no llegó al servidor
+  se dice en ámbar y se sube de inmediato; y los fallos de los teléfonos se ven
+  en `/datos/salud`.
+
 - ✅ 2026-09-21 · **Recibo digital por correo**: sale solo al crear la orden, con
   las prendas, el total y el botón a la orden, a nombre de la tienda; se reenvía
   desde la orden y la orden dice si salió. **Cobro por kilo**: cada tienda elige

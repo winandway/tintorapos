@@ -21,4 +21,7 @@ export const produccion = {
   piezasListas: "{listas} de {total} listas",
   ultimaEscaneada: "Última escaneada",
   urgente: "Urgente",
+  guardadoEnEquipo:
+    "#{numero}: {estado}. Guardado en este equipo; todavía no llegó al sistema. Se está subiendo solo.",
+  actualizadoEnVivo: "Se actualiza sola",
 };

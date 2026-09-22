@@ -239,6 +239,12 @@ export const COBERTURA: Record<string, Cobertura> = {
       { metodo: "POST", cuerpo: { fondoCents: 1 }, esperado: [200, 409] },
     ],
   },
+  // Quien cobra (aunque no pueda abrir caja) sabe si hay caja abierta; B solo ve la suya.
+  "/datos/caja/estado": { casos: () => [{ metodo: "GET", esperado: [200] }] },
+  // Parte de fallo de un teléfono: público, sin sesión y sin nada personal (ver diagnostico.test.ts).
+  "/datos/diagnostico": {
+    publica: "parte anónimo de fallos del navegador; no lee ni escribe datos de tiendas",
+  },
   "/datos/caja/movimientos": {
     casos: () => [
       { metodo: "POST", cuerpo: { tipo: "entrada", montoCents: 1, motivo: "prueba" }, esperado: [200, 409] },

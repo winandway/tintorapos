@@ -14,4 +14,12 @@ export const entrega = {
   otra: "Entregar otra",
   metodo: "Método de pago",
   ubicaciones: "Buscar en: {ubicaciones}",
+  cajaCerradaTitulo: "Abre la caja para cobrar en efectivo",
+  cajaCerradaTexto:
+    "Escribe el dinero con el que empieza el cajón (puede ser 0). La caja queda abierta y la entrega sigue.",
+  abrirYSeguir: "Abrir caja y entregar",
+  pideCaja:
+    "No tienes permiso para abrir la caja. Pídele a un cajero o gerente que la abra, o cobra con tarjeta u otro.",
+  guardadaEnEquipo:
+    "La orden #{numero} quedó registrada como entregada en este equipo, pero todavía no llegó al sistema. Se está subiendo sola; mira el aviso de arriba. Si en un minuto sigue ahí, revisa el internet.",
 };

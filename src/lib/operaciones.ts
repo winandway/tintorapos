@@ -8,7 +8,7 @@
 import { ErrorApi, pedir } from "./api";
 import type { OperacionLocal } from "./sin-conexion/almacen";
 import { actualizarLocal } from "./sin-conexion/cache";
-import { encolar } from "./sin-conexion/cola";
+import { encolar, sincronizar } from "./sin-conexion/cola";
 
 export interface RespuestaOrden {
   id: string;
@@ -30,22 +30,38 @@ function sinRed(e: unknown): boolean {
   return e instanceof ErrorApi && e.sinConexion;
 }
 
+const enLinea = () => typeof navigator === "undefined" || navigator.onLine !== false;
+
+/**
+ * Se manda; si el navegador no pudo ni mandar, se reintenta UNA vez (en el
+ * celular un envío se cae a mitad y el siguiente sale). Si tampoco, queda en la
+ * cola del equipo, se dispara la subida enseguida y se devuelve la respuesta
+ * optimista marcada con `enCola`: la pantalla tiene que decirlo, nunca darlo por
+ * hecho. Con el internet apagado no se insiste: directo a la cola.
+ */
 async function intentar<T>(
   llamar: () => Promise<T>,
   op: Omit<OperacionLocal, "id" | "creadoEn">,
   optimista: () => T | Promise<T>,
 ): Promise<T> {
-  if (typeof navigator !== "undefined" && navigator.onLine === false) {
-    await encolar(op);
-    return optimista();
+  if (enLinea()) {
+    try {
+      return await llamar();
+    } catch (e) {
+      if (!sinRed(e)) throw e;
+      if (enLinea()) {
+        try {
+          return await llamar();
+        } catch (e2) {
+          if (!sinRed(e2)) throw e2;
+        }
+      }
+    }
   }
-  try {
-    return await llamar();
-  } catch (e) {
-    if (!sinRed(e)) throw e;
-    await encolar(op);
-    return optimista();
-  }
+  await encolar(op);
+  // Si hay internet, que suba ya: no se espera al reloj de 30 segundos.
+  if (enLinea()) void sincronizar().catch(() => {});
+  return optimista();
 }
 
 export async function crearOrden(

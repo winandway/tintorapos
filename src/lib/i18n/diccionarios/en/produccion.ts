@@ -24,4 +24,7 @@ export const produccion: Forma<typeof base> = {
   piezasListas: "{listas} of {total} ready",
   ultimaEscaneada: "Last scanned",
   urgente: "Rush",
+  guardadoEnEquipo:
+    "#{numero}: {estado}. Saved on this device; it hasn't reached the system yet. It's uploading on its own.",
+  actualizadoEnVivo: "Updates on its own",
 };

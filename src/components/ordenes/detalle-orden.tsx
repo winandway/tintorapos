@@ -114,7 +114,7 @@ export function DetalleOrden({
   const { d, idioma } = useIdioma();
   const dor = d.ordenes;
   const avisar = useAvisar();
-  const { datos, error, recargar } = useDatos<{ orden: Orden }>(`/datos/ordenes/${id}`);
+  const { datos, error, recargar } = useDatos<{ orden: Orden }>(`/datos/ordenes/${id}`, { enVivo: true });
   const { ejecutar, modal } = useConAutorizacion();
   const [cobrando, setCobrando] = useState(false);
   const [motivo, setMotivo] = useState<Motivo>(null);

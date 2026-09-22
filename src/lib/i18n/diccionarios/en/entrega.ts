@@ -17,4 +17,11 @@ export const entrega: Forma<typeof base> = {
   otra: "Next pickup",
   metodo: "Payment method",
   ubicaciones: "Look in: {ubicaciones}",
+  cajaCerradaTitulo: "Open the register to take cash",
+  cajaCerradaTexto:
+    "Enter the cash the drawer starts with (0 is fine). The register opens and the pickup goes ahead.",
+  abrirYSeguir: "Open register and hand over",
+  pideCaja: "You can't open the register. Ask a cashier or manager to open it, or take card or other.",
+  guardadaEnEquipo:
+    "Order #{numero} was recorded as picked up on this device, but it hasn't reached the system yet. It's uploading on its own; check the notice at the top. If it's still there after a minute, check the internet.",
 };

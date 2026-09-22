@@ -73,7 +73,11 @@ export function Mostrador({
   const { d, idioma } = useIdioma();
   const dm = d.mostrador;
   const { datos: cat, error: errorCat } = useDatos<Catalogo>("/datos/catalogo", { cache: true });
-  const caja = useDatos<{ turno: unknown }>("/datos/caja", { cache: true });
+  // El estado de la caja para quien cobra, tenga o no permiso de abrirla (B44).
+  const caja = useDatos<{ abierta: boolean; puedeAbrir: boolean }>("/datos/caja/estado", {
+    cache: true,
+    enVivo: true,
+  });
   const [cliente, setCliente] = useState<ClienteElegido | null>(null);
   const [carrito, despachar] = useReducer(reducirCarrito, undefined, carritoVacio);
   const [servicioId, setServicioId] = useState<string>("");
@@ -145,7 +149,8 @@ export function Mostrador({
     );
   const enLinea = useEnLinea();
   // Sin conexión el efectivo se acepta igual: se registra al sincronizar.
-  const cajaAbierta = Boolean(caja.datos?.turno) || !enLinea;
+  // Solo se da por cerrada cuando el servidor lo dijo; si no cargó, decide el servidor al cobrar.
+  const cajaAbierta = caja.datos?.abierta !== false || !enLinea;
 
   const montoCobro =
     modoPago === "completo" ? totales.totalCents : modoPago === "abono" ? (aCentavos(abono) ?? 0) : 0;
