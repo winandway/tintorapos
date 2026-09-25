@@ -9,12 +9,21 @@ type Manejador = (
   extra?: { params: Promise<Record<string, string | string[]>> },
 ) => Promise<Response>;
 
+/**
+ * Cada navegador de prueba es un visitante distinto (su propia IP). Antes la IP
+ * salía al azar entre 250 y de vez en cuando dos navegadores coincidían: los
+ * límites por IP (5 registros por hora) se sumaban y una prueba fallaba sola.
+ * Ahora es un contador: 500 direcciones distintas por archivo, en orden.
+ */
+let siguienteIp = 0;
+function ipNueva(): string {
+  const n = siguienteIp++ % 500;
+  return n < 250 ? `203.0.113.${n + 1}` : `198.51.100.${n - 250 + 1}`;
+}
+
 export class Navegador {
   cookies = new Map<string, string>([["tp_csrf", "csrf-de-prueba-0123456789"]]);
-  /** Cada navegador de prueba es un visitante distinto (su propia IP). */
-  cabecerasExtra: Record<string, string> = {
-    "cf-connecting-ip": `203.0.113.${Math.floor(Math.random() * 250) + 1}`,
-  };
+  cabecerasExtra: Record<string, string> = { "cf-connecting-ip": ipNueva() };
 
   cabeceraCookie(): string {
     return [...this.cookies].map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join("; ");

@@ -27,6 +27,7 @@ interface OrdenVista {
   dia: number;
   fechaPromesa: number;
   atrasada: boolean;
+  entregadaEn?: number | null;
   cliente: { nombre: string };
   prendas: {
     id: string;
@@ -146,6 +147,8 @@ export function PantallaProduccion({ zona }: { zona: string }) {
 
   const nombre = (es: string, en: string | null) => textoBilingue(idioma, es, en);
   const columnas = ["recibida", "en_proceso", "lista"] as const;
+  // Una orden entregada o anulada no se mueve: se dice, en vez de dejar botones que fallan.
+  const cerrada = orden && (["entregada", "anulada", "abandonada"] as const).find((x) => x === orden.estado);
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -194,25 +197,34 @@ export function PantallaProduccion({ zona }: { zona: string }) {
                   →
                 </Link>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="self-center text-[13px] font-semibold text-gris">{dp.todaLaOrden}:</span>
-                <Boton
-                  tamano="chico"
-                  variante="secundario"
-                  disabled={ocupado}
-                  onClick={() => mover(orden, "en_proceso", null)}
-                >
-                  {dp.enProceso}
-                </Boton>
-                <Boton
-                  tamano="chico"
-                  variante="exito"
-                  disabled={ocupado}
-                  onClick={() => mover(orden, "lista", null)}
-                >
-                  {dp.lista}
-                </Boton>
-              </div>
+              {cerrada && (
+                <Aviso tono="info" className="mt-3">
+                  {fmt(dp.cerrada[cerrada], {
+                    fecha: orden.entregadaEn ? formatoFecha(orden.entregadaEn, idioma, zona) : "",
+                  })}
+                </Aviso>
+              )}
+              {!cerrada && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="self-center text-[13px] font-semibold text-gris">{dp.todaLaOrden}:</span>
+                  <Boton
+                    tamano="chico"
+                    variante="secundario"
+                    disabled={ocupado}
+                    onClick={() => mover(orden, "en_proceso", null)}
+                  >
+                    {dp.enProceso}
+                  </Boton>
+                  <Boton
+                    tamano="chico"
+                    variante="exito"
+                    disabled={ocupado}
+                    onClick={() => mover(orden, "lista", null)}
+                  >
+                    {dp.lista}
+                  </Boton>
+                </div>
+              )}
               <ul className="mt-3 divide-y divide-percha/60">
                 {orden.prendas.map((p) => (
                   <li
@@ -230,17 +242,20 @@ export function PantallaProduccion({ zona }: { zona: string }) {
                       {p.notas && <span className="block truncate text-[12px] text-alerta">⚠ {p.notas}</span>}
                     </span>
                     <EtiquetaEstado estado={p.estado} />
-                    {p.estado !== "lista" && p.estado !== "entregada" && p.estado !== "anulada" && (
-                      <Boton
-                        tamano="chico"
-                        variante="exito"
-                        disabled={ocupado}
-                        onClick={() => mover(orden, "lista", p.id)}
-                        aria-label={`${dp.lista}: ${nombre(p.prendaEs, p.prendaEn)}`}
-                      >
-                        ✓
-                      </Boton>
-                    )}
+                    {!cerrada &&
+                      p.estado !== "lista" &&
+                      p.estado !== "entregada" &&
+                      p.estado !== "anulada" && (
+                        <Boton
+                          tamano="chico"
+                          variante="exito"
+                          disabled={ocupado}
+                          onClick={() => mover(orden, "lista", p.id)}
+                          aria-label={`${dp.lista}: ${nombre(p.prendaEs, p.prendaEn)}`}
+                        >
+                          ✓
+                        </Boton>
+                      )}
                   </li>
                 ))}
               </ul>

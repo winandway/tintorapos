@@ -24,6 +24,11 @@ export const produccion: Forma<typeof base> = {
   piezasListas: "{listas} of {total} ready",
   ultimaEscaneada: "Last scanned",
   urgente: "Rush",
+  cerrada: {
+    entregada: "This order was already picked up on {fecha}: its items no longer move.",
+    anulada: "This order was voided: its items no longer move.",
+    abandonada: "This order was marked abandoned: its items no longer move.",
+  },
   guardadoEnEquipo:
     "#{numero}: {estado}. Saved on this device; it hasn't reached the system yet. It's uploading on its own.",
   actualizadoEnVivo: "Updates on its own",

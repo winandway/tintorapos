@@ -158,6 +158,35 @@ describe("producción y entrega (contra el servidor real)", () => {
     expect(await estadoDe(orden.id)).toBe("entregada");
   });
 
+  it("una orden ya entregada: al volver a escanearla, Entregar y Producción lo dicen claro y no ofrecen botones", async () => {
+    const u = userEvent.setup();
+    const orden = await esc.nuevaOrden();
+    await cambiarEstado(e.env.DB, esc.sesion, orden.id, { estado: "lista" });
+    const codigo = (await e.env.DB.prepare("select codigo_publico from ordenes where id = ?")
+      .bind(orden.id)
+      .first<{ codigo_publico: string }>())!.codigo_publico;
+    const { entregarOrden } = await import("@/server/ordenes/acciones");
+    await entregarOrden(e.env.DB, esc.sesion, orden.id, {
+      pago: { id: crypto.randomUUID(), metodo: "tarjeta_externa", montoCents: 1250 },
+    });
+
+    const vista = montar(<PantallaEntrega moneda="USD" zona={ZONA} />);
+    // Lo que manda el lector al escanear el QR del recibo: la dirección completa.
+    await escanear(u, de.buscar, `https://tintorapos.com/t/${codigo}`);
+    expect(
+      await screen.findByText((t) => t.startsWith("Esta orden ya fue entregada el")),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Entregar|entregar/ })).not.toBeInTheDocument();
+    vista.unmount();
+
+    montar(<PantallaProduccion zona={ZONA} />);
+    await escanear(u, dp.escanearPlaceholder, `https://tintorapos.com/t/${codigo}`);
+    expect(
+      await screen.findByText((t) => t.startsWith("Esta orden ya fue entregada el")),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: dp.lista })).not.toBeInTheDocument();
+  });
+
   it("entrega con efectivo y la caja cerrada: el botón no se apaga, abre la caja ahí mismo y entrega", async () => {
     const u = userEvent.setup();
     await cerrarTurno(e.env.DB, esc.sesion, 0, null);

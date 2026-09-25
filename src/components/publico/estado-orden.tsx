@@ -8,6 +8,8 @@ import type { OrdenPublica } from "@/server/publico/orden";
 const PASOS = ["recibida", "en_proceso", "lista", "entregada"] as const;
 /** Cada cuánto se vuelve a preguntar mientras la página está a la vista. */
 export const INTERVALO_PUBLICO_MS = 30_000;
+/** Al abrirse, una primera consulta enseguida: el HTML puede venir de un caché del navegador. */
+export const PRIMERA_CONSULTA_MS = 1_500;
 
 /**
  * Lo que ve el cliente, y se mantiene al día solo: vuelve a preguntar por la
@@ -57,8 +59,10 @@ export function EstadoOrdenEnVivo({
     window.addEventListener("focus", alVolver);
     window.addEventListener("pageshow", alVolver);
     const reloj = setInterval(pedir, INTERVALO_PUBLICO_MS);
+    const primera = setTimeout(pedir, PRIMERA_CONSULTA_MS);
     return () => {
       vivo = false;
+      clearTimeout(primera);
       document.removeEventListener("visibilitychange", alVolver);
       window.removeEventListener("focus", alVolver);
       window.removeEventListener("pageshow", alVolver);

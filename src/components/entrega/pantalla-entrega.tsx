@@ -46,6 +46,7 @@ interface Orden {
   totalCents: number;
   saldoCents: number;
   fechaPromesa: number;
+  entregadaEn?: number | null;
   cliente: { nombre: string; apellido: string | null };
   prendas: {
     id: string;
@@ -143,6 +144,8 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
   );
 
   const noLista = orden ? orden.prendas.some((p) => p.estado !== "lista" && p.estado !== "anulada") : false;
+  // Una orden que ya se entregó (o se anuló) no tiene botón: se dice qué pasó y cuándo.
+  const cerrada = orden && (["entregada", "anulada", "abandonada"] as const).find((x) => x === orden.estado);
   const ubicaciones = orden ? [...new Set(orden.prendas.map((p) => p.ubicacion).filter(Boolean))] : [];
   // Solo se da por cerrada cuando el servidor lo dijo: si el estado no cargó, decide el servidor al cobrar.
   const cajaCerrada =
@@ -306,7 +309,14 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
             <p className="text-[13px]">{orden.saldoCents > 0 ? de.saldo : de.pagada}</p>
             <p className="numero-ticket text-5xl">{dinero(orden.saldoCents)}</p>
           </div>
-          {orden.saldoCents > 0 && (
+          {cerrada && (
+            <Aviso tono="info" className="text-[15px]">
+              {fmt(de.cerrada[cerrada], {
+                fecha: orden.entregadaEn ? formatoFecha(orden.entregadaEn, idioma, zona) : "",
+              })}
+            </Aviso>
+          )}
+          {!cerrada && orden.saldoCents > 0 && (
             <div className="space-y-3">
               <div
                 className="grid grid-cols-3 gap-1 rounded-2xl bg-papel p-1"
@@ -344,14 +354,22 @@ export function PantallaEntrega({ moneda, zona }: { moneda: string; zona: string
               )}
             </div>
           )}
-          {noLista && <Aviso tono="alerta">{de.noLista}</Aviso>}
-          <Boton ancho tamano="grande" variante="exito" cargando={ocupado} onClick={() => entregar(noLista)}>
-            {noLista
-              ? de.entregarIgual
-              : orden.saldoCents > 0
-                ? fmt(de.cobrarYEntregar, { monto: dinero(orden.saldoCents) })
-                : de.entregar}
-          </Boton>
+          {!cerrada && noLista && <Aviso tono="alerta">{de.noLista}</Aviso>}
+          {!cerrada && (
+            <Boton
+              ancho
+              tamano="grande"
+              variante="exito"
+              cargando={ocupado}
+              onClick={() => entregar(noLista)}
+            >
+              {noLista
+                ? de.entregarIgual
+                : orden.saldoCents > 0
+                  ? fmt(de.cobrarYEntregar, { monto: dinero(orden.saldoCents) })
+                  : de.entregar}
+            </Boton>
+          )}
         </section>
       )}
       <Modal

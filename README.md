@@ -69,6 +69,13 @@ cd "/Users/windocellc/Software-Tintora POS" && npm run demo:local && node script
 Salen en 2x; se pasan a webp a la mitad (ver el encabezado de `scripts/capturas.mjs`)
 y se describen en `src/lib/contenido/capturas.ts`.
 
+Cuando alguien diga que en un iPhone «no pasa nada», el recorrido completo se
+reproduce en el motor de Safari (WebKit) contra el sitio en vivo, con el demo:
+
+```bash
+cd "/Users/windocellc/Software-Tintora POS" && npx playwright install webkit && node scripts/repro-webkit.mjs
+```
+
 Las etiquetas para impresoras Zebra se comprueban contra un emulador público (no
 entra en `verify` porque le pega a un servicio de afuera):
 

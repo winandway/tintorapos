@@ -160,6 +160,10 @@ export function saludPublica(s: Salud): Salud {
   return {
     estado: s.estado,
     revisadoEn: s.revisadoEn,
-    piezas: Object.fromEntries(Object.entries(s.piezas).map(([k, p]) => [k, { estado: p.estado }])),
+    // Los fallos de los teléfonos sí se enseñan completos: no llevan datos
+    // personales ni secretos, y son lo que hace falta para ayudar a una tienda.
+    piezas: Object.fromEntries(
+      Object.entries(s.piezas).map(([k, p]) => [k, k === "clientes" ? p : { estado: p.estado }]),
+    ),
   };
 }

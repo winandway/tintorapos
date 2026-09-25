@@ -66,12 +66,12 @@ describe("la página del cliente se actualiza sola", () => {
     expect(screen.getByTestId("piezas-publico")).toHaveTextContent("2 de 2 prendas listas");
     expect(screen.getByTestId("publico-en-vivo")).toHaveTextContent("Esta página se actualiza sola.");
 
-    // Y sin tocar nada, al pasar el intervalo.
+    // Y sin tocar nada: una primera consulta poco después de abrirse y otra al pasar el intervalo.
     respuesta = { ...BASE, estado: "entregada", listas: 2 };
     await act(async () => {
       await vi.advanceTimersByTimeAsync(INTERVALO_PUBLICO_MS + 10);
     });
-    expect(llamadas).toBe(2);
+    expect(llamadas).toBe(3);
     expect(screen.getByTestId("estado-publico")).toHaveTextContent("Ya recogiste esta orden.");
     expect(String((fetch as unknown as { mock: { calls: unknown[][] } }).mock.calls[0]![0])).toBe(
       "/datos/publico/orden/QN9MS26YSQP1ABCDEFGH",

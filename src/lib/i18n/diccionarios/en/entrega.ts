@@ -22,6 +22,11 @@ export const entrega: Forma<typeof base> = {
     "Enter the cash the drawer starts with (0 is fine). The register opens and the pickup goes ahead.",
   abrirYSeguir: "Open register and hand over",
   pideCaja: "You can't open the register. Ask a cashier or manager to open it, or take card or other.",
+  cerrada: {
+    entregada: "This order was already picked up on {fecha}. There's nothing left to do with it.",
+    anulada: "This order was voided. It can't be handed over.",
+    abandonada: "This order was marked abandoned. If the customer came for it, open it from Orders.",
+  },
   guardadaEnEquipo:
     "Order #{numero} was recorded as picked up on this device, but it hasn't reached the system yet. It's uploading on its own; check the notice at the top. If it's still there after a minute, check the internet.",
 };

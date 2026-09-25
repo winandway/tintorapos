@@ -904,6 +904,19 @@ publica y le corre las pruebas de punta a punta en celular y escritorio.
     servidor lo rechaza → `POST /datos/diagnostico` (público, sin CSRF, tope por
     IP) → `sistema.fallos_cliente` → `/datos/salud` pieza `clientes` (en rojo con
     3 o más en 24 h; el detalle solo con `RELOJ_SECRETO`).
+  - **Revisión a fondo del 25 sep 2026** (Richard: «le dimos salida, lo volvimos a
+    escanear y los pasos no se completaron»): se reprodujo TODO el recorrido en el
+    motor de Safari (WebKit, iPhone emulado) contra el sitio en vivo con el demo:
+    marcar lista → el servidor queda `lista`; entregar → `entregada`, cola 0; la
+    página del cliente → «Ya recogiste esta orden», 4 pasos. Funciona. Lo que sí
+    estaba mal y se corrigió: al volver a escanear una orden YA entregada, Entregar
+    y Producción enseñaban la tarjeta con botones que fallaban (409); ahora dicen
+    «Esta orden ya fue entregada el <fecha>» y no ofrecen botones. La página del
+    cliente además consulta una vez 1,5 s después de abrirse (por si el HTML venía
+    de un caché del navegador). Y el detalle de `clientes` en `/datos/salud` es
+    público (no lleva nada personal): así se ve desde afuera qué falla en un
+    teléfono. Guion de la reproducción: se corre con
+    `node scripts/repro-webkit.mjs` (necesita `npx playwright install webkit`).
 - **Candados:** `tests/ui/cola-honesta.test.tsx` (reintento, cola, subida
   inmediata, sin internet directo a la cola, error del servidor no se encola),
   `tests/ui/publico-en-vivo.test.tsx`, `tests/integracion/diagnostico.test.ts`

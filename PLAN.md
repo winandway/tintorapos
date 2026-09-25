@@ -31,3 +31,7 @@
 - [x] K7. Guías (sin conexión, entrega, página del cliente), CANDADOS B44,
       CLAUDE.md y PENDIENTES.
 - [x] K8. verify, punta a punta, paquete, publicar y comprobar en vivo.
+- [x] K9. Revisión a fondo (25 sep): recorrido completo reproducido en WebKit
+      (Safari) contra el sitio en vivo; orden ya entregada se dice claro al
+      volver a escanearla; página del cliente consulta al abrirse; detalle de
+      fallos de teléfonos público en /datos/salud; guion en scripts/repro-webkit.mjs.

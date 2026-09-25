@@ -21,6 +21,11 @@ export const produccion = {
   piezasListas: "{listas} de {total} listas",
   ultimaEscaneada: "Última escaneada",
   urgente: "Urgente",
+  cerrada: {
+    entregada: "Esta orden ya fue entregada el {fecha}: sus prendas ya no se mueven.",
+    anulada: "Esta orden fue anulada: sus prendas ya no se mueven.",
+    abandonada: "Esta orden se marcó como abandonada: sus prendas ya no se mueven.",
+  },
   guardadoEnEquipo:
     "#{numero}: {estado}. Guardado en este equipo; todavía no llegó al sistema. Se está subiendo solo.",
   actualizadoEnVivo: "Se actualiza sola",

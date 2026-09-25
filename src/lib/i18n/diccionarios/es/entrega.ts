@@ -20,6 +20,11 @@ export const entrega = {
   abrirYSeguir: "Abrir caja y entregar",
   pideCaja:
     "No tienes permiso para abrir la caja. Pídele a un cajero o gerente que la abra, o cobra con tarjeta u otro.",
+  cerrada: {
+    entregada: "Esta orden ya fue entregada el {fecha}. No hay nada más que hacer con ella.",
+    anulada: "Esta orden fue anulada. No se puede entregar.",
+    abandonada: "Esta orden se marcó como abandonada. Si el cliente vino por ella, ábrela desde Órdenes.",
+  },
   guardadaEnEquipo:
     "La orden #{numero} quedó registrada como entregada en este equipo, pero todavía no llegó al sistema. Se está subiendo sola; mira el aviso de arriba. Si en un minuto sigue ahí, revisa el internet.",
 };
