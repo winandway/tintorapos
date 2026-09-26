@@ -25,7 +25,7 @@ export const produccion: Forma<typeof base> = {
   ultimaEscaneada: "Last scanned",
   urgente: "Rush",
   cerrada: {
-    entregada: "This order was already picked up on {fecha}: its items no longer move.",
+    entregada: "This order was already picked up ({fecha}): its items no longer move.",
     anulada: "This order was voided: its items no longer move.",
     abandonada: "This order was marked abandoned: its items no longer move.",
   },

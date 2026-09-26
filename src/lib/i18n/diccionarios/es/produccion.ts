@@ -22,7 +22,7 @@ export const produccion = {
   ultimaEscaneada: "Última escaneada",
   urgente: "Urgente",
   cerrada: {
-    entregada: "Esta orden ya fue entregada el {fecha}: sus prendas ya no se mueven.",
+    entregada: "Esta orden ya se entregó ({fecha}): sus prendas ya no se mueven.",
     anulada: "Esta orden fue anulada: sus prendas ya no se mueven.",
     abandonada: "Esta orden se marcó como abandonada: sus prendas ya no se mueven.",
   },

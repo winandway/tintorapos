@@ -173,17 +173,13 @@ describe("producción y entrega (contra el servidor real)", () => {
     const vista = montar(<PantallaEntrega moneda="USD" zona={ZONA} />);
     // Lo que manda el lector al escanear el QR del recibo: la dirección completa.
     await escanear(u, de.buscar, `https://tintorapos.com/t/${codigo}`);
-    expect(
-      await screen.findByText((t) => t.startsWith("Esta orden ya fue entregada el")),
-    ).toBeInTheDocument();
+    expect(await screen.findByText((t) => t.startsWith("Esta orden ya se entregó ("))).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Entregar|entregar/ })).not.toBeInTheDocument();
     vista.unmount();
 
     montar(<PantallaProduccion zona={ZONA} />);
     await escanear(u, dp.escanearPlaceholder, `https://tintorapos.com/t/${codigo}`);
-    expect(
-      await screen.findByText((t) => t.startsWith("Esta orden ya fue entregada el")),
-    ).toBeInTheDocument();
+    expect(await screen.findByText((t) => t.startsWith("Esta orden ya se entregó ("))).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: dp.lista })).not.toBeInTheDocument();
   });
 
