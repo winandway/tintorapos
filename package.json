@@ -56,7 +56,7 @@
     "fake-indexeddb": "^6.2.5",
     "husky": "^9.1.7",
     "jsdom": "^30.0.1",
-    "lint-staged": "^17.5.1",
+    "lint-staged": "^17.6.0",
     "miniflare": "^5.20260915.0-alpha",
     "msw": "^2.15.0",
     "prettier": "^3.9.7",
